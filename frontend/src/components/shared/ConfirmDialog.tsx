@@ -6,23 +6,28 @@ import { AlertTriangle, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
 
 export interface ConfirmDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  open?: boolean;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
   onConfirm: (reason?: string) => void | Promise<void>;
   title: string;
-  description: string;
+  description: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'danger' | 'default';
+  variant?: 'danger' | 'default' | 'destructive' | 'warning';
   requireReason?: boolean;
   reasonLabel?: string;
   reasonPlaceholder?: string;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
+  open,
   onClose,
+  onOpenChange,
   onConfirm,
   title,
   description,
@@ -33,19 +38,27 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   reasonLabel,
   reasonPlaceholder,
   isLoading = false,
+  disabled = false,
 }) => {
   const { t } = useTranslation();
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState(false);
 
+  const isVisible = open !== undefined ? open : Boolean(isOpen);
+
   useEffect(() => {
-    if (isOpen) {
+    if (isVisible) {
       setReason('');
       setReasonError(false);
     }
-  }, [isOpen]);
+  }, [isVisible]);
 
-  if (!isOpen) return null;
+  if (!isVisible) return null;
+
+  const handleClose = () => {
+    if (onOpenChange) onOpenChange(false);
+    if (onClose) onClose();
+  };
 
   const handleConfirm = async () => {
     if (requireReason && !reason.trim()) {
@@ -54,6 +67,8 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     }
     await onConfirm(requireReason ? reason.trim() : undefined);
   };
+
+  const isDestructive = variant === 'danger' || variant === 'destructive';
 
   return (
     <div
@@ -66,7 +81,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <div className="flex items-start gap-3">
           <div
             className={`p-2.5 rounded-full shrink-0 ${
-              variant === 'danger'
+              isDestructive
                 ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400'
                 : 'bg-amber-100 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400'
             }`}
@@ -75,11 +90,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</p>
+            {typeof description === 'string' ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</p>
+            ) : (
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{description}</div>
+            )}
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isLoading}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-md"
             aria-label="Close dialog"
@@ -120,14 +139,14 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-3">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
             {cancelText || t('cancel')}
           </Button>
           <Button
-            variant={variant === 'danger' ? 'destructive' : 'default'}
+            variant={isDestructive ? 'destructive' : 'default'}
             onClick={handleConfirm}
             isLoading={isLoading}
-            disabled={isLoading || (requireReason && !reason.trim())}
+            disabled={isLoading || disabled || (requireReason && !reason.trim())}
           >
             {confirmText || t('confirm')}
           </Button>

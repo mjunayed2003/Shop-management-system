@@ -305,3 +305,74 @@ All API calls are routed through `src/lib/api/client.ts` which automatically:
   - `X-Content-Type-Options: nosniff`: Prevents MIME-sniffing.
   - `Referrer-Policy: strict-origin-when-cross-origin`.
   - `Permissions-Policy: camera=(self), microphone=(), geolocation=()`.
+
+---
+
+## Phase F2 - Catalog & Inventory UI Reference
+
+### 1. Catalog Routes & Screens
+
+| Route | Purpose | Key Capabilities |
+|---|---|---|
+| `/catalog/master-data` | Business-wide Master Data management | Category hierarchical tree view (blocks delete if children/products exist), Brand, Season, Size (sort order), Color (hex swatch picker), Unit (allow_decimal toggle). System presets marked read-only. |
+| `/products` | Product Catalog List | Server-side paginated DataTable, multi-branch chips (Admin only), stock in current branch, retail price ranges, quick barcode search shortcut, CSV export with formula injection prevention, batch CSV import. |
+| `/products/new` | Single-page Product Create | Basic garment attributes, bulk variant generator (sizes x colors Cartesian product), single variant toggle, advisory price warning, branch assignment (multi-select for admin, auto-bound for branch staff), 409 field mapping. |
+| `/products/[id]` | Product Detail Hub | 6 comprehensive tabs: Overview, Variants, Stock (with cost gating & admin multi-branch matrix), Branches (activate/deactivate with force stock override), Barcode Labels shortcut, Movement History (live stock ledger). |
+| `/products/[id]/edit` | Product Edit Form | Modify attributes, add new variants, deactivate existing variants, change tracking mode with safety confirmations. |
+| `/catalog/barcodes` | Thermal & Sheet Barcode Designer | Thermal presets (50x30mm, 38x25mm), A4 24-label sheet grid, custom mm dimensions, field toggles, audit print logging (`INITIAL_PRINT` vs `REPRINT` with mandatory reason), client-side SVG rendering via JsBarcode. |
+| `/catalog/lookup` | Scanner-Aware Barcode Tool | Handles hardware scanner keystrokes (<45ms) vs manual typing. Renders 3 discrete cases: active in branch, `PRODUCT_IN_OTHER_BRANCH` (`OtherBranchStockPanel`), and 404 with pre-filled create shortcut. |
+| `/catalog/price-lists` | Custom Price Lists | Business-wide price list management (Retail, Wholesale tiers, Festive campaigns). |
+| `/catalog/price-lists/[id]` | Price List Items Editor | Variant price overrides table, bulk price adjustments (% or fixed BDT) using `decimal.js`, CSV import & export with validation. |
+
+---
+
+### 2. Phase F2 Backend Endpoints Used
+
+| Endpoint | Method | Backend Status | Frontend Implementation Notes |
+|---|---|---|---|
+| `/api/v1/catalog/categories` | GET, POST | Existing | Lists category tree / creates new category |
+| `/api/v1/catalog/categories/:id` | PATCH, DELETE | Existing | Updates category / Deletes category (400 if children exist) |
+| `/api/v1/catalog/brands` | GET, POST, PATCH, DELETE | Existing | Full Brand CRUD |
+| `/api/v1/catalog/seasons` | GET, POST, PATCH, DELETE | Existing | Full Season CRUD |
+| `/api/v1/catalog/sizes` | GET, POST, PATCH, DELETE | Existing | Full Size CRUD with `sortOrder` |
+| `/api/v1/catalog/colors` | GET, POST, PATCH, DELETE | Existing | Full Color CRUD with `hexCode` |
+| `/api/v1/catalog/units` | GET, POST, PATCH, DELETE | Existing | Full Unit CRUD with `allowDecimal` |
+| `/api/v1/catalog/products` | GET | Existing | Paginated listing with search, filters, branch context |
+| `/api/v1/catalog/products` | POST | Existing | Single request creates product + variants + branch activation |
+| `/api/v1/catalog/products/:id` | GET, PATCH, DELETE | Existing | Retrieves product detail, variants, branch balances |
+| `/api/v1/catalog/product-branches/activate` | POST | Existing | Admin-only activation of product in another branch |
+| `/api/v1/catalog/product-branches/deactivate` | POST | Existing | Admin-only deactivation; rejects if branch has stock unless `force: true` |
+| `/api/v1/catalog/barcodes/print` | POST | Existing | Audit log for label printing; enforces reason on `REPRINT` |
+| `/api/v1/catalog/barcodes/lookup/:barcode` | GET | Existing | Scans barcode and returns branch status and stock |
+| `/api/v1/catalog/price-lists` | GET, POST | Existing | List and create price lists |
+| `/api/v1/catalog/price-lists/:id` | GET, PATCH | Existing | Retrieve price list and update settings |
+| `/api/v1/catalog/price-lists/:id/items` | POST | Existing | Set or update item price override |
+| `/api/v1/catalog/price-lists/:id/items/:variantId` | DELETE | Existing | Remove variant override from price list |
+| `/api/v1/inventory/stock/all-branches-summary` | GET | Existing | Admin-only stock summary across all branches (used for matrix) |
+| `/api/v1/inventory/stock/movements` | GET | Existing | Stock movement ledger (used for History tab) |
+
+*Note on Missing Backend Endpoints: No dedicated bulk product CSV import endpoint exists on the backend. The frontend implements client-side parsing, validation, and batched creation.*
+
+---
+
+### 3. Key Design Decisions
+
+#### Cost Visibility & Role Gating
+- The backend catalog API does not expose a discrete `products.view_cost` permission.
+- **Rule applied**: Average cost prices and total inventory valuation figures are strictly hidden from users unless they possess the `products:update` permission or are a business owner (`user.isOwner`). Cashiers and read-only sales staff see retail and wholesale prices only.
+
+#### CSV Import & Formula Injection Protection
+- **Approach**: In the absence of a server-side bulk import endpoint, the frontend parses CSV files client-side, validates headers and rows, presents a preview table with per-row validation errors, and posts records in sequential batches of 5 with an animated progress bar.
+- **Security (CWE-1236)**: Every cell exported to CSV is evaluated for spreadsheet formula triggers (`=`, `+`, `-`, `@`, `\t`, `\r`). If detected, the cell is prepended with a single quote (`'`) to neutralize formula execution in Microsoft Excel or Google Sheets.
+
+#### Label Printing & CSS Architecture
+- Label printing uses a dedicated global `@media print` stylesheet.
+- **Thermal printers (50x30mm, 38x25mm, custom)**:
+  - `@page { size: <width>mm <height>mm; margin: 0; }`
+  - `.printable-label { break-after: page; page-break-after: always; }`
+  - Ensures each label feeds cleanly on thermal roll printers without margin drift.
+- **A4 Sheets**:
+  - `@page { size: A4 portrait; margin: 10mm; }`
+  - Uses CSS Grid (`grid-template-columns: repeat(3, 1fr)`) with `break-inside: avoid` for 24-label sheets.
+- **Bangla Support**: Uses Google Fonts Noto Sans Bengali with embedded web fonts to guarantee clean typographic rendering on thermal and ink/laser printers.
+

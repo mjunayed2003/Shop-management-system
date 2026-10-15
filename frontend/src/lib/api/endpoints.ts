@@ -270,4 +270,199 @@ export const api = {
     resetPassword: (id: string, newPassword: string) =>
       apiClient.post<{ success: boolean; message: string }>(`/api/v1/users/${id}/reset-password`, { newPassword }),
   },
+
+  // Catalog
+  catalog: {
+    // Master Data: Categories
+    categories: {
+      list: (params?: { search?: string; includeInactive?: boolean }) =>
+        apiClient.get<any[]>('/api/v1/catalog/categories', { params }),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/categories/${id}`),
+      create: (data: { name: string; code?: string; parentId?: string }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/categories', data, options),
+      update: (id: string, data: { name?: string; code?: string; parentId?: string | null; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/categories/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/categories/${id}`),
+    },
+
+    // Master Data: Brands
+    brands: {
+      list: (params?: { search?: string }) =>
+        apiClient.get<any[]>('/api/v1/catalog/brands', { params }),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/brands/${id}`),
+      create: (data: { name: string; code?: string }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/brands', data, options),
+      update: (id: string, data: { name?: string; code?: string; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/brands/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/brands/${id}`),
+    },
+
+    // Master Data: Seasons
+    seasons: {
+      list: (params?: { search?: string }) =>
+        apiClient.get<any[]>('/api/v1/catalog/seasons', { params }),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/seasons/${id}`),
+      create: (data: { name: string; code?: string }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/seasons', data, options),
+      update: (id: string, data: { name?: string; code?: string; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/seasons/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/seasons/${id}`),
+    },
+
+    // Master Data: Sizes
+    sizes: {
+      list: () => apiClient.get<any[]>('/api/v1/catalog/sizes'),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/sizes/${id}`),
+      create: (data: { name: string; code?: string; sortOrder?: number }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/sizes', data, options),
+      update: (id: string, data: { name?: string; code?: string; sortOrder?: number; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/sizes/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/sizes/${id}`),
+    },
+
+    // Master Data: Colors
+    colors: {
+      list: () => apiClient.get<any[]>('/api/v1/catalog/colors'),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/colors/${id}`),
+      create: (data: { name: string; code?: string; hexCode?: string }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/colors', data, options),
+      update: (id: string, data: { name?: string; code?: string; hexCode?: string; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/colors/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/colors/${id}`),
+    },
+
+    // Master Data: Units
+    units: {
+      list: () => apiClient.get<any[]>('/api/v1/catalog/units'),
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/units/${id}`),
+      create: (data: { name: string; code?: string; allowDecimal?: boolean }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/units', data, options),
+      update: (id: string, data: { name?: string; code?: string; allowDecimal?: boolean; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/units/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/units/${id}`),
+    },
+
+    // Products
+    products: {
+      list: (params: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        categoryId?: string;
+        brandId?: string;
+        seasonId?: string;
+        gender?: string;
+        isActive?: boolean;
+        branchId?: string;
+        sortBy?: string;
+        sortOrder?: string;
+      }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { total: number; page: number; limit: number; totalPages: number };
+        }>('/api/v1/catalog/products', { params }),
+
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/products/${id}`),
+
+      create: (data: any, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/products', data, options),
+
+      update: (id: string, data: any) =>
+        apiClient.patch<any>(`/api/v1/catalog/products/${id}`, data),
+
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/products/${id}`),
+    },
+
+    // Variants
+    variants: {
+      create: (productId: string, data: any, options?: RequestOptions) =>
+        apiClient.post<any>(`/api/v1/catalog/variants/products/${productId}`, data, options),
+
+      update: (id: string, data: any) =>
+        apiClient.patch<any>(`/api/v1/catalog/variants/${id}`, data),
+
+      deactivate: (id: string) =>
+        apiClient.delete<any>(`/api/v1/catalog/variants/${id}`),
+
+      bulkGenerate: (productId: string, data: any, options?: RequestOptions) =>
+        apiClient.post<any>(`/api/v1/catalog/variants/products/${productId}/bulk`, data, options),
+    },
+
+    // Product Branches
+    branches: {
+      activate: (data: { productId: string; branchId: string }) =>
+        apiClient.post<any>('/api/v1/catalog/product-branches/activate', data),
+
+      deactivate: (data: { productId: string; branchId: string; force?: boolean }) =>
+        apiClient.post<any>('/api/v1/catalog/product-branches/deactivate', data),
+    },
+
+    productBranches: {
+      activate: (data: { productId: string; branchId: string }) =>
+        apiClient.post<any>('/api/v1/catalog/product-branches/activate', data),
+
+      deactivate: (data: { productId: string; branchId: string; force?: boolean }) =>
+        apiClient.post<any>('/api/v1/catalog/product-branches/deactivate', data),
+    },
+
+    // Barcodes
+    barcodes: {
+      lookup: (barcode: string) =>
+        apiClient.get<any>(`/api/v1/catalog/barcodes/lookup/${encodeURIComponent(barcode)}`),
+
+      print: (data: {
+        variantId: string;
+        productUnitId?: string;
+        quantity?: number;
+        printType?: 'INITIAL_PRINT' | 'REPRINT';
+        reason?: string;
+      }) => apiClient.post<any>('/api/v1/catalog/barcodes/print', data),
+    },
+
+    // Price Lists
+    priceLists: {
+      list: () => apiClient.get<any[]>('/api/v1/catalog/price-lists'),
+
+      get: (id: string) => apiClient.get<any>(`/api/v1/catalog/price-lists/${id}`),
+
+      create: (data: { name: string; code?: string; type?: string; isDefault?: boolean }, options?: RequestOptions) =>
+        apiClient.post<any>('/api/v1/catalog/price-lists', data, options),
+
+      update: (id: string, data: { name?: string; isDefault?: boolean; isActive?: boolean }) =>
+        apiClient.patch<any>(`/api/v1/catalog/price-lists/${id}`, data),
+
+      setItem: (id: string, data: { variantId: string; price: number }) =>
+        apiClient.post<any>(`/api/v1/catalog/price-lists/${id}/items`, data),
+
+      removeItem: (id: string, variantId: string) =>
+        apiClient.delete<any>(`/api/v1/catalog/price-lists/${id}/items/${variantId}`),
+    },
+  },
+
+  // Inventory
+  inventory: {
+    stock: {
+      summary: () =>
+        apiClient.get<{
+          summary: { totalQuantity: number; totalCostValue: number; totalVariants: number };
+          byBrand: any[];
+          byCategory: any[];
+          variants: any[];
+        }>('/api/v1/inventory/stock/all-branches-summary'),
+
+      movements: (params: {
+        page?: number;
+        limit?: number;
+        variantId?: string;
+        movementType?: string;
+        referenceType?: string;
+        startDate?: string;
+        endDate?: string;
+      }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { total: number; page: number; limit: number; totalPages: number };
+        }>('/api/v1/inventory/stock/movements', { params }),
+    },
+  },
 };
