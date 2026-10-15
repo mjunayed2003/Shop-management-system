@@ -1,0 +1,435 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '@/lib/store/auth-store';
+import { useTranslation } from '@/lib/i18n';
+import { useToast } from '@/components/feedback/ToastContext';
+import { api, UserSessionDto } from '@/lib/api/endpoints';
+import { normalizeBDPhone, isValidBDPhone } from '@/lib/utils/phone';
+
+import { FormFieldWrapper } from '@/components/shared/FormFieldWrapper';
+import { PhoneInput } from '@/components/shared/PhoneInput';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { TableSkeleton } from '@/components/ui/skeleton';
+import { formatDate, formatDateTime } from '@/lib/utils/formatters';
+
+import {
+  User,
+  KeyRound,
+  ShieldCheck,
+  Smartphone,
+  Laptop,
+  Globe,
+  Trash2,
+  LogOut,
+  CheckCircle2,
+  Lock,
+  Sparkles,
+} from 'lucide-react';
+
+export default function ProfilePage() {
+  const { t, locale } = useTranslation();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const { user, business, permissions, updateUserProfile } = useAuthStore();
+
+  // Profile Form State
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [profileMsg, setProfileMsg] = useState<string | null>(null);
+
+  // Password Form State
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwdMsg, setPwdMsg] = useState<string | null>(null);
+
+  // Logout All Confirmation State
+  const [isLogoutAllOpen, setIsLogoutAllOpen] = useState(false);
+
+  // Fetch Active Sessions
+  const { data: sessions = [], isLoading: isLoadingSessions } = useQuery({
+    queryKey: ['sessions'],
+    queryFn: () => api.auth.getSessions(),
+  });
+
+  // Fetch Permissions Grouping to display clean names
+  const { data: permissionGroups = [] } = useQuery({
+    queryKey: ['permissions'],
+    queryFn: () => api.roles.listPermissions(),
+  });
+
+  // Profile Update Mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: { firstName: string; lastName: string; email: string; phone: string }) =>
+      api.auth.updateProfile(data),
+    onSuccess: (res) => {
+      updateUserProfile({
+        firstName: res.user.firstName,
+        lastName: res.user.lastName,
+        email: res.user.email,
+        phone: res.user.phone,
+      });
+      toast.success(t('profile.updateSuccess'));
+      setProfileMsg('প্রোফাইল তথ্য সফলভাবে সংরক্ষিত হয়েছে।');
+    },
+    onError: (err: any) => {
+      setProfileMsg(err.message || 'প্রোফাইল আপডেট করা যায়নি');
+    },
+  });
+
+  // Password Mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: (data: { oldPassword: string; newPassword: string }) =>
+      api.auth.changePassword(data),
+    onSuccess: () => {
+      toast.success(t('profile.passwordChangeSuccess'));
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPwdMsg('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।');
+    },
+    onError: (err: any) => {
+      setPwdMsg(err.message || 'পাসওয়ার্ড পরিবর্তন করা যায়নি');
+    },
+  });
+
+  // Revoke Session Mutation
+  const revokeSessionMutation = useMutation({
+    mutationFn: (id: string) => api.auth.revokeSession(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      toast.success('সেশন সফলভাবে বাতিল করা হয়েছে');
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'সেশন বাতিল করা সম্ভব হয়নি');
+    },
+  });
+
+  // Logout All Devices Mutation
+  const logoutAllMutation = useMutation({
+    mutationFn: () => api.auth.logoutAllDevices(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      toast.success(t('profile.allRevokedSuccess'));
+      setIsLogoutAllOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'অনুরোধ ব্যর্থ হয়েছে');
+    },
+  });
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileMsg(null);
+
+    if (!isValidBDPhone(phone)) {
+      setProfileMsg('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন');
+      return;
+    }
+
+    updateProfileMutation.mutate({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim().toLowerCase(),
+      phone: normalizeBDPhone(phone),
+    });
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdMsg(null);
+
+    if (newPassword.length < 6) {
+      setPwdMsg('নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPwdMsg('নতুন পাসওয়ার্ড নিশ্চিতকরণ মিলছে না');
+      return;
+    }
+
+    changePasswordMutation.mutate({
+      oldPassword,
+      newPassword,
+    });
+  };
+
+  return (
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Page Title */}
+      <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+          <User className="w-6 h-6 text-emerald-600" />
+          <span>{t('profile.title')}</span>
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          {t('profile.subtitle')}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Card 1: Personal Information Form */}
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <User className="w-4 h-4 text-emerald-600" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              {t('profile.personalInfo')}
+            </h2>
+          </div>
+
+          {profileMsg && (
+            <p className="text-xs font-medium p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+              {profileMsg}
+            </p>
+          )}
+
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <FormFieldWrapper label={t('register.firstName')} required>
+                <Input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </FormFieldWrapper>
+              <FormFieldWrapper label={t('register.lastName')} required>
+                <Input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </FormFieldWrapper>
+            </div>
+
+            <FormFieldWrapper label={t('users.phone')} required>
+              <PhoneInput
+                value={phone}
+                onChange={setPhone}
+              />
+            </FormFieldWrapper>
+
+            <FormFieldWrapper label={t('users.email')} required>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </FormFieldWrapper>
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                isLoading={updateProfileMutation.isPending}
+                disabled={updateProfileMutation.isPending}
+              >
+                {t('profile.updateProfileBtn')}
+              </Button>
+            </div>
+          </form>
+        </div>
+
+        {/* Card 2: Change Password Form */}
+        <div id="password" className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <KeyRound className="w-4 h-4 text-emerald-600" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              {t('profile.changePassword')}
+            </h2>
+          </div>
+
+          {pwdMsg && (
+            <p className="text-xs font-medium p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+              {pwdMsg}
+            </p>
+          )}
+
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <FormFieldWrapper label={t('profile.oldPassword')} required>
+              <Input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </FormFieldWrapper>
+
+            <FormFieldWrapper label={t('profile.newPassword')} required>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="কমপক্ষে ৬ অক্ষরের নতুন পাসওয়ার্ড"
+                required
+              />
+            </FormFieldWrapper>
+
+            <FormFieldWrapper label={t('profile.confirmNewPassword')} required>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="নতুন পাসওয়ার্ড নিশ্চিত করুন"
+                required
+              />
+            </FormFieldWrapper>
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="outline"
+                isLoading={changePasswordMutation.isPending}
+                disabled={changePasswordMutation.isPending}
+              >
+                {t('profile.changePasswordBtn')}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Card 3: Read-only "My permissions" section */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              {t('profile.myPermissions')}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Badge variant={user?.isOwner ? 'warning' : 'info'}>
+              {user?.isOwner ? 'মালিক (Owner)' : user?.role?.name}
+            </Badge>
+          </div>
+        </div>
+
+        {user?.isOwner ? (
+          <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
+            <p className="text-xs sm:text-sm text-emerald-900 dark:text-emerald-100 font-medium leading-relaxed">
+              আপনি এই প্রতিষ্ঠানের প্রধান মালিক (Owner)। আপনার অ্যাকাউন্টে সমস্ত মডিউল, শাখা, সেটিংস এবং আর্থিক প্রতিবেদনের ওপর পূর্ণাঙ্গ সুপার-অ্যাডমিন অনুমোদন (*) সক্রিয় রয়েছে।
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-xs text-slate-500">
+              আপনার রোলে ({user?.role?.name}) মোট <strong>{permissions.length}</strong> টি অনুমতি বরাদ্দ রয়েছে:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              {permissions.map((permCode) => (
+                <div
+                  key={permCode}
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/60 text-xs font-medium text-slate-700 dark:text-slate-300"
+                >
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="font-mono text-[11px] truncate">{permCode}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Card 4: Active Sessions List */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Laptop className="w-4 h-4 text-emerald-600" />
+              <span>{t('profile.activeSessions')}</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">{t('profile.sessionsDesc')}</p>
+          </div>
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsLogoutAllOpen(true)}
+            leftIcon={<LogOut className="w-3.5 h-3.5" />}
+          >
+            {t('profile.logoutAllDevices')}
+          </Button>
+        </div>
+
+        {isLoadingSessions ? (
+          <TableSkeleton rows={3} cols={4} />
+        ) : sessions.length === 0 ? (
+          <p className="text-xs text-slate-400 py-4 text-center">কোন সক্রিয় সেশন পাওয়া যায়নি</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 uppercase tracking-wider font-semibold">
+                  <th className="py-2.5 px-3">{t('profile.deviceInfo')}</th>
+                  <th className="py-2.5 px-3">{t('profile.ipAddress')}</th>
+                  <th className="py-2.5 px-3">{t('profile.loginTime')}</th>
+                  <th className="py-2.5 px-3 text-right">{t('actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {sessions.map((sess, idx) => (
+                  <tr key={sess.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/50">
+                    <td className="py-3 px-3 font-medium text-slate-800 dark:text-slate-200">
+                      <div className="flex items-center gap-2">
+                        {sess.user_agent?.toLowerCase().includes('mobile') ? (
+                          <Smartphone className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <Laptop className="w-4 h-4 text-slate-400" />
+                        )}
+                        <span className="truncate max-w-xs">{sess.user_agent || 'Unknown Device'}</span>
+                        {idx === 0 && (
+                          <Badge variant="success" size="sm">
+                            {t('profile.currentSession')}
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-500">{sess.ip_address || '127.0.0.1'}</td>
+                    <td className="py-3 px-3 text-slate-500">{formatDateTime(sess.created_at, locale)}</td>
+                    <td className="py-3 px-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => revokeSessionMutation.mutate(sess.id)}
+                        disabled={revokeSessionMutation.isPending}
+                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        <span>{t('profile.revokeSession')}</span>
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Logout All Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isLogoutAllOpen}
+        onClose={() => setIsLogoutAllOpen(false)}
+        onConfirm={() => logoutAllMutation.mutate()}
+        title="সব ডিভাইস থেকে লগআউট নিশ্চিতকরণ"
+        description="আপনি কি নিশ্চিত যে আপনার সমস্ত সক্রিয় ব্রাউজার ও ডিভাইসের সেশন বাতিল করতে চান? এরপর সব ডিভাইসে পুনরায় পাসওয়ার্ড দিয়ে লগইন করতে হবে।"
+        confirmText={t('profile.logoutAllDevices')}
+        variant="danger"
+        isLoading={logoutAllMutation.isPending}
+      />
+    </div>
+  );
+}
