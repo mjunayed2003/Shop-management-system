@@ -65,6 +65,21 @@ export class PlanLimitReachedError extends ApiError {
   }
 }
 
+export class InsufficientStockError extends ApiError {
+  availableQuantity?: number;
+
+  constructor(message = 'Insufficient stock for this operation', availableQuantity?: number, rawData?: any) {
+    super(message, 400, rawData, 'INSUFFICIENT_STOCK');
+    this.name = 'InsufficientStockError';
+    this.availableQuantity = availableQuantity;
+  }
+}
+
+export function extractAvailableStockFromError(message: string): number | undefined {
+  const match = message.match(/available:?\s*([0-9.]+)/i);
+  return match && match[1] ? parseFloat(match[1]) : undefined;
+}
+
 /**
  * Normalizes HTTP response errors into strongly-typed error instances
  */
@@ -104,6 +119,22 @@ export function normalizeHttpError(statusCode: number, responseData: any): ApiEr
 
   if (statusCode === 409) {
     return new ConflictError(messageText);
+  }
+
+  // Check for Insufficient Stock error (400 or 422 with message containing "sold or moved", "available:", "insufficient stock")
+  if (
+    (statusCode === 400 || statusCode === 422) &&
+    (messageText.toLowerCase().includes('already been sold or moved') ||
+      messageText.toLowerCase().includes('insufficient stock') ||
+      messageText.toLowerCase().includes('current available:') ||
+      responseData?.code === 'INSUFFICIENT_STOCK')
+  ) {
+    let availQty: number | undefined;
+    const match = messageText.match(/available:?\s*([0-9.]+)/i);
+    if (match && match[1]) {
+      availQty = parseFloat(match[1]);
+    }
+    return new InsufficientStockError(messageText, availQty, responseData);
   }
 
   // NestJS class-validator returns 400 with message: string[] (e.g. ['email must be an email', ...])

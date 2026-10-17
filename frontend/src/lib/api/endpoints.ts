@@ -439,9 +439,231 @@ export const api = {
     },
   },
 
-  // Inventory
+  // Purchasing & Suppliers
+  purchases: {
+    // Suppliers
+    suppliers: {
+      list: (params?: { page?: number; limit?: number; search?: string; isActive?: boolean }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/suppliers', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/suppliers/${id}`),
+
+      create: (
+        data: {
+          name: string;
+          code: string;
+          companyName?: string;
+          phone: string;
+          email?: string;
+          address?: string;
+          city?: string;
+          openingBalance?: number;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/suppliers', data, options),
+
+      update: (
+        id: string,
+        data: {
+          name?: string;
+          companyName?: string;
+          phone?: string;
+          email?: string;
+          address?: string;
+          city?: string;
+          isActive?: boolean;
+        },
+      ) => apiClient.patch<any>(`/api/v1/inventory/suppliers/${id}`, data),
+
+      delete: (id: string) =>
+        apiClient.delete<any>(`/api/v1/inventory/suppliers/${id}`),
+
+      ledger: (id: string, params?: { startDate?: string; endDate?: string }) =>
+        apiClient.get<{
+          supplier: {
+            id: string;
+            name: string;
+            code: string;
+            openingBalance: number;
+            currentBalance: number;
+          };
+          ledger: {
+            date: string;
+            type: 'PURCHASE' | 'RETURN' | 'PAYMENT';
+            referenceNo: string;
+            description?: string | null;
+            debit: number;
+            credit: number;
+            amount: number;
+            runningBalance: number;
+          }[];
+        }>(`/api/v1/inventory/suppliers/${id}/ledger`, { params }),
+    },
+
+    // Purchase Orders
+    orders: {
+      list: (params?: { page?: number; limit?: number; status?: string; supplierId?: string; search?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/purchase-orders', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/purchase-orders/${id}`),
+
+      create: (
+        data: {
+          supplierId: string;
+          expectedDelivery?: string;
+          notes?: string;
+          items: { variantId: string; quantity: number; unitCost: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/purchase-orders', data, options),
+
+      update: (
+        id: string,
+        data: {
+          supplierId?: string;
+          expectedDelivery?: string;
+          notes?: string;
+          items?: { variantId: string; quantity: number; unitCost: number }[];
+        },
+      ) => apiClient.patch<any>(`/api/v1/inventory/purchase-orders/${id}`, data),
+
+      issue: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/purchase-orders/${id}/issue`),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/purchase-orders/${id}/cancel`),
+    },
+
+    // Purchases (Goods Receipts)
+    purchases: {
+      list: (params?: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        supplierId?: string;
+        search?: string;
+        startDate?: string;
+        endDate?: string;
+      }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/purchases', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/purchases/${id}`),
+
+      create: (
+        data: {
+          supplierId: string;
+          purchaseOrderId?: string;
+          supplierInvoiceNo?: string;
+          purchaseDate?: string;
+          discountAmount?: number;
+          taxAmount?: number;
+          shippingCost?: number;
+          paidAmount?: number;
+          paymentMethod?: string;
+          paymentReference?: string;
+          landedCost?: boolean;
+          notes?: string;
+          items: {
+            variantId: string;
+            quantity: number;
+            unitCost: number;
+            vatPercentage?: number;
+          }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/purchases', data, options),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/purchases/${id}/cancel`),
+    },
+
+    // Supplier Payments
+    payments: {
+      list: (params?: { page?: number; limit?: number; supplierId?: string; purchaseId?: string; search?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/supplier-payments', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/supplier-payments/${id}`),
+
+      create: (
+        data: {
+          supplierId: string;
+          purchaseId?: string;
+          amount: number;
+          paymentMethod: string;
+          referenceNo?: string;
+          paymentDate?: string;
+          notes?: string;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/supplier-payments', data, options),
+    },
+
+    // Purchase Returns
+    returns: {
+      list: (params?: { page?: number; limit?: number; status?: string; supplierId?: string; purchaseId?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/purchase-returns', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/purchase-returns/${id}`),
+
+      create: (
+        data: {
+          supplierId: string;
+          purchaseId?: string;
+          reason?: string;
+          status?: 'DRAFT' | 'COMPLETED';
+          items: { variantId: string; quantity: number; unitCost: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/purchase-returns', data, options),
+
+      complete: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/purchase-returns/${id}/complete`),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/purchase-returns/${id}/cancel`),
+    },
+  },
+
+  // Inventory & Stock
   inventory: {
     stock: {
+      list: (params?: {
+        page?: number;
+        limit?: number;
+        brandId?: string;
+        categoryId?: string;
+        seasonId?: string;
+        gender?: string;
+        lowStockOnly?: boolean;
+        zeroStockOnly?: boolean;
+        search?: string;
+      }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+          totals?: { totalQuantity: number; totalCostValue: number };
+        }>('/api/v1/inventory/stock', { params }),
+
       summary: () =>
         apiClient.get<{
           summary: { totalQuantity: number; totalCostValue: number; totalVariants: number };
@@ -463,6 +685,160 @@ export const api = {
           data: any[];
           meta: { total: number; page: number; limit: number; totalPages: number };
         }>('/api/v1/inventory/stock/movements', { params }),
+
+      lowStockReport: () =>
+        apiClient.get<{
+          branchId: string;
+          totalLowStockVariants: number;
+          items: any[];
+        }>('/api/v1/inventory/stock/low-stock-report'),
+
+      valuation: () =>
+        apiClient.get<{
+          branchId: string;
+          totalQuantity: number;
+          totalCostValue: number;
+          totalItems: number;
+          totalVariants?: number;
+          totalUnits?: number;
+          byCategory: any[];
+          byBrand: any[];
+        }>('/api/v1/inventory/stock/valuation'),
+
+      enterOpening: (
+        data: {
+          variantId: string;
+          quantity: number;
+          unitCost: number;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/stock/opening', data, options),
+
+      checkConsistency: () =>
+        apiClient.get<{
+          totalBalancesChecked: number;
+          mismatchCount: number;
+          mismatches: any[];
+        }>('/api/v1/inventory/stock/consistency-check'),
+    },
+
+    transfers: {
+      list: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/transfers', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/transfers/${id}`),
+
+      create: (
+        data: {
+          toBranchId: string;
+          notes?: string;
+          items: { variantId: string; sentQty: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/transfers', data, options),
+
+      dispatch: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/transfers/${id}/dispatch`),
+
+      receive: (
+        id: string,
+        data: {
+          items: { itemId: string; receivedQty: number; discrepancyNote?: string }[];
+        },
+      ) => apiClient.post<any>(`/api/v1/inventory/transfers/${id}/receive`, data),
+
+      reject: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/transfers/${id}/reject`),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/transfers/${id}/cancel`),
+
+      instant: (
+        data: {
+          fromBranchId: string;
+          toBranchId: string;
+          notes?: string;
+          idempotencyKey?: string;
+          items: { variantId: string; quantity: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/transfers/instant', data, options),
+    },
+
+    adjustments: {
+      list: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/adjustments', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/adjustments/${id}`),
+
+      create: (
+        data: {
+          reason: string;
+          notes?: string;
+          items: { variantId: string; physicalQty: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/adjustments', data, options),
+
+      approve: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/adjustments/${id}/approve`),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/adjustments/${id}/cancel`),
+    },
+
+    stocktakes: {
+      list: (params?: { page?: number; limit?: number; status?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/stocktakes', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/inventory/stocktakes/${id}`),
+
+      start: (
+        data: { categoryId?: string; brandId?: string; notes?: string },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/stocktakes/start', data, options),
+
+      recordCounts: (
+        id: string,
+        data: { counts: { itemId: string; countedQty: number }[] },
+      ) => apiClient.post<any>(`/api/v1/inventory/stocktakes/${id}/counts`, data),
+
+      complete: (id: string, data?: { createAdjustment?: boolean }) =>
+        apiClient.post<any>(`/api/v1/inventory/stocktakes/${id}/complete`, data),
+
+      cancel: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/stocktakes/${id}/cancel`),
+    },
+
+    damagedStock: {
+      list: (params?: { page?: number; limit?: number; status?: string }) =>
+        apiClient.get<{
+          data: any[];
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        }>('/api/v1/inventory/damaged-stock', { params }),
+
+      report: (
+        data: { variantId: string; quantity: number; reason: string },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/inventory/damaged-stock', data, options),
+
+      approve: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/damaged-stock/${id}/approve`),
+
+      writeOff: (id: string) =>
+        apiClient.post<any>(`/api/v1/inventory/damaged-stock/${id}/write-off`),
     },
   },
 };

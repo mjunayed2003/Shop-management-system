@@ -37,6 +37,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
   isLoading?: boolean;
   loadingText?: string;
   leftIcon?: React.ReactNode;
@@ -49,6 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className = '',
       variant,
       size,
+      asChild = false,
       isLoading = false,
       loadingText,
       disabled,
@@ -59,11 +61,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
+    const combinedClassName = `${buttonVariants({ variant, size })} ${className}`.trim();
+
+    if (asChild && React.isValidElement(children)) {
+      const child = children as React.ReactElement<any>;
+      return React.cloneElement(child, {
+        ref,
+        className: `${combinedClassName} ${child.props.className || ''}`.trim(),
+        ...props,
+      });
+    }
+
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        className={`${buttonVariants({ variant, size })} ${className}`}
+        className={combinedClassName}
         {...props}
       >
         {isLoading && <Loader2 className="w-4 h-4 animate-spin shrink-0" />}

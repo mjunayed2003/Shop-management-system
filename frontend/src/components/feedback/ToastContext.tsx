@@ -21,6 +21,7 @@ interface ToastContextType {
   error: (message: string, title?: string) => void;
   warning: (message: string, title?: string) => void;
   info: (message: string, title?: string) => void;
+  showToast: (message: string, type?: ToastType, title?: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -52,6 +53,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const error = useCallback((msg: string, title?: string) => addToast('error', msg, title), [addToast]);
   const warning = useCallback((msg: string, title?: string) => addToast('warning', msg, title), [addToast]);
   const info = useCallback((msg: string, title?: string) => addToast('info', msg, title), [addToast]);
+  const showToast = useCallback(
+    (message: string, type: ToastType = 'info', title?: string) => addToast(type, message, title),
+    [addToast],
+  );
 
   const value = useMemo(
     () => ({
@@ -62,8 +67,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       error,
       warning,
       info,
+      showToast,
     }),
-    [toasts, addToast, removeToast, success, error, warning, info],
+    [toasts, addToast, removeToast, success, error, warning, info, showToast],
   );
 
   return (
@@ -125,6 +131,7 @@ export function useToast() {
       error: () => {},
       warning: () => {},
       info: () => {},
+      showToast: () => {},
     };
   }
   return context;

@@ -40,20 +40,30 @@ export function exportToCsv(
  * Generates CSV content and triggers client-side file download
  */
 export function downloadCsv(
-  contentOrFilename: string,
+  contentOrRecordsOrFilename: string | Record<string, any>[],
   filenameOrHeaders?: string | string[],
   maybeRows?: (string | number | boolean | null | undefined)[][],
 ) {
   let csvContent = '';
   let filename = 'export.csv';
 
-  if (Array.isArray(filenameOrHeaders)) {
+  if (Array.isArray(contentOrRecordsOrFilename)) {
+    // Signature: downloadCsv(records: Record<string, any>[], filename: string)
+    filename = typeof filenameOrHeaders === 'string' ? filenameOrHeaders : 'export.csv';
+    if (contentOrRecordsOrFilename.length > 0) {
+      const headers = Object.keys(contentOrRecordsOrFilename[0]);
+      const rows = contentOrRecordsOrFilename.map((obj) => headers.map((h) => obj[h]));
+      csvContent = exportToCsv(headers, rows);
+    } else {
+      csvContent = '';
+    }
+  } else if (Array.isArray(filenameOrHeaders)) {
     // Signature: downloadCsv(filename, headers, rows)
-    filename = contentOrFilename;
+    filename = contentOrRecordsOrFilename;
     csvContent = exportToCsv(filenameOrHeaders, maybeRows || []);
   } else {
     // Signature: downloadCsv(csvContent, filename)
-    csvContent = contentOrFilename;
+    csvContent = contentOrRecordsOrFilename;
     filename = filenameOrHeaders || 'export.csv';
   }
 

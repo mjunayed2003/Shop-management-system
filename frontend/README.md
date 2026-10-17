@@ -376,3 +376,130 @@ All API calls are routed through `src/lib/api/client.ts` which automatically:
   - Uses CSS Grid (`grid-template-columns: repeat(3, 1fr)`) with `break-inside: avoid` for 24-label sheets.
 - **Bangla Support**: Uses Google Fonts Noto Sans Bengali with embedded web fonts to guarantee clean typographic rendering on thermal and ink/laser printers.
 
+---
+
+## Phase F3 - Purchasing & Stock UI Reference
+
+### 1. Purchasing & Stock Routes & Screens
+
+| Route | Purpose | Key Capabilities |
+|---|---|---|
+| `/purchases/suppliers` | Suppliers Management | Business-wide supplier list, search, status filter, current balance column (styled in red if we owe money), create/edit modal with auto code generator, PhoneInput, opening balance (create only), soft delete with confirm, 409 conflict field mapping, formula-injection safe CSV export. |
+| `/purchases/suppliers/[id]` | Supplier Detail Hub | Profile card with balance KPIs, running ledger tab (Purchases, Returns, Payments, date range filter, CSV export with formula injection guard), quick action shortcuts (New Purchase, Pay Supplier, Return Goods). |
+| `/purchases/orders` | Purchase Orders List | Status filter tabs (`DRAFT`, `ISSUED`, `PARTIALLY_RECEIVED`, `COMPLETED`, `CANCELLED`), search, issue action, cancel action with required reason, and "Receive Goods" shortcut pre-filling remaining quantities. |
+| `/purchases/orders/new` | Create Purchase Order | Create PO in `DRAFT` status: supplier selector with inline quick-create, expected delivery date, notes, variant search or hardware barcode scan, duplicate-variant merging, quantity input, unit cost, decimal math totals. Pre-fills items from low-stock report if `?source=low_stock`. |
+| `/purchases/orders/[id]` | Purchase Order Detail | Line items with ordered vs received quantities, visual progress bars, issue and cancel actions, and "Receive Goods" shortcut opening purchase form pre-filled with remaining quantities. |
+| `/purchases` | Purchases (Goods Receipts) List | Date range filter, supplier filter, status filter, search, page totals summary row, Cancel Purchase (with required reason, showing backend refusal when stock was already sold), Add Payment action shortcut. |
+| `/purchases/new` | Purchase (Goods Receipt) Form | **High-speed receiving screen**: supplier with inline quick-create, invoice #, purchase date, optional PO link. Hardware barcode scanner auto-increments quantity or adds row. Duplicate-variant merge. Whole-number enforcement for tracked items. Unit cost divergence >20% advisory warning banner. Landed cost checkbox. Totals preview via `decimal.js`. Payment now (validated `<= total`). Draft persistence in `localStorage` keyed by `(branchId, userId)`. Idempotency key per form open. Post-success screen with "Print Barcode Labels for These Units" linking to label printer pre-filled with returned `ProductUnit` barcodes. |
+| `/purchases/[id]` | Purchase Detail Hub | Header info, line items, applied payments list, return memos, tracked individual product units grid with barcode badges, cancel and payment action shortcuts. |
+| `/purchases/payments` | Supplier Payments List | Payment records list, supplier filter, search, CSV export, record payment modal with overpayment protection (`payAmount <= purchaseDue`). |
+| `/purchases/payments/[id]` | Printable Payment Voucher | Payment receipt voucher with `@media print` styling and Bangla-safe typography. |
+| `/purchases/returns` | Purchase Returns List | Returns list with status filters (`DRAFT`, `COMPLETED`, `CANCELLED`), search, printable return note shortcut. |
+| `/purchases/returns/new` | Create Purchase Return | Standalone or pre-filled from purchase with `maxReturnable = purchased - already returned`. Server validation error display when return exceeds limit. |
+| `/purchases/returns/[id]` | Purchase Return Detail | Return detail with items list, Complete (DRAFT -> COMPLETED) and Cancel actions, printable debit note with print CSS. |
+| `/inventory/stock` | Branch Stock Overview | DataTable of variants: product, size, color, brand, category, quantity, allocated, available, status chip (`OK`, `Low`, `Zero`, `Negative`), totals footer (qty and value from server), CSV export. Cost columns permission-gated. Admin All-Branches matrix view with brand/category grouping toggle. Movement history drawer with source document route links. |
+| `/inventory/stock/low-stock` | Low Stock & Reorder Suggestions | Variants below or at reorder level, shortage calculation (`reorder_level - available`), checkbox multi-selection with "Create Purchase Order from Selected" shortcut pre-filling PO. CSV export. |
+| `/inventory/stock/valuation` | Stock Valuation Report | Permission-gated branch valuation report: total cost value (BDT), total units, category and brand breakdown tables, CSV export. |
+| `/inventory/opening` | Opening Stock Entry | Screen to enter initial stock and unit cost: barcode scan, catalog search, bulk entry table, CSV import with validation and per-row errors. Shows backend refusal message when movements already exist with a shortcut button to create a Stock Adjustment. |
+| `/inventory/transfers` | Stock Transfers Hub | Outgoing tab, Incoming tab (with 60-second polling for live transfer requests), and All tab (Admin only). Status filters (`PENDING`, `IN_TRANSIT`, `RECEIVED`, `REJECTED`, `CANCELLED`). Action awaiting indicators. Auto badge for POS sales cross-branch transfers. |
+| `/inventory/transfers/new` | Initiate Stock Transfer | Destination branch selector (strictly excludes current branch), variant search and barcode scanning, available stock in source branch display, quantity validation (`<= available`), notes, submits as `PENDING`. |
+| `/inventory/transfers/[id]` | Stock Transfer Detail & Receive | Status timeline (Created -> Dispatched -> Received / Rejected / Cancelled). Dispatch action (source). Cancel action (source). Receive modal (destination users only): sent vs received quantity, mandatory discrepancy note when `received < sent`, discrepancy summary. Reject action with mandatory reason. Printable transfer slip. |
+| `/inventory/adjustments` | Stock Adjustments List | Adjustments list with status filters (`DRAFT`, `APPROVED`, `CANCELLED`), search, link to detail. |
+| `/inventory/adjustments/new` | Create Stock Adjustment | Reason dropdown (`PHYSICAL_COUNT_DISCREPANCY`, `DAMAGED_EXPIRED`, `DATA_ENTRY_CORRECTION`, `INTERNAL_USE`, `OTHER`), notes, variant scan/search, system quantity snapshot, physical count input, computed difference preview (+/-), unit cost from server. Submits as `DRAFT`. Supports pre-fill from opening stock refusal (`?variantId=...&suggestedQty=...`). |
+| `/inventory/adjustments/[id]` | Stock Adjustment Detail | Items list showing +/- quantity and value impact from server. Approve action only for users with `stock:approve` (hidden for non-owner creator to prevent self-approval conflicts). Cancel action for drafts. |
+| `/inventory/stocktake` | Physical Stocktake Audit | Automatically resumes active `IN_PROGRESS` stocktake for the current branch or starts a new one with optional category/brand filter. High-speed counting screen: barcode scan increments counted quantity (+1) immediately, manual quantity edit, progress indicator, search, "Show only uncounted" and "Show only discrepancies" filters, debounced autosave batches (600ms) with visible saving indicator. Complete action with checkbox to auto-generate DRAFT Stock Adjustment from discrepancies. Cancel action with confirm. |
+| `/inventory/damaged` | Damaged Stock Management | List of damaged reports with status (`PENDING`, `APPROVED`, `WRITTEN_OFF`), total loss KPI card from server (permission-gated). Report damaged stock modal (barcode scan, quantity, reason). Approve action (PENDING -> APPROVED). Write-off action (APPROVED -> WRITTEN_OFF, executes DAMAGE stock-out movement at exact current WAC). |
+| `/inventory/consistency` | Consistency Verification Tool | Admin-only read-only audit tool. Calls `/api/v1/inventory/stock/consistency-check`. Compares `StockBalance.quantity` against the sum of `StockMovement` ledger and tracked `ProductUnit` barcodes. Shows mismatch flags, read-only (no auto-fix), and formula-injection safe CSV export. |
+
+---
+
+### 2. Phase F3 Backend Endpoints Used
+
+| Endpoint | Method | Backend Controller | Frontend Implementation Notes |
+|---|---|---|---|
+| `/api/v1/inventory/suppliers` | GET, POST | `SupplierController` | List suppliers / Create supplier with auto code and opening balance |
+| `/api/v1/inventory/suppliers/:id` | GET, PATCH, DELETE | `SupplierController` | Detail / Update / Soft delete (409 conflict handled) |
+| `/api/v1/inventory/suppliers/:id/ledger` | GET | `SupplierController` | Supplier ledger entries (Purchases, Returns, Payments) with running balance |
+| `/api/v1/inventory/purchase-orders` | GET, POST | `PurchaseOrderController` | List purchase orders / Create PO in `DRAFT` |
+| `/api/v1/inventory/purchase-orders/:id` | GET, PATCH | `PurchaseOrderController` | PO details / Update DRAFT items and delivery date |
+| `/api/v1/inventory/purchase-orders/:id/issue` | POST | `PurchaseOrderController` | Transition PO from DRAFT to ISSUED |
+| `/api/v1/inventory/purchase-orders/:id/cancel` | POST | `PurchaseOrderController` | Cancel PO with reason |
+| `/api/v1/inventory/purchases` | GET, POST | `PurchaseController` | List purchases / Receive goods purchase with landed cost, tax, units |
+| `/api/v1/inventory/purchases/:id` | GET | `PurchaseController` | Purchase detail with line items, payments, returns, and ProductUnits |
+| `/api/v1/inventory/purchases/:id/cancel` | POST | `PurchaseController` | Cancel purchase; backend throws 400 if stock was already sold or moved |
+| `/api/v1/inventory/supplier-payments` | GET, POST | `SupplierPaymentController` | List payments / Record payment against purchase or general advance |
+| `/api/v1/inventory/supplier-payments/:id` | GET | `SupplierPaymentController` | Payment detail (used for printable voucher) |
+| `/api/v1/inventory/purchase-returns` | GET, POST | `PurchaseReturnController` | List returns / Create purchase return with items and reason |
+| `/api/v1/inventory/purchase-returns/:id` | GET | `PurchaseReturnController` | Return detail view |
+| `/api/v1/inventory/purchase-returns/:id/complete` | POST | `PurchaseReturnController` | Finalize DRAFT return -> COMPLETED |
+| `/api/v1/inventory/purchase-returns/:id/cancel` | POST | `PurchaseReturnController` | Cancel DRAFT return |
+| `/api/v1/inventory/stock` | GET | `StockController` | Current branch stock list with filters and totals footer |
+| `/api/v1/inventory/stock/all-branches-summary` | GET | `StockController` | All-branches stock matrix for multi-branch admins / owners |
+| `/api/v1/inventory/stock/movements` | GET | `StockController` | Variant stock movement history ledger |
+| `/api/v1/inventory/stock/low-stock-report` | GET | `StockController` | Low stock report with reorder levels and shortage calculations |
+| `/api/v1/inventory/stock/valuation` | GET | `StockController` | Branch valuation report with category and brand breakdown |
+| `/api/v1/inventory/stock/opening` | POST | `StockController` | Enter opening stock; rejects if movements already exist |
+| `/api/v1/inventory/stock/consistency-check` | GET | `StockController` | Read-only verification of stock balance vs ledger & units |
+| `/api/v1/inventory/transfers` | GET, POST | `StockTransferController` | List transfers / Initiate transfer (status `PENDING`) |
+| `/api/v1/inventory/transfers/:id` | GET | `StockTransferController` | Transfer detail with items, status timeline, and discrepancies |
+| `/api/v1/inventory/transfers/:id/dispatch` | POST | `StockTransferController` | Dispatch goods (`PENDING` -> `IN_TRANSIT`, reduces source stock) |
+| `/api/v1/inventory/transfers/:id/receive` | POST | `StockTransferController` | Receive goods (`IN_TRANSIT` -> `RECEIVED`, destination users only) |
+| `/api/v1/inventory/transfers/:id/reject` | POST | `StockTransferController` | Reject transfer (returns stock to origin branch) |
+| `/api/v1/inventory/transfers/:id/cancel` | POST | `StockTransferController` | Cancel transfer (returns stock to origin branch) |
+| `/api/v1/inventory/adjustments` | GET, POST | `StockAdjustmentController` | List adjustments / Create adjustment draft (`DRAFT`) |
+| `/api/v1/inventory/adjustments/:id` | GET | `StockAdjustmentController` | Adjustment detail with +/- differences and value impact |
+| `/api/v1/inventory/adjustments/:id/approve` | POST | `StockAdjustmentController` | Approve adjustment (creator cannot approve unless owner) |
+| `/api/v1/inventory/adjustments/:id/cancel` | POST | `StockAdjustmentController` | Cancel DRAFT adjustment |
+| `/api/v1/inventory/stocktakes` | GET | `StocktakeController` | List stocktakes for current branch |
+| `/api/v1/inventory/stocktakes/start` | POST | `StocktakeController` | Start stocktake with snapshot (only one `IN_PROGRESS` allowed) |
+| `/api/v1/inventory/stocktakes/:id` | GET | `StocktakeController` | Stocktake details with counted and discrepancy lines |
+| `/api/v1/inventory/stocktakes/:id/counts` | POST | `StocktakeController` | Record batch physical counts (used by debounced autosave) |
+| `/api/v1/inventory/stocktakes/:id/complete` | POST | `StocktakeController` | Complete stocktake and optionally generate DRAFT adjustment |
+| `/api/v1/inventory/stocktakes/:id/cancel` | POST | `StocktakeController` | Cancel active stocktake session |
+| `/api/v1/inventory/damaged-stock` | GET, POST | `DamagedStockController` | List damaged stock / Report damage (`PENDING`) |
+| `/api/v1/inventory/damaged-stock/:id/approve` | POST | `DamagedStockController` | Approve damaged report (`PENDING` -> `APPROVED`) |
+| `/api/v1/inventory/damaged-stock/:id/write-off` | POST | `DamagedStockController` | Write-off damaged stock (executes DAMAGE stock movement) |
+
+*All 38 endpoints mapped cleanly to existing NestJS controllers in `backend/src/modules/inventory/controllers`.*
+
+---
+
+### 3. Key Design Decisions
+
+#### 1. Purchase Form Draft Persistence
+- **Storage Strategy**: Local drafts are persisted to browser `localStorage` under the key:
+  `purchase_draft_${currentBranchId}_${user.id}`
+- **Security & Branch Isolation**: Scoped strictly per branch and per user ID. If the user changes active branches or logs out, drafts from other branches or users are never loaded or mixed.
+- **Lifecycle**:
+  - Saved automatically on form changes (with a 500ms debounce).
+  - Prompts with a visual toast when an existing draft is detected and restored.
+  - Cleared immediately upon successful purchase creation or explicit form reset.
+- **Idempotency Key**: Generated once per form open using `crypto.randomUUID()`. Reused across retries or double-clicks to protect backend creation idempotency, and regenerated upon successful submission.
+
+#### 2. Cost Visibility & Valuation Permissions
+- **Rule Followed (F2 Convention)**:
+  - Users have access to view unit costs, average costs (WAC), inventory valuation, and total loss values if and only if:
+    `user?.isOwner || permissions?.includes('products:update') || permissions?.includes('*')`
+  - When false:
+    - Average cost (`avg_cost_price`) and total cost value columns are omitted from the Stock Overview DataTable.
+    - Net value impact columns are hidden in Stock Adjustments and Stocktake review screens.
+    - Direct access to `/inventory/stock/valuation` displays a permission-denied banner and redirects.
+
+#### 3. Stocktake Autosave & Batching Approach
+- **Speed & Reliability**: Built for rapid barcode scanning where warehouse staff may scan items in rapid succession.
+- **Queue & Debounce**:
+  - Scanning increments the local count in React state immediately (`<16ms`).
+  - Updates are staged in a mutable `pendingUpdatesRef` map (`itemId -> countedQty`).
+  - A 600ms debounce timer flushes the staged updates in a single batch request to `POST /api/v1/inventory/stocktakes/:id/counts`.
+  - An autosave status indicator displays "Saving counts..." while network requests are in flight and transitions to "Saved" with a green checkmark once confirmed.
+- **Active Session Resume**: On visiting `/inventory/stocktake`, the client queries `api.inventory.stocktakes.list({ status: 'IN_PROGRESS', limit: 1 })`. If an active session exists, it immediately loads and resumes counting instead of prompting to start a new one.
+
+#### 4. Stock Adjustment Self-Approval Conflict Protection
+- **Backend Mirroring**: The backend restricts `approveAdjustment` so that the creator cannot approve their own adjustment unless `isOwner: true`.
+- **UI Guard**: The "Approve Adjustment" button is hidden if `adjustment.created_by === user.id && !user.isOwner`, and an informational banner is displayed explaining that another authorized staff member or business owner must approve it.
+
+#### 5. Destination Branch Isolation in Transfers
+- **Source vs Destination**: When initiating a transfer, the destination branch dropdown filters out `branches.filter(b => b.id !== currentBranchId)`.
+- **Receipt Authorization**: The "Receive Goods" and "Reject Transfer" buttons are hidden unless `currentBranchId === transfer.to_branch_id || user.isOwner`.
+- **Discrepancy Note**: The Receive modal enforces that if `receivedQty < sentQty`, the discrepancy note input is strictly mandatory before the confirmation button can be submitted.
+

@@ -20,7 +20,9 @@ export interface ConfirmDialogProps {
   reasonLabel?: string;
   reasonPlaceholder?: string;
   isLoading?: boolean;
+  loading?: boolean;
   disabled?: boolean;
+  children?: React.ReactNode;
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -38,8 +40,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   reasonLabel,
   reasonPlaceholder,
   isLoading = false,
+  loading = false,
   disabled = false,
+  children,
 }) => {
+  const effectiveLoading = isLoading || loading;
   const { t } = useTranslation();
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState(false);
@@ -137,16 +142,19 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </div>
         )}
 
+        {/* Custom Children */}
+        {children}
+
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-3">
-          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
+          <Button variant="outline" onClick={handleClose} disabled={effectiveLoading}>
             {cancelText || t('cancel')}
           </Button>
           <Button
             variant={isDestructive ? 'destructive' : 'default'}
             onClick={handleConfirm}
-            isLoading={isLoading}
-            disabled={isLoading || disabled || (requireReason && !reason.trim())}
+            isLoading={effectiveLoading}
+            disabled={effectiveLoading || disabled || (requireReason && !reason.trim())}
           >
             {confirmText || t('confirm')}
           </Button>

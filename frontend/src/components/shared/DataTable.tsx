@@ -22,6 +22,7 @@ export interface DataTableProps<T = any> {
   data: T[];
   isLoading?: boolean;
   totalRows?: number;
+  total?: number;
   page?: number;
   limit?: number;
   onPageChange?: (page: number) => void;
@@ -46,6 +47,7 @@ export function DataTable<T extends Record<string, any>>({
   data = [],
   isLoading = false,
   totalRows = 0,
+  total,
   page = 1,
   limit = 20,
   onPageChange,
@@ -62,7 +64,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const effectivePage = pagination?.page ?? page;
   const effectiveLimit = pagination?.limit ?? limit;
-  const effectiveTotalRows = pagination?.totalItems ?? totalRows;
+  const effectiveTotalRows = pagination?.totalItems ?? total ?? totalRows;
   const effectiveTotalPages =
     pagination?.totalPages ?? Math.max(1, Math.ceil(effectiveTotalRows / effectiveLimit));
   const effectiveOnPageChange = pagination?.onPageChange ?? onPageChange;
