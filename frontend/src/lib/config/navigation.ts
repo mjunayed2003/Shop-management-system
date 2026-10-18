@@ -25,6 +25,7 @@ import {
   AlertOctagon,
   PlusCircle,
   CheckCircle2,
+  Printer,
 } from 'lucide-react';
 import React from 'react';
 
@@ -41,6 +42,21 @@ export const SIDEBAR_NAV_ITEMS: NavItemConfig[] = [
     href: '/dashboard',
     labelKey: 'nav.dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    href: '/pos',
+    labelKey: 'pos.posTitle',
+    icon: ShoppingCart,
+  },
+  {
+    href: '/sales',
+    labelKey: 'pos.salesList',
+    icon: Receipt,
+  },
+  {
+    href: '/settings/printer',
+    labelKey: 'pos.printerSettings',
+    icon: Printer,
   },
   {
     href: '/products',

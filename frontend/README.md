@@ -503,3 +503,118 @@ All API calls are routed through `src/lib/api/client.ts` which automatically:
 - **Receipt Authorization**: The "Receive Goods" and "Reject Transfer" buttons are hidden unless `currentBranchId === transfer.to_branch_id || user.isOwner`.
 - **Discrepancy Note**: The Receive modal enforces that if `receivedQty < sentQty`, the discrepancy note input is strictly mandatory before the confirmation button can be submitted.
 
+---
+
+## Phase F4 - POS Screen, Customers & Receipts Reference
+
+### 1. POS & Sales Routes & Screens
+
+| Route | Purpose | Key Capabilities |
+|---|---|---|
+| `/pos` | High-Speed POS Terminal | Full-screen minimal-chrome terminal. **Register Session Gate**: blocks selling if no open register shift (dropdown of branch cash registers + MoneyInput opening balance); displays register code, opened time, and cashier in top bar. **Scanner-Aware BarcodeInput**: always-focused input, auto-clears on scan, audio feedback (Web Audio chirps/buzzes, toggleable). Autocomplete product search dropdown. Catalog Quick-Pick tab with category filter. Tracked-individually product units (1 unit per line, blocks repeat scans with `UNIT_ALREADY_ADDED`). Debounced `/sales/calculate` calls (latest wins); local Decimal.js preview replaced by authoritative server totals. Line discount & price override (permission `sale.discount` gated). Retail vs Wholesale toggle. Customer selection with phone lookup & quick-create. Hold sale (F8), retrieve held cart (F9) with fresh catalog re-pricing. Cross-branch auto-transfer dialog. Split payment tender modal (CASH, BKASH, NAGAD, CARDS, BANK, CHEQUE). Post-sale invoice success screen with auto-print & SMS queue. |
+| `/pos/register/close` | Shift Close & Reconciliation Placeholder | Placeholder page linking to Phase F5 (cash drawer reconciliation, X/Z reports). |
+| `/sales` | Sales History & Invoices List | Branch-scoped sales table (multi-branch badge for admins). Filters: invoice search, status (`COMPLETED`, `PARTIALLY_PAID`, `DUE`, `VOIDED`), sale type (`RETAIL`, `WHOLESALE`), customer, date range. Summary KPI cards from server (total sales amount, paid amount, due amount). Quick Reprint action with COPY banner. |
+| `/sales/[id]` | Full Sale Detail Hub | Comprehensive invoice review: customer card (ledger due balance), outlet & cash register details, items table with permission-gated WAC cost price and profit margins (`cost.view` / owner), cross-branch auto-transfers notice (source branch + transfer #), payments tender breakdown, reprint receipt button, link to F5 Return/Exchange, and **Void Sale** action (permission `sale.void`, mandatory reason input, displays backend refusal when outside 48hr window or returns exist, reverses stock movements and customer ledger). |
+| `/sales/[id]/return` | Sale Return / Exchange Placeholder | Placeholder page linking to Phase F5 (barcode-driven return items, refund vouchers). |
+| `/customers/[id]/collect-due` | Customer Debt Collection Placeholder | Placeholder page linking to Phase F5 (customer due settlement across cash/MFS tenders). |
+| `/settings/printer` | Device-Level Printer & Receipt Settings | Configures local device printing saved in `localStorage`: default format (`THERMAL_80`, `THERMAL_58`, `A4`), auto-print trigger, number of copies, paper width fine-tuning (mm), font size scaling (small, medium, large), Bangla numerals toggle (`toBanglaDigits`), monochrome logo upload (data URL, size-capped <200KB), receipt policy footer text. "Test Print Receipt" and "Test Print Barcode" action buttons. Step-by-step Chrome Kiosk mode setup guide. |
+
+---
+
+### 2. POS Keyboard Shortcuts Reference
+
+Designed for high-speed checkout without touching the mouse:
+
+| Shortcut | Action | Description |
+|---|---|---|
+| **F2** | Focus Scanner Input | Focuses the main barcode scanner and product search input. |
+| **F4** | Customer Selection | Opens customer lookup modal with phone-first search and quick-create. |
+| **F8** | Hold Sale | Prompts for a reference name / customer note and holds the active cart. |
+| **F9** | Recall Held Sales | Opens the held sales modal to inspect and retrieve parked carts with fresh prices. |
+| **F10** or **Ctrl+Enter** | Pay Now | Opens split payment tender modal with authoritative server payable total. |
+| **+** or **=** | Increment Quantity | Increments quantity by 1 on the currently selected cart line. |
+| **-** or **_** | Decrement Quantity | Decrements quantity by 1 on the currently selected cart line. |
+| **Del** / **Delete** | Remove Item | Removes the currently selected line from the cart. |
+| **Esc** | Dismiss / Close | Closes active modals and dismisses autocomplete popups. |
+
+---
+
+### 3. Chrome Kiosk Silent Printing Setup
+
+To enable silent, zero-click thermal printing without browser print preview dialog prompts:
+
+1. Right-click your Google Chrome or Microsoft Edge desktop shortcut and choose **Properties**.
+2. In the **Target** field, append `--kiosk --kiosk-printing` at the end:
+   ```cmd
+   chrome.exe --kiosk --kiosk-printing
+   ```
+3. Set your 80mm or 58mm thermal receipt printer as the **Default Windows Printer**.
+4. In the POS, when the cashier taps "Pay Now", the receipt feeds immediately without any modal prompt.
+
+---
+
+### 4. Phase F4 Backend Endpoints Used
+
+| Endpoint | Method | Backend Controller | Implementation Notes |
+|---|---|---|---|
+| `/api/v1/sales/register-sessions/current` | GET | `RegisterSessionController` | Checks active open shift for current user; returns 404 if no session open. |
+| `/api/v1/sales/register-sessions/open` | POST | `RegisterSessionController` | Opens session with `cashRegisterId` and `openingBalance`. |
+| `/api/v1/sales/calculate` | POST | `SaleController` | Authoritative calculation of cart subtotal, line discounts, coupons, taxes, round-off, and totals. |
+| `/api/v1/sales` | POST | `SaleController` | Atomic sale creation: stock movements, WAC cost, payments, auto-transfers, loyalty, SMS. |
+| `/api/v1/sales` | GET | `SaleController` | Paginated sales list with filters and financial summary. |
+| `/api/v1/sales/:id` | GET | `SaleController` | Complete sale detail by UUID or invoice number. |
+| `/api/v1/sales/:id/void` | POST | `SaleController` | Single-transaction invoice void: reverses stock movements, restores tracked units, reverses customer due. |
+| `/api/v1/sales/held` | POST | `HeldSaleController` | Holds cart without allocating stock. |
+| `/api/v1/sales/held` | GET | `HeldSaleController` | Lists unretrieved held sales for branch. |
+| `/api/v1/sales/held/:id/retrieve` | POST | `HeldSaleController` | Retrieves held cart and re-calculates prices via pricing service. |
+| `/api/v1/sales/held/:id` | DELETE | `HeldSaleController` | Deletes a held sale. |
+| `/api/v1/customers/lookup` | GET | `CustomerController` | Phone-first lookup supporting various BD formats (`01...`, `+8801...`, `8801...`). |
+| `/api/v1/customers/quick` | POST | `CustomerController` | Quick customer registration with name + phone only. |
+| `/api/v1/customers` | GET | `CustomerController` | List and search customers by name or phone. |
+| `/api/v1/catalog/barcodes/lookup/:barcode` | GET | `BarcodeController` | Scans barcode: returns variant if active in branch, or `PRODUCT_IN_OTHER_BRANCH` with other branch stock. |
+
+*Zero endpoint shapes were guessed; all request bodies, query params, and response DTOs match the verified NestJS backend controllers.*
+
+---
+
+### 5. Key Architectural & Design Decisions
+
+#### 1. Cart Persistence & Multi-Branch Safety
+- **Storage Strategy**: Cart state is persisted in `localStorage` under `pos_cart_${branchId}_${userId}`.
+- **Branch Switching Protection**:
+  - `useBranchStore.switchBranch` and `BranchSwitcher` check `useCartStore.getState().items.length > 0`.
+  - If the cart has items, a `ConfirmDialog` blocks the switch with the warning: *"Switching branches with items in your cart will clear the cart. Do you want to continue?"*.
+  - Upon confirmation, the cart is cleared and the branch switch executes with query cache invalidation.
+- **No Cart Mixing**: Carts from branch A are never shown or mixed into branch B.
+
+#### 2. Authoritative Server Totals & Debounced Calculation
+- **Rule Followed**: The frontend NEVER computes authoritative money.
+- **Implementation**:
+  - A fast local preview is computed using `Decimal.js` for immediate UI response.
+  - Every cart modification triggers a debounced call (250ms) to `POST /api/v1/sales/calculate`.
+  - Calculation requests track a sequential `latestCalculateRequestId` to ensure late responses are dropped (latest-wins).
+  - The server values (`subtotal`, `lineDiscountTotal`, `couponDiscount`, `taxAmount`, `roundOff`, `totalAmount`) strictly replace local preview values.
+
+#### 3. Idempotency Key & Safe Network-Error Retry
+- **One Key per Cart Intent**: Generated via `crypto.randomUUID()` when a new cart begins.
+- **Reuse on Retries**: Kept identical on retries, double-clicks, and network timeouts.
+- **Network Error Safety**: If connection drops during checkout, the payment modal remains open with a "Retry (Safe)" button using the exact same `idempotencyKey`. The backend caches the idempotency response and returns the existing invoice without duplicate stock deductions or charges.
+- **Regeneration**: Regenerated only after a confirmed successful sale or after the cashier explicitly clears the cart.
+
+#### 4. PrinterAdapter Architecture & Receipt Rendering
+- **PrinterAdapter Interface**:
+  ```ts
+  export interface PrinterAdapter {
+    printReceipt(htmlContent: string, options?: PrintJobOptions): Promise<boolean>;
+  }
+  ```
+- **BrowserPrintAdapter**: Employs a hidden detached iframe (`#__pos_print_iframe__`) to inject generated HTML and trigger `window.print()`. This guarantees the main POS viewport never reflows or scrolls during print execution.
+- **Future Extensibility**: A native desktop wrapper (e.g. Electron, ESC/POS over USB or Raw Bluetooth) can implement `PrinterAdapter` without changing a single line of POS UI code.
+- **Print CSS Widths**:
+  - `THERMAL_80`: `@page { size: 80mm auto; margin: 0; }` with `width: 80mm;`
+  - `THERMAL_58`: `@page { size: 58mm auto; margin: 0; }` with `width: 58mm;`
+  - `A4`: `@page { size: A4; margin: 12mm; }` with full table invoice styling.
+- **Bangla Font Embedding**: Embeds Google Font `Noto Sans Bengali` in the print HTML stylesheet to prevent missing glyphs or ugly fallback font rendering on thermal printers. Includes Latin-to-Bangla digit conversion (`toBanglaDigits`).
+- **Reprint Marker**: Automatically renders `*** COPY / DUPLICATE RECEIPT ***` header banner whenever `isReprint: true`.
+
+

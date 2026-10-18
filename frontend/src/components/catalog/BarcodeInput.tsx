@@ -11,6 +11,7 @@ interface BarcodeInputProps {
   placeholder?: string;
   autoFocus?: boolean;
   className?: string;
+  clearOnScan?: boolean;
 }
 
 export function BarcodeInput({
@@ -19,6 +20,7 @@ export function BarcodeInput({
   placeholder = 'Scan barcode or type and press Enter...',
   autoFocus = true,
   className = '',
+  clearOnScan = false,
 }: BarcodeInputProps) {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +37,9 @@ export function BarcodeInput({
     if (e) e.preventDefault();
     const clean = value.trim();
     if (clean) {
+      if (clearOnScan) {
+        setValue('');
+      }
       onScan(clean);
     }
   };

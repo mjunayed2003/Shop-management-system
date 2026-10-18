@@ -3,8 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBranchStore } from '@/lib/store/branch-store';
+import { useCartStore } from '@/lib/store/cart-store';
 import { useTranslation } from '@/lib/i18n';
 import { useToast } from '../feedback/ToastContext';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { Store, ChevronDown, Check } from 'lucide-react';
 
 export function BranchSwitcher() {
@@ -13,6 +15,7 @@ export function BranchSwitcher() {
   const queryClient = useQueryClient();
   const { branches, currentBranchId, currentBranch, switchBranch } = useBranchStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [pendingBranchId, setPendingBranchId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,20 +42,40 @@ export function BranchSwitcher() {
     );
   }
 
+  const executeSwitch = (targetBranchId: string) => {
+    const nextBranch = branches.find((b) => b.id === targetBranchId);
+    switchBranch(targetBranchId, queryClient);
+    setIsOpen(false);
+    setPendingBranchId(null);
+
+    toast.info(
+      `${t('branch.switchBranch')}: ${nextBranch?.name || targetBranchId}`,
+      t('branch.currentBranch'),
+    );
+  };
+
   const handleSelect = (branchId: string) => {
     if (branchId === currentBranchId) {
       setIsOpen(false);
       return;
     }
 
-    const nextBranch = branches.find((b) => b.id === branchId);
-    switchBranch(branchId, queryClient);
-    setIsOpen(false);
+    const cartItems = useCartStore.getState().items;
+    if (cartItems && cartItems.length > 0) {
+      // Warn and confirm before clearing cart and switching
+      setPendingBranchId(branchId);
+      setIsOpen(false);
+      return;
+    }
 
-    toast.info(
-      `${t('branch.switchBranch')}: ${nextBranch?.name || branchId}`,
-      t('branch.currentBranch'),
-    );
+    executeSwitch(branchId);
+  };
+
+  const handleConfirmSwitchWithCart = () => {
+    if (pendingBranchId) {
+      useCartStore.getState().clearCart();
+      executeSwitch(pendingBranchId);
+    }
   };
 
   return (
@@ -101,6 +124,17 @@ export function BranchSwitcher() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(pendingBranchId)}
+        onClose={() => setPendingBranchId(null)}
+        onConfirm={handleConfirmSwitchWithCart}
+        title={t('branch.switchBranch')}
+        description={t('pos.branchSwitchCartWarning')}
+        variant="warning"
+        confirmText={t('confirm')}
+        cancelText={t('cancel')}
+      />
     </div>
   );
 }

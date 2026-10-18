@@ -344,7 +344,7 @@ export const api = {
 
     // Products
     products: {
-      list: (params: {
+      list: (params?: {
         page?: number;
         limit?: number;
         search?: string;
@@ -840,5 +840,210 @@ export const api = {
       writeOff: (id: string) =>
         apiClient.post<any>(`/api/v1/inventory/damaged-stock/${id}/write-off`),
     },
+  },
+
+  // Customers (Business-Wide)
+  customers: {
+    list: (params?: { page?: number; limit?: number; search?: string }) =>
+      apiClient.get<{
+        data: any[];
+        meta: { page: number; limit: number; total: number; totalPages: number };
+      }>('/api/v1/customers', { params }),
+
+    get: (id: string) => apiClient.get<any>(`/api/v1/customers/${id}`),
+
+    lookup: (phone: string) =>
+      apiClient.get<any>('/api/v1/customers/lookup', { params: { phone } }),
+
+    quickCreate: (data: { name: string; phone: string }, options?: RequestOptions) =>
+      apiClient.post<any>('/api/v1/customers/quick', data, options),
+
+    create: (data: any, options?: RequestOptions) =>
+      apiClient.post<any>('/api/v1/customers', data, options),
+
+    update: (id: string, data: any) =>
+      apiClient.put<any>(`/api/v1/customers/${id}`, data),
+
+    delete: (id: string) =>
+      apiClient.delete<any>(`/api/v1/customers/${id}`),
+
+    ledger: (id: string, params?: { startDate?: string; endDate?: string; page?: number; limit?: number }) =>
+      apiClient.get<any>(`/api/v1/customers/ledger/${id}`, { params }),
+
+    dueSummary: () =>
+      apiClient.get<any>('/api/v1/customers/due-summary'),
+  },
+
+  // Sales & POS
+  sales: {
+    calculate: (data: {
+      items: {
+        variantId?: string;
+        barcode?: string;
+        quantity: number;
+        unitPrice?: number;
+        discountAmount?: number;
+        sourceBranchId?: string;
+        productUnitBarcode?: string;
+      }[];
+      saleType?: 'RETAIL' | 'WHOLESALE';
+      customerId?: string;
+      couponCode?: string;
+    }) => apiClient.post<any>('/api/v1/sales/calculate', data),
+
+    create: (
+      data: {
+        idempotencyKey: string;
+        customerId?: string;
+        saleType?: 'RETAIL' | 'WHOLESALE';
+        items: {
+          variantId?: string;
+          barcode?: string;
+          quantity: number;
+          unitPrice?: number;
+          discountAmount?: number;
+          sourceBranchId?: string;
+          productUnitBarcode?: string;
+          productUnitBarcodes?: string[];
+        }[];
+        payments: {
+          paymentMethod: string;
+          amount: number;
+          transactionNo?: string;
+          idempotencyKey?: string;
+        }[];
+        couponCode?: string;
+        notes?: string;
+        registerSessionId?: string;
+        isOffline?: boolean;
+      },
+      options?: RequestOptions,
+    ) => apiClient.post<any>('/api/v1/sales', data, options),
+
+    list: (params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      customerId?: string;
+      saleType?: string;
+      startDate?: string;
+      endDate?: string;
+      cashierId?: string;
+      branchId?: string;
+    }) =>
+      apiClient.get<{
+        data: any[];
+        meta: { page: number; limit: number; total: number; totalPages: number };
+        summary?: { totalSalesCount: number; totalSalesAmount: number; totalPaidAmount: number; totalDueAmount: number };
+      }>('/api/v1/sales', { params }),
+
+    get: (identifier: string) =>
+      apiClient.get<any>(`/api/v1/sales/${encodeURIComponent(identifier)}`),
+
+    void: (id: string, data: { reason: string }) =>
+      apiClient.post<any>(`/api/v1/sales/${id}/void`, data),
+
+    dailySummary: (params?: { date?: string }) =>
+      apiClient.get<any>('/api/v1/sales/reports/daily-summary', { params }),
+
+    byGroup: (params?: { startDate?: string; endDate?: string; groupBy?: 'product' | 'brand' | 'category' }) =>
+      apiClient.get<any>('/api/v1/sales/reports/by-group', { params }),
+
+    // Held Carts
+    held: {
+      hold: (
+        data: {
+          referenceName: string;
+          customerId?: string;
+          items: { variantId: string; quantity: number; unitPrice?: number; discountAmount?: number }[];
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/held', data, options),
+
+      list: () => apiClient.get<any[]>('/api/v1/sales/held'),
+
+      retrieve: (id: string) => apiClient.post<any>(`/api/v1/sales/held/${id}/retrieve`),
+
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/sales/held/${id}`),
+    },
+
+    // Register Sessions
+    registerSessions: {
+      current: () => apiClient.get<any>('/api/v1/sales/register-sessions/current'),
+
+      open: (
+        data: { cashRegisterId: string; openingBalance: number },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/register-sessions/open', data, options),
+
+      close: (
+        data: { closingBalance: number; registerSessionId?: string },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/register-sessions/close', data, options),
+
+      summary: () => apiClient.get<any>('/api/v1/sales/register-sessions/summary'),
+
+      summaryById: (id: string) =>
+        apiClient.get<any>(`/api/v1/sales/register-sessions/${id}/summary`),
+
+      cashMovements: (sessionId?: string) =>
+        apiClient.get<any[]>('/api/v1/sales/register-sessions/cash-movements', {
+          params: sessionId ? { sessionId } : undefined,
+        }),
+
+      createCashMovement: (
+        data: {
+          type: 'PAY_IN' | 'PAY_OUT';
+          amount: number;
+          reason: string;
+          registerSessionId?: string;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/register-sessions/cash-movements', data, options),
+
+      cashBook: (params?: { date?: string }) =>
+        apiClient.get<any>('/api/v1/sales/register-sessions/cash-book', { params }),
+    },
+  },
+
+  // Aliases for quick access
+  categories: {
+    list: (params?: { search?: string; includeInactive?: boolean }) =>
+      apiClient.get<any[]>('/api/v1/catalog/categories', { params }),
+    get: (id: string) => apiClient.get<any>(`/api/v1/catalog/categories/${id}`),
+  },
+
+  products: {
+    list: (params?: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      categoryId?: string;
+      brandId?: string;
+      seasonId?: string;
+      gender?: string;
+      isActive?: boolean;
+      branchId?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    }) =>
+      apiClient.get<{
+        data: any[];
+        meta: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/catalog/products', { params }),
+    get: (id: string) => apiClient.get<any>(`/api/v1/catalog/products/${id}`),
+  },
+
+  barcodes: {
+    lookup: (barcode: string) =>
+      apiClient.get<any>(`/api/v1/catalog/barcodes/lookup/${encodeURIComponent(barcode)}`),
+    print: (data: {
+      variantId: string;
+      productUnitId?: string;
+      quantity?: number;
+      printType?: 'INITIAL_PRINT' | 'REPRINT';
+      reason?: string;
+    }) => apiClient.post<any>('/api/v1/catalog/barcodes/print', data),
   },
 };
