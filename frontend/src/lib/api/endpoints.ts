@@ -1423,4 +1423,57 @@ export const api = {
     sendPromotional: (data: { message: string; boughtInLastDays?: number; minSpend?: number; lang?: 'en' | 'bn' }) =>
       apiClient.post<{ queued: number; skipped: number }>('/api/v1/sms/promotional', data),
   },
+
+  // Phase F7: Subscription & Billing (Tenant side)
+  subscription: {
+    getCurrent: () =>
+      apiClient.get<{
+        subscription: any;
+        effectiveLimits: any;
+        usage: any;
+        activeOverrides: any[];
+      }>('/api/v1/subscription/current'),
+
+    getInvoices: (params?: { page?: number; limit?: number }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/subscription/invoices', { params }),
+
+    getInvoiceDetail: (id: string) =>
+      apiClient.get<any>(`/api/v1/subscription/invoices/${id}`),
+
+    getPayments: (params?: { page?: number; limit?: number }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/subscription/payments', { params }),
+
+    upgrade: (data: { planId: string; billingCycle?: 'MONTHLY' | 'YEARLY' }) =>
+      apiClient.post<{ message: string; subscription: any; invoice: any }>('/api/v1/subscription/upgrade', data),
+
+    cancel: (data: { reason?: string }) =>
+      apiClient.post<{ message: string; subscription: any }>('/api/v1/subscription/cancel', data),
+  },
+
+  // Phase F7: Support Tickets (Tenant side)
+  support: {
+    createTicket: (data: { subject: string; description: string; priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }) =>
+      apiClient.post<any>('/api/v1/support/tickets', data),
+
+    listTickets: (params?: { page?: number; limit?: number }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/support/tickets', { params }),
+
+    getTicketThread: (id: string) =>
+      apiClient.get<any>(`/api/v1/support/tickets/${id}`),
+
+    reply: (id: string, message: string) =>
+      apiClient.post<any>(`/api/v1/support/tickets/${id}/messages`, { message }),
+
+    close: (id: string) =>
+      apiClient.patch<any>(`/api/v1/support/tickets/${id}/close`),
+  },
 };

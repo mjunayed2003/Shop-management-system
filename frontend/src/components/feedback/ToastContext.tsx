@@ -22,6 +22,7 @@ interface ToastContextType {
   warning: (message: string, title?: string) => void;
   info: (message: string, title?: string) => void;
   showToast: (message: string, type?: ToastType, title?: string) => void;
+  show: (message: string, type?: ToastType, title?: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -68,6 +69,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       warning,
       info,
       showToast,
+      show: showToast,
     }),
     [toasts, addToast, removeToast, success, error, warning, info, showToast],
   );
@@ -132,6 +134,7 @@ export function useToast() {
       warning: () => {},
       info: () => {},
       showToast: () => {},
+      show: () => {},
     };
   }
   return context;

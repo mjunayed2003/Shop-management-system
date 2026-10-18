@@ -28,6 +28,7 @@ export interface BusinessInfo {
     planName?: string;
     trialEndsAt?: string;
     currentPeriodEnd?: string;
+    graceEndsAt?: string;
     limits?: any;
   } | null;
   warning?: string | null;

@@ -77,6 +77,8 @@ export const en = {
     smsHub: 'SMS Gateway',
     negativeStock: 'Negative Stock',
     auditLogs: 'Audit Trail',
+    billing: 'Billing & Invoices',
+    support: 'Support Tickets',
     reports: 'Reports',
     settings: 'Settings',
     profile: 'Profile',

@@ -77,6 +77,8 @@ export const bn = {
     smsHub: 'এসএমএস গেটওয়ে',
     negativeStock: 'নেগেটিভ স্টক সংশোধন',
     auditLogs: 'সিস্টেম অডিট ট্রেইল',
+    billing: 'বিলিং ও ইনভয়েস',
+    support: 'সাপোর্ট টিকিট',
     reports: 'প্রতিবেদন',
     settings: 'সেটিংস',
     profile: 'প্রোফাইল',

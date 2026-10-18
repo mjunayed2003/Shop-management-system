@@ -33,6 +33,7 @@ import {
   Bell,
   MessageSquare,
   ShieldAlert,
+  LifeBuoy,
 } from 'lucide-react';
 import React from 'react';
 
@@ -246,6 +247,16 @@ export const SIDEBAR_NAV_ITEMS: NavItemConfig[] = [
     labelKey: 'nav.auditLogs',
     icon: ShieldAlert,
     requiredPermission: 'audit:read',
+  },
+  {
+    href: '/billing',
+    labelKey: 'nav.billing',
+    icon: CreditCard,
+  },
+  {
+    href: '/support',
+    labelKey: 'nav.support',
+    icon: LifeBuoy,
   },
   {
     href: '/roles',

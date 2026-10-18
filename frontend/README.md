@@ -906,6 +906,196 @@ To guarantee ledger integrity, the following operations are strictly blocked off
 - **Unicode UTF-16 (Bangla & Emojis)**: 70 characters for single SMS; 67 characters per concatenated segment.
 - Integrated directly into the SMS Campaign Composer with live segment countdown, preview, and estimated cost estimation (BDT 0.35/segment).
 
+---
+
+## Phase F7: Billing, Support & Platform Administration
+
+### 1. Platform Admin Setup & First SUPER_ADMIN Creation
+
+The Platform Administration Console operates as an independent control plane built into the same codebase, isolated under `/(platform)`.
+
+#### Creating the Initial SUPER_ADMIN
+Before accessing `/platform/login`, a platform administrator account must exist in PostgreSQL. Create one via Prisma CLI or a NestJS seed script:
+
+```bash
+# In the backend directory:
+node -e '
+const { PrismaClient, SuperAdminRole } = require("./dist/generated/prisma/client");
+const bcrypt = require("bcrypt");
+const prisma = new PrismaClient();
+
+async function seed() {
+  const hash = await bcrypt.hash("PlatformAdmin123!", 10);
+  const admin = await prisma.superAdmin.upsert({
+    where: { email: "admin@platform.pos" },
+    update: {},
+    create: {
+      email: "admin@platform.pos",
+      password_hash: hash,
+      first_name: "Master",
+      lastName: "Supervisor",
+      role: SuperAdminRole.SUPER_ADMIN,
+      is_active: true,
+    },
+  });
+  console.log("SUPER_ADMIN provisioned:", admin.email);
+}
+seed().then(() => prisma.$disconnect());
+'
+```
+
+Once provisioned, navigate to `http://localhost:3000/platform/login` and log in.
+
+---
+
+### 2. Dual-App Architecture & Security Boundary (Rule 1)
+
+1. **Two Separate Apps Inside One Codebase**:
+   - **Tenant Application**: Mounted under `/(app)`. Uses teal/emerald accents, standard app shell, branch switcher, and POS sales engine.
+   - **Platform Admin Console**: Mounted under `/(platform)`. Uses slate-950 dark theme with deep indigo branding, persistent "PLATFORM ADMIN" warning badge, and strictly isolated route trees.
+2. **Token & Storage Key Isolation**:
+   - Tenant tokens use `pos_token` (HTTP-only cookie & BFF session).
+   - Platform tokens use `pos_platform_token` in client storage.
+   - Logging in or out of one application has zero effect on the other.
+3. **Dedicated API Client (`platformApiClient`)**:
+   - Targets `/platform/*` routes (not `/api/v1/*`).
+   - Strictly omits `x-branch-id` headers.
+   - Sends `Authorization: Bearer <pos_platform_token>`.
+   - On 401 Unauthorized, redirects exclusively to `/platform/login`.
+   - Tenant JWT tokens fail backend `PlatformAuthGuard` validation (`payload.aud === 'platform'`), preventing cross-app token reuse.
+
+---
+
+### 3. Platform Role-Based Access Control (RBAC) Matrix
+
+| Route / Capability | SUPER_ADMIN | BILLING_ADMIN | PLATFORM_SUPPORT |
+|---|:---:|:---:|:---:|
+| **Platform Dashboard** (`/platform/dashboard`) | Read | Read | Read |
+| **Business Directory** (`/platform/businesses`) | Full | Read | Read + Suspend/Reactivate |
+| **Business Detail** (`/platform/businesses/:id`) | Full | Full | Read Only |
+| **Suspend / Reactivate Business** | Yes | No | Yes (with reason) |
+| **Subscription Overrides** (Create/Expire) | Yes | Yes (with reason) | No |
+| **Global Invoices** (`/platform/invoices`) | Full | Full | Read Only |
+| **Record Payment** (Manual / MFS / Bank) | Yes (Idempotency Key) | Yes (Idempotency Key) | No |
+| **Void Invoice / Mark Overdue** | Yes | Yes | No |
+| **Support Desk** (`/platform/support`) | Full | Full | Full (Assign & Reply) |
+| **Subscription Plans** (`/platform/plans`) | Create, Edit, Delete | Create, Edit | No |
+| **System Settings & Secrets** (`/platform/settings`) | Full (Write-Only replace) | No | No |
+| **Platform Admins** (`/platform/admins`) | Full (Create/Roles/Status) | No | No |
+| **Platform Audit Logs** (`/platform/audit-logs`) | Read + CSV Export | Read + CSV Export | Read + CSV Export |
+
+#### Administrative Safeguards:
+- **Self-Demotion / Self-Disable Ban**: Administrators cannot modify their own active role or deactivate their own account.
+- **Last Active SUPER_ADMIN Protection**: If only one active `SUPER_ADMIN` exists in the system, deactivation and role modification are permanently locked in both UI and backend.
+
+---
+
+### 4. Tenant Subscription State Machine & Banners
+
+The tenant app (`/(app)`) continuously verifies subscription state:
+- **`TRIAL`**: Non-intrusive trial banner indicating days remaining and link to `/billing`.
+- **`PAYMENT_DUE` / `GRACE`**: Persistent orange/amber warning banner displaying days until service cutoff, amount due, and direct CTA to invoice.
+- **`SUSPENDED` / `CANCELLED`**: Full-screen locked barrier on all operational screens (`/pos`, `/products`, `/purchases`, `/inventory`, `/roles`, etc.). Access is strictly permitted only to:
+  1. `/billing` — To review invoices, payment instructions, and confirm payment tickets.
+  2. `/support` — To communicate with platform support specialists.
+- **Auto-Recheck**: Subscription state is re-evaluated on every internal navigation and on browser window focus.
+
+---
+
+### 5. Backend Endpoints Reference (Phase F7)
+
+#### Tenant Subscription & Support APIs (`/api/v1/*`)
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/subscription/current` | Active subscription details, plan limits, overrides, and current usage |
+| `GET` | `/subscription/invoices` | Paginated subscription invoice history |
+| `GET` | `/subscription/invoices/:id` | Detailed invoice breakdown with payments received |
+| `POST` | `/subscription/upgrade` | Request plan upgrade/downgrade with billing cycle selection |
+| `POST` | `/subscription/cancel` | Cancel subscription with required cancellation reason |
+| `POST` | `/support/tickets` | Open support ticket (with optional invoice reference) |
+| `GET` | `/support/tickets` | Paginated ticket thread list for current business |
+| `GET` | `/support/tickets/:id` | Full message thread between shop and platform admins |
+| `POST` | `/support/tickets/:id/messages` | Append reply to ticket thread |
+| `POST` | `/support/tickets/:id/close` | Mark ticket closed by merchant |
+
+#### Platform Control Plane APIs (`/platform/*`)
+| Method | Endpoint | Role Guard | Description |
+|---|---|---|---|
+| `POST` | `/platform/auth/login` | Public | Platform admin login with JWT issuance |
+| `POST` | `/platform/auth/logout` | Authenticated | Invalidate platform session |
+| `GET` | `/platform/auth/me` | Authenticated | Inspect current platform admin identity |
+| `POST` | `/platform/auth/change-password` | Authenticated | Rotate platform admin password |
+| `GET` | `/platform/admins` | SUPER_ADMIN | List all platform administrative accounts |
+| `POST` | `/platform/admins` | SUPER_ADMIN | Provision a new platform admin |
+| `PATCH` | `/platform/admins/:id` | SUPER_ADMIN | Alter platform admin role or active status |
+| `GET` | `/platform/dashboard` | All Platform | Aggregated MRR, subscriber counts, overdue amounts, SMS volume |
+| `GET` | `/platform/businesses` | All Platform | Search & filter tenant businesses with pagination |
+| `GET` | `/platform/businesses/:id` | All Platform | Tenant detail: plan, usage, users, branches, overrides |
+| `POST` | `/platform/businesses/:id/suspend` | SUPER_ADMIN, PLATFORM_SUPPORT | Suspend tenant with mandatory audit reason |
+| `POST` | `/platform/businesses/:id/reactivate` | SUPER_ADMIN, PLATFORM_SUPPORT | Reactivate tenant with mandatory audit reason |
+| `POST` | `/platform/overrides` | SUPER_ADMIN, BILLING_ADMIN | Grant custom price, discount, free access, or extra limits |
+| `PATCH` | `/platform/overrides/:id/expire` | SUPER_ADMIN, BILLING_ADMIN | Expire active override immediately |
+| `GET` | `/platform/plans` | All Platform | List subscription plans with resource limits |
+| `POST` | `/platform/plans` | SUPER_ADMIN, BILLING_ADMIN | Create a new subscription pricing tier |
+| `PATCH` | `/platform/plans/:id` | SUPER_ADMIN, BILLING_ADMIN | Update pricing tier, trial duration, or quota limits |
+| `DELETE` | `/platform/plans/:id` | SUPER_ADMIN | Delete plan (blocked if subscriptions exist) |
+| `GET` | `/platform/invoices` | All Platform | Global cross-tenant invoices with status filters |
+| `POST` | `/platform/invoices/:id/void` | SUPER_ADMIN, BILLING_ADMIN | Void unpaid subscription invoice |
+| `POST` | `/platform/invoices/:id/mark-overdue` | SUPER_ADMIN, BILLING_ADMIN | Transition invoice to OVERDUE status |
+| `POST` | `/platform/invoices/:id/pay` | SUPER_ADMIN, BILLING_ADMIN | Record payment (amount, method, transactionId) |
+| `GET` | `/platform/revenue/summary` | SUPER_ADMIN, BILLING_ADMIN | MRR estimate, collected this month, overdue receivables |
+| `GET` | `/platform/tickets` | All Platform | Cross-tenant support desk queue with priority filters |
+| `GET` | `/platform/tickets/:id` | All Platform | Inspect complete merchant conversation thread |
+| `PATCH` | `/platform/tickets/:id/assign` | All Platform | Assign ticket to an admin |
+| `PATCH` | `/platform/tickets/:id/status` | All Platform | Update ticket status (`OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`) |
+| `POST` | `/platform/tickets/:id/messages` | All Platform | Dispatch official admin reply (triggers push notification) |
+| `GET` | `/platform/settings` | SUPER_ADMIN | Inspect system settings (encrypted values masked) |
+| `POST` | `/platform/settings` | SUPER_ADMIN | Upsert setting or rotate encrypted secret |
+| `GET` | `/platform/audit-logs` | All Platform | Global platform audit trail with entity/action filters |
+
+---
+
+### 6. Missing Endpoints & Handled Fallbacks
+
+Per Phase F7 guidelines, the following endpoints are missing from the backend and were handled without breaking constraints:
+
+1. **`GET /api/v1/public/plans` or `GET /api/v1/subscription/plans`**:
+   - *Status*: Missing. Tenants can only inspect their current plan via `/api/v1/subscription/current`.
+   - *Resolution*: Provided static fallback seed configuration in `src/lib/config/pricing-plans.ts` with Starer, Pro, and Enterprise tiers for the public pricing page (`/pricing`) and plan comparison.
+2. **`POST /platform/invoices/issue` (Manual Invoice Creation)**:
+   - *Status*: Missing. Backend subscription invoices are generated automatically by cron jobs (`SubscriptionBillingService`) upon billing cycle rollover or plan upgrades.
+   - *Resolution*: Handled via automated schedule; documented for platform operators.
+3. **`GET /platform/payments/webhook-logs`**:
+   - *Status*: Missing. The backend exposes the headless webhook receiver `POST /platform/payments/webhook` with HMAC validation, but no queryable log table exists.
+   - *Resolution*: Skipped UI view as instructed; recorded transactions appear under `/platform/invoices`.
+4. **`GET /platform/sms/overview`**:
+   - *Status*: Missing. Cross-business breakdown of SMS logs does not exist under `/platform/sms`.
+   - *Resolution*: Platform dashboard displays aggregate `smsVolume` returned by `/platform/dashboard`.
+
+---
+
+### 7. Key Design Decisions
+
+1. **Tenant / Platform Token Isolation**:
+   - Platform authentication stores credentials exclusively in `pos_platform_token`.
+   - API client strictly segregates headers: tenant calls include `x-branch-id` and tenant bearer token; platform calls point to `/platform/*` with platform token and zero tenant headers.
+   - Platform JWTs carry `aud: platform`, ensuring the tenant backend rejects them if forged.
+2. **Platform Idle Timeout (15 Minutes)**:
+   - Every administrative API request and mouse/keyboard interaction updates `lastActivity`.
+   - Inactivity exceeding 15 minutes automatically clears credentials and redirects to `/platform/login` with an expiry warning.
+3. **Zero-Exposure Secret Management**:
+   - Backend masks encrypted system settings as `'******'` upon retrieval.
+   - The UI replaces secrets in **Write-Only** mode: the previous key is never revealed in devtools, network payloads, or logs. New secrets are encrypted with AES-256-GCM server-side.
+4. **Downgrade Validation Rule**:
+   - When a tenant attempts to downgrade plans, the frontend evaluates current usage metrics against the target plan's quotas (e.g. branches, users, products, variants).
+   - If any current metric exceeds target limits, the downgrade submission is blocked in the UI with a descriptive warning detailing exact excess resources.
+5. **Payment Instructions & TrxID Verification Flow**:
+   - Tenant billing displays official bKash Merchant number, Nagad, and Bank direct deposit instructions.
+   - The "I Have Paid" flow allows the merchant to submit their Transaction ID and optional invoice reference as a dedicated support ticket, alerting platform operators to verify funds and record the payment.
+6. **Strict Ban on Impersonation ("Login as Shop")**:
+   - No route, button, helper, or backend proxy exists to impersonate tenant shops. Platform operators view only aggregate usage counts and manage subscription states from the outside.
+
+
 
 
 
