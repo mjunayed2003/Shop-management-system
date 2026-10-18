@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 
-export default function PlatformLoginPage() {
+function PlatformLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setPlatformAuth, isAuthenticated } = usePlatformAuthStore();
@@ -143,5 +143,19 @@ export default function PlatformLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PlatformLoginPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+          <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+        </div>
+      }
+    >
+      <PlatformLoginForm />
+    </React.Suspense>
   );
 }
