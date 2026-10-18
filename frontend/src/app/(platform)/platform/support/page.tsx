@@ -29,7 +29,7 @@ import {
   Search,
 } from 'lucide-react';
 
-export default function PlatformSupportDeskPage() {
+function PlatformSupportDeskContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -493,5 +493,19 @@ export default function PlatformSupportDeskPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PlatformSupportDeskPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="p-8 text-center text-slate-500">
+          <div className="h-8 w-48 bg-slate-900 rounded animate-pulse mx-auto" />
+        </div>
+      }
+    >
+      <PlatformSupportDeskContent />
+    </React.Suspense>
   );
 }
