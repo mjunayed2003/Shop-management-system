@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: 'দোকান পিওএস - পোশাক রিটেইল শপ ম্যানেজমেন্ট',
   description: 'মাল্টি-টেন্যান্ট, মাল্টি-ব্রাঞ্চ আধুনিক পোশাক খুচরা বিক্রয় ও ইনভেন্টরি সিস্টেম (বাংলাদেশ বাজার)',
   keywords: ['POS', 'Retail POS', 'Clothing POS', 'Bangladesh POS', 'দোকান ম্যানেজমেন্ট', 'ইনভেন্টরি'],
+  manifest: '/manifest.json',
+  themeColor: '#10b981',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Shop POS',
+  },
 };
 
 export default function RootLayout({

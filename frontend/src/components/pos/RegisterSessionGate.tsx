@@ -25,8 +25,12 @@ import {
   LogOut,
   Maximize2,
   Minimize2,
+  DollarSign,
+  FileText,
 } from 'lucide-react';
 import { soundFx } from '@/lib/utils/audio';
+import { CashMovementModal } from './CashMovementModal';
+import { SessionSummaryModal } from './SessionSummaryModal';
 
 export interface RegisterSession {
   id: string;
@@ -61,6 +65,8 @@ export function RegisterSessionGate({
   const [openingBalance, setOpeningBalance] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(soundFx.isEnabled());
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isCashMovementOpen, setIsCashMovementOpen] = useState<boolean>(false);
+  const [isSummaryOpen, setIsSummaryOpen] = useState<boolean>(false);
 
   // 1. Fetch current open register session for this user in this branch
   const {
@@ -336,6 +342,30 @@ export function RegisterSessionGate({
           </Button>
 
           <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsCashMovementOpen(true)}
+            className="h-8 px-2.5 text-xs font-semibold gap-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800"
+            title="Pay-In / Pay-Out"
+          >
+            <DollarSign className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Cash Movement</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsSummaryOpen(true)}
+            className="h-8 px-2.5 text-xs font-semibold gap-1.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800"
+            title="Live Shift Summary (X Report)"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">X Report</span>
+          </Button>
+
+          <Button
             asChild
             variant="outline"
             size="sm"
@@ -353,6 +383,19 @@ export function RegisterSessionGate({
       <div className="flex-1 overflow-hidden relative">
         {children(currentSession)}
       </div>
+
+      {/* Cash Movement Modal */}
+      <CashMovementModal
+        isOpen={isCashMovementOpen}
+        onClose={() => setIsCashMovementOpen(false)}
+      />
+
+      {/* Session Summary (X Report) Modal */}
+      <SessionSummaryModal
+        isOpen={isSummaryOpen}
+        onClose={() => setIsSummaryOpen(false)}
+        sessionId={currentSession.id}
+      />
     </div>
   );
 }

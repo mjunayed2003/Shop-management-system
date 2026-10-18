@@ -1,0 +1,41 @@
+{
+  "name": "Shop Management POS",
+  "short_name": "Shop POS",
+  "description": "Enterprise Clothing & Retail Multi-Branch Point of Sale with Offline Sync",
+  "start_url": "/pos",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#10b981",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Open POS Terminal",
+      "short_name": "POS",
+      "description": "Start billing and sales transactions",
+      "url": "/pos",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sync Hub",
+      "short_name": "Sync",
+      "description": "Review offline queue and conflicts",
+      "url": "/sync",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

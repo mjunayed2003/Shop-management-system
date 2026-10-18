@@ -978,7 +978,7 @@ export const api = {
       ) => apiClient.post<any>('/api/v1/sales/register-sessions/open', data, options),
 
       close: (
-        data: { closingBalance: number; registerSessionId?: string },
+        data: { closingBalance: number; registerSessionId?: string; closingNotes?: string },
         options?: RequestOptions,
       ) => apiClient.post<any>('/api/v1/sales/register-sessions/close', data, options),
 
@@ -1002,8 +1002,218 @@ export const api = {
         options?: RequestOptions,
       ) => apiClient.post<any>('/api/v1/sales/register-sessions/cash-movements', data, options),
 
-      cashBook: (params?: { date?: string }) =>
+      cashBook: (params?: { date?: string; branchId?: string }) =>
         apiClient.get<any>('/api/v1/sales/register-sessions/cash-book', { params }),
+    },
+
+    // Sales Returns (Phase F5)
+    returns: {
+      create: (
+        data: {
+          saleId?: string;
+          invoiceNo?: string;
+          items: {
+            saleItemId: string;
+            quantity: number;
+            condition?: 'RESELLABLE' | 'DAMAGED';
+            trackedUnitBarcodes?: string[];
+          }[];
+          refundMethod: 'CASH' | 'BKASH' | 'NAGAD' | 'ADJUSTED_IN_EXCHANGE';
+          reason?: string;
+          idempotencyKey: string;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/returns', data, options),
+
+      list: (params?: {
+        saleId?: string;
+        customerId?: string;
+        page?: number;
+        limit?: number;
+      }) =>
+        apiClient.get<{
+          items: any[];
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+        }>('/api/v1/sales/returns', { params }),
+
+      get: (id: string) => apiClient.get<any>(`/api/v1/sales/returns/${id}`),
+
+      getSlip: (id: string) => apiClient.get<any>(`/api/v1/sales/returns/${id}/slip`),
+    },
+
+    // Sales Exchanges (Phase F5)
+    exchanges: {
+      create: (
+        data: {
+          originalSaleId?: string;
+          originalInvoiceNo?: string;
+          returnedItems: {
+            saleItemId: string;
+            quantity: number;
+            condition?: 'RESELLABLE' | 'DAMAGED';
+            trackedUnitBarcodes?: string[];
+          }[];
+          newItems: {
+            variantId?: string;
+            barcode?: string;
+            quantity: number;
+            unitPrice?: number;
+            discountAmount?: number;
+            sourceBranchId?: string;
+            productUnitBarcode?: string;
+            productUnitBarcodes?: string[];
+          }[];
+          payments?: {
+            paymentMethod: string;
+            amount: number;
+            transactionNo?: string;
+            idempotencyKey?: string;
+          }[];
+          idempotencyKey: string;
+          reason?: string;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/exchanges', data, options),
+
+      list: (params?: {
+        originalSaleId?: string;
+        page?: number;
+        limit?: number;
+      }) =>
+        apiClient.get<{
+          items: any[];
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+        }>('/api/v1/sales/exchanges', { params }),
+
+      get: (id: string) => apiClient.get<any>(`/api/v1/sales/exchanges/${id}`),
+    },
+
+    // Due Collections (Phase F5)
+    dueCollections: {
+      collect: (
+        data: {
+          customerId: string;
+          amount: number;
+          paymentMethod: string;
+          transactionNo?: string;
+          notes?: string;
+          idempotencyKey: string;
+        },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/sales/due-collections', data, options),
+
+      list: (params?: {
+        customerId?: string;
+        page?: number;
+        limit?: number;
+      }) =>
+        apiClient.get<{
+          items: any[];
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+        }>('/api/v1/sales/due-collections', { params }),
+
+      get: (id: string) =>
+        apiClient.get<any>(`/api/v1/sales/due-collections/${id}`),
+
+      getReceipt: (id: string) =>
+        apiClient.get<any>(`/api/v1/sales/due-collections/${id}/receipt`),
+
+      reports: {
+        outstanding: () =>
+          apiClient.get<any[]>('/api/v1/sales/due-collections/reports/outstanding'),
+        branchSplit: () =>
+          apiClient.get<any[]>('/api/v1/sales/due-collections/reports/branch-split'),
+      },
+    },
+
+    // Reports & Profit Analysis (Phase F5)
+    reports: {
+      profit: (params?: { startDate?: string; endDate?: string; branchId?: string }) =>
+        apiClient.get<any>('/api/v1/sales/reports/profit', { params }),
+
+      collections: (params?: { startDate?: string; endDate?: string; branchId?: string }) =>
+        apiClient.get<any>('/api/v1/sales/reports/collections', { params }),
+    },
+  },
+
+  // Showroom Expenses (Phase F5)
+  expenses: {
+    create: (
+      data: {
+        expenseCategoryId: string;
+        amount: number;
+        taxAmount?: number;
+        expenseDate?: string;
+        vendorName?: string;
+        receiptNo?: string;
+        description?: string;
+        paymentMethod?: string;
+        paidFromRegister?: boolean;
+        attachment?: {
+          fileName: string;
+          mimeType: string;
+          fileContentBase64?: string;
+        };
+      },
+      options?: RequestOptions,
+    ) => apiClient.post<any>('/api/v1/expenses', data, options),
+
+    update: (
+      id: string,
+      data: {
+        expenseCategoryId?: string;
+        amount?: number;
+        taxAmount?: number;
+        vendorName?: string;
+        receiptNo?: string;
+        description?: string;
+        reason?: string;
+      },
+    ) => apiClient.put<any>(`/api/v1/expenses/${id}`, data),
+
+    delete: (id: string) => apiClient.delete<any>(`/api/v1/expenses/${id}`),
+
+    list: (params?: {
+      page?: number;
+      limit?: number;
+      categoryId?: string;
+      startDate?: string;
+      endDate?: string;
+    }) =>
+      apiClient.get<{
+        items: any[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      }>('/api/v1/expenses', { params }),
+
+    get: (id: string) => apiClient.get<any>(`/api/v1/expenses/${id}`),
+
+    summaryReport: (params?: { startDate?: string; endDate?: string }) =>
+      apiClient.get<any>('/api/v1/expenses/reports/summary', { params }),
+
+    categories: {
+      list: () => apiClient.get<any[]>('/api/v1/expenses/categories'),
+      get: (id: string) => apiClient.get<any>(`/api/v1/expenses/categories/${id}`),
+      create: (
+        data: { name: string; code?: string; description?: string },
+        options?: RequestOptions,
+      ) => apiClient.post<any>('/api/v1/expenses/categories', data, options),
+      update: (
+        id: string,
+        data: { name?: string; code?: string; description?: string },
+      ) => apiClient.put<any>(`/api/v1/expenses/categories/${id}`, data),
+      delete: (id: string) => apiClient.delete<any>(`/api/v1/expenses/categories/${id}`),
     },
   },
 
@@ -1045,5 +1255,172 @@ export const api = {
       printType?: 'INITIAL_PRINT' | 'REPRINT';
       reason?: string;
     }) => apiClient.post<any>('/api/v1/catalog/barcodes/print', data),
+  },
+
+  // Phase F6: Health Check
+  health: {
+    check: () => apiClient.get<{ status: string; timestamp: string }>('/health', { skipBranchHeader: true }),
+  },
+
+  // Phase F6: Offline Sync
+  sync: {
+    reserveInvoiceNumbers: (count = 50) =>
+      apiClient.post<{
+        prefix: string;
+        from: number;
+        to: number;
+        count: number;
+        server_time: string;
+      }>('/api/v1/sync/reserve-invoice-numbers', { count }),
+
+    bootstrap: (updatedSince?: string) =>
+      apiClient.get<{
+        products: any[];
+        customers: any[];
+        priceLists: any[];
+        coupons: any[];
+        permissions: string[];
+        server_time: string;
+      }>('/api/v1/sync/bootstrap', { params: updatedSince ? { updated_since: updatedSince } : undefined }),
+
+    push: (items: any[]) =>
+      apiClient.post<{
+        processed: number;
+        conflicts: number;
+        failed: number;
+        results: Array<{
+          client_sync_id: string;
+          entity_type: string;
+          status: 'PROCESSED' | 'CONFLICT' | 'FAILED';
+          result?: any;
+          error_message?: string;
+        }>;
+        server_time: string;
+      }>('/api/v1/sync/push', { items }),
+
+    conflicts: () =>
+      apiClient.get<any[]>('/api/v1/sync/conflicts'),
+
+    retryConflict: (id: string) =>
+      apiClient.post<any>(`/api/v1/sync/conflicts/${id}/retry`),
+
+    resolveConflict: (id: string, notes: string) =>
+      apiClient.post<any>(`/api/v1/sync/conflicts/${id}/resolve`, { notes }),
+
+    negativeStock: () =>
+      apiClient.get<any[]>('/api/v1/sync/negative-stock'),
+
+    status: () =>
+      apiClient.get<{
+        pending: number;
+        failed: number;
+        conflict: number;
+        lastSuccessfulSync: string | null;
+        server_time: string;
+      }>('/api/v1/sync/status'),
+  },
+
+  // Phase F6: Notifications
+  notifications: {
+    list: (params?: { page?: number; limit?: number; unreadOnly?: boolean }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/notifications', { params }),
+
+    unreadCount: () =>
+      apiClient.get<{ unreadCount: number }>('/api/v1/notifications/unread-count'),
+
+    markRead: (id: string) =>
+      apiClient.patch<any>(`/api/v1/notifications/${id}/read`),
+
+    markAllRead: () =>
+      apiClient.post<{ markedCount: number }>('/api/v1/notifications/mark-all-read'),
+  },
+
+  // Phase F6: Dashboards
+  dashboards: {
+    business: () =>
+      apiClient.get<{
+        sales: {
+          today: { revenue: number; count: number };
+          thisWeek: { revenue: number; count: number };
+          thisMonth: { revenue: number; count: number };
+        };
+        expenses: { today: number; thisWeek: number; thisMonth: number };
+        receivables: number;
+        payables: number;
+        stockValue: number;
+        lowStockCount: number;
+        topProducts: Array<{
+          variantId: string;
+          sku?: string;
+          productName?: string;
+          quantitySold: number;
+          revenue: number;
+        }>;
+        salesTrend: Array<{ date: string; total: number }>;
+        branchComparison: Array<{ branchId: string; branchName: string; monthRevenue: number }>;
+        profit?: {
+          today: { gross: number; net: number };
+          thisWeek: { gross: number; net: number };
+          thisMonth: { gross: number; net: number };
+        };
+        cogs?: { today: number; thisWeek: number; thisMonth: number };
+      }>('/api/v1/dashboards/business'),
+
+    cashier: () =>
+      apiClient.get<{
+        activeSession: {
+          id: string;
+          registerName: string;
+          openedAt: string;
+          openingBalance: number | string;
+        } | null;
+        today: { salesCount: number; salesAmount: number };
+      }>('/api/v1/dashboards/cashier'),
+  },
+
+  // Phase F6: Audit Logs
+  auditLogs: {
+    list: (params?: {
+      page?: number;
+      limit?: number;
+      userId?: string;
+      action?: string;
+      entityTable?: string;
+    }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/audit-logs', { params }),
+  },
+
+  // Phase F6: Exports
+  exports: {
+    sales: () => `${apiClient['baseUrl']}/api/v1/exports/sales`,
+    stock: () => `${apiClient['baseUrl']}/api/v1/exports/stock`,
+    expenses: () => `${apiClient['baseUrl']}/api/v1/exports/expenses`,
+    customerDue: () => `${apiClient['baseUrl']}/api/v1/exports/customer-due`,
+    smsLogs: () => `${apiClient['baseUrl']}/api/v1/exports/sms-logs`,
+    auditLogs: () => `${apiClient['baseUrl']}/api/v1/exports/audit-logs`,
+  },
+
+  // Phase F6: SMS
+  sms: {
+    listLogs: (params?: { page?: number; limit?: number; purpose?: string; status?: string }) =>
+      apiClient.get<{
+        data: any[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>('/api/v1/sms/logs', { params }),
+
+    previewDueReminders: (data: { minDue?: number; olderThanDays?: number; customerId?: string }) =>
+      apiClient.post<{ count: number; totalDue: number; recipients: any[] }>('/api/v1/sms/due-reminder/preview', data),
+
+    sendDueReminders: (data: { minDue?: number; olderThanDays?: number; customerId?: string; lang?: 'en' | 'bn' }) =>
+      apiClient.post<{ sent: number; skipped: number }>('/api/v1/sms/due-reminder', data),
+
+    sendPromotional: (data: { message: string; boughtInLastDays?: number; minSpend?: number; lang?: 'en' | 'bn' }) =>
+      apiClient.post<{ queued: number; skipped: number }>('/api/v1/sms/promotional', data),
   },
 };

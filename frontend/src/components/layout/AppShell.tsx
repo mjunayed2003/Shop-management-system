@@ -6,6 +6,7 @@ import { AppTopBar } from './AppTopBar';
 import { Breadcrumbs } from './Breadcrumbs';
 import { SuspendedNotice } from '../feedback/SuspendedNotice';
 import { ProtectedRoute } from '../auth/ProtectedRoute';
+import { PwaUpdatePrompt } from '../pwa/PwaUpdatePrompt';
 
 export function AppShell({
   children,
@@ -49,6 +50,9 @@ export function AppShell({
 
         {/* Lock screen if business subscription is SUSPENDED */}
         <SuspendedNotice />
+
+        {/* PWA Update & Install Prompt */}
+        <PwaUpdatePrompt />
       </div>
     </ProtectedRoute>
   );

@@ -5,15 +5,22 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { useBranchStore } from '@/lib/store/branch-store';
+import { useOfflineStore } from '@/lib/store/offline-store';
+import { exportPendingQueueAsJson, wipePosDatabase } from '@/lib/offline/db';
 import { useTranslation } from '@/lib/i18n';
-import { User, KeyRound, LogOut, ChevronDown, Shield } from 'lucide-react';
+import { User, KeyRound, LogOut, ChevronDown, Shield, AlertTriangle, Download } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export function UserMenu() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user, business, clearAuth } = useAuthStore();
-  const { clearBranchState } = useBranchStore();
+  const { currentBranchId, clearBranchState } = useBranchStore();
+  const { pendingCount, conflictCount } = useOfflineStore();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isLogoutGuardOpen, setIsLogoutGuardOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,15 +35,49 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const handleLogout = async () => {
+  const triggerLogoutCheck = () => {
+    setIsOpen(false);
+    if (pendingCount > 0 || conflictCount > 0) {
+      setIsLogoutGuardOpen(true);
+    } else {
+      executeSafeLogout();
+    }
+  };
+
+  const executeSafeLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch {
       // ignore
     }
+
+    // Wipe local cache only after queue is empty or confirmed
+    try {
+      await wipePosDatabase(business?.id, currentBranchId, user.id);
+    } catch {
+      // ignore
+    }
+
     clearAuth();
     clearBranchState();
+    setIsLogoutGuardOpen(false);
     router.push('/login');
+  };
+
+  const handleExportAndLogout = async () => {
+    try {
+      const { json } = await exportPendingQueueAsJson(business?.id, currentBranchId, user.id);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pending-queue-before-logout-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // ignore
+    }
+    await executeSafeLogout();
   };
 
   const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase() || 'U';
@@ -98,7 +139,7 @@ export function UserMenu() {
           <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={triggerLogoutCheck}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors text-left"
             >
               <LogOut className="w-4 h-4" />
@@ -107,6 +148,57 @@ export function UserMenu() {
           </div>
         </div>
       )}
+
+      {/* Logout Warning Dialog if Outbox Has Pending Items */}
+      <Dialog open={isLogoutGuardOpen} onOpenChange={setIsLogoutGuardOpen}>
+        <DialogContent className="max-w-md p-6 space-y-4">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-rose-600 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-rose-600" />
+              <span>Unsynced Offline Transactions Pending</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+            <p>
+              You have <strong>{pendingCount} unsynced item(s)</strong> and <strong>{conflictCount} conflict(s)</strong> waiting in your local device queue.
+            </p>
+            <p className="text-rose-600 dark:text-rose-400 font-semibold">
+              Logging out will wipe the local offline cache on this device. If you log out now without syncing, these offline transactions will be lost permanently.
+            </p>
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsLogoutGuardOpen(false)}
+              className="text-xs h-8 rounded-xl"
+            >
+              Cancel &amp; Keep Session
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleExportAndLogout}
+              className="text-xs h-8 rounded-xl border-amber-300 text-amber-800 dark:text-amber-200"
+            >
+              <Download className="w-3.5 h-3.5 mr-1" />
+              Export JSON &amp; Logout
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={executeSafeLogout}
+              className="text-xs h-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold"
+            >
+              Discard &amp; Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

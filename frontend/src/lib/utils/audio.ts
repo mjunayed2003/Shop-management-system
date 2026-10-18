@@ -101,6 +101,10 @@ class SoundController {
       // Ignore
     }
   }
+
+  public playBeep(): void {
+    this.playSuccess();
+  }
 }
 
 export const soundFx = new SoundController();

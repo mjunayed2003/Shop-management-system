@@ -1,0 +1,158 @@
+[
+  {
+    "name": "Standard Single Item Cart",
+    "description": "1 item at 1500 BDT with no discounts or taxes",
+    "input": {
+      "items": [
+        {
+          "variantId": "var-101",
+          "sku": "TSHIRT-BLK-M",
+          "name": "Premium Cotton T-Shirt",
+          "quantity": 1,
+          "basePrice": 1500
+        }
+      ],
+      "saleType": "RETAIL"
+    },
+    "expected": {
+      "subtotal": 1500,
+      "lineDiscountTotal": 0,
+      "couponDiscount": 0,
+      "totalDiscount": 0,
+      "taxAmount": 0,
+      "rawTotal": 1500,
+      "roundOff": 0,
+      "totalAmount": 1500
+    }
+  },
+  {
+    "name": "Multiple Items with Line Discounts",
+    "description": "2 items (2x800 = 1600 with 100 discount, 1x1200 with 200 discount)",
+    "input": {
+      "items": [
+        {
+          "variantId": "var-102",
+          "sku": "POLO-BLU-L",
+          "name": "Classic Polo Shirt",
+          "quantity": 2,
+          "basePrice": 800,
+          "discountAmount": 100
+        },
+        {
+          "variantId": "var-103",
+          "sku": "JEANS-SLIM-32",
+          "name": "Slim Fit Denim",
+          "quantity": 1,
+          "basePrice": 1200,
+          "discountAmount": 200
+        }
+      ],
+      "saleType": "RETAIL"
+    },
+    "expected": {
+      "subtotal": 2800,
+      "lineDiscountTotal": 300,
+      "couponDiscount": 0,
+      "totalDiscount": 300,
+      "taxAmount": 0,
+      "rawTotal": 2500,
+      "roundOff": 0,
+      "totalAmount": 2500
+    }
+  },
+  {
+    "name": "Cart with Percentage Coupon and Bangladesh Rounding",
+    "description": "Subtotal 3500, 10% coupon = 350 discount, 5% tax = 157.50, rawTotal = 3307.50, roundOff = 0.50 -> 3308",
+    "input": {
+      "items": [
+        {
+          "variantId": "var-104",
+          "sku": "JACKET-WIN-XL",
+          "name": "Winter Jacket",
+          "quantity": 1,
+          "basePrice": 3500
+        }
+      ],
+      "saleType": "RETAIL",
+      "coupon": {
+        "id": "coup-10",
+        "code": "WINTER10",
+        "discountType": "PERCENTAGE",
+        "discountValue": 10,
+        "minPurchaseAmount": 1000
+      },
+      "taxRatePercent": 5
+    },
+    "expected": {
+      "subtotal": 3500,
+      "lineDiscountTotal": 0,
+      "couponDiscount": 350,
+      "totalDiscount": 350,
+      "taxAmount": 175,
+      "rawTotal": 3325,
+      "roundOff": 0,
+      "totalAmount": 3325
+    }
+  },
+  {
+    "name": "Fractional Amount Rounding Half Up",
+    "description": "Item 499.60 BDT raw total rounds to 500.00 with roundOff +0.40",
+    "input": {
+      "items": [
+        {
+          "variantId": "var-105",
+          "sku": "SOCKS-WHT-3P",
+          "name": "Cotton Socks 3-Pack",
+          "quantity": 1,
+          "basePrice": 499.60
+        }
+      ],
+      "saleType": "RETAIL"
+    },
+    "expected": {
+      "subtotal": 499.60,
+      "lineDiscountTotal": 0,
+      "couponDiscount": 0,
+      "totalDiscount": 0,
+      "taxAmount": 0,
+      "rawTotal": 499.60,
+      "roundOff": 0.40,
+      "totalAmount": 500
+    }
+  },
+  {
+    "name": "Custom Price Override & Wholesale Sale",
+    "description": "Wholesale price override 3x450 (base 600) with flat coupon 150",
+    "input": {
+      "items": [
+        {
+          "variantId": "var-106",
+          "sku": "TSHIRT-BULK",
+          "name": "Basic Tee Bulk",
+          "quantity": 3,
+          "basePrice": 600,
+          "unitPrice": 450,
+          "isCustomPrice": true
+        }
+      ],
+      "saleType": "WHOLESALE",
+      "coupon": {
+        "id": "coup-flat",
+        "code": "SAVE150",
+        "discountType": "FLAT",
+        "discountValue": 150,
+        "minPurchaseAmount": 1000
+      }
+    },
+    "expected": {
+      "subtotal": 1350,
+      "lineDiscountTotal": 0,
+      "couponDiscount": 150,
+      "totalDiscount": 150,
+      "taxAmount": 0,
+      "rawTotal": 1200,
+      "roundOff": 0,
+      "totalAmount": 1200
+    }
+  }
+]

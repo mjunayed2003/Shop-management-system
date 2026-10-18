@@ -617,4 +617,295 @@ To enable silent, zero-click thermal printing without browser print preview dial
 - **Bangla Font Embedding**: Embeds Google Font `Noto Sans Bengali` in the print HTML stylesheet to prevent missing glyphs or ugly fallback font rendering on thermal printers. Includes Latin-to-Bangla digit conversion (`toBanglaDigits`).
 - **Reprint Marker**: Automatically renders `*** COPY / DUPLICATE RECEIPT ***` header banner whenever `isReprint: true`.
 
+---
+
+## Phase F5: Returns, Exchange, Due Collection, Expenses, Cash Movements, Register Close & Reports
+
+### 1. New Pages & Routes Added in Phase F5
+
+| Route | Page Component | Description & Key Features |
+|---|---|---|
+| `/sales/:id/return` | `app/(app)/sales/[id]/return/page.tsx` | Production Sales Return form with server max returnable check, condition selection (`RESELLABLE` / `DAMAGED`), tracked-unit barcodes, server due-first split preview, cross-branch banner & permission gating (`return.cross_branch`), and printable return slip. |
+| `/sales/returns` | `app/(app)/sales/returns/page.tsx` | Returns History list with Find Sale scanner/search input, date filters, branch scope, and reprint copy slip trigger. |
+| `/sales/returns/:id` | `app/(app)/sales/returns/[id]/page.tsx` | Detail view of a completed sales return with item condition logs, debt adjustment audit, and reprint slip. |
+| `/sales/exchange` | `app/(app)/sales/exchange/page.tsx` | 4-Step Guided Product Exchange wizard: Step 1 Find Sale -> Step 2 Choose Return Items -> Step 3 Pick New Items (POS catalog & scanner) -> Step 4 Review financial balance (`EVEN`, `CUSTOMER_PAYS`, `SHOP_REFUNDS`), atomic submission with single idempotency key, and exchange voucher print. |
+| `/sales/exchanges` | `app/(app)/sales/exchanges/page.tsx` | Product Exchanges history linking the return voucher with the newly generated sale invoice. |
+| `/customers/due` | `app/(app)/customers/due/page.tsx` | Customer Due Collections Hub with business-wide phone-first lookup, credit limit indicators, per-branch debt split, and quick collection entry. |
+| `/customers/:id/collect-due` | `app/(app)/customers/[id]/collect-due/page.tsx` | Dedicated Due Collection form with quick "Full Due" / "Half" buttons, advance payment blocking, oldest-first FIFO debt allocation breakdown, open cash shift check, and printable money receipt. |
+| `/customers/due/aging` | `app/(app)/customers/due/aging/page.tsx` | Customer Due Aging Report with 0-30, 31-60, 61-90, 90+ day aging buckets, per-branch split, formula-injection safe CSV export, and bulk reminder SMS confirmation dialog. |
+| `/expenses` | `app/(app)/expenses/page.tsx` | Showroom Expenses management with category filters, date picker, server totals row, CSV export (formula injection safe), category CRUD modal, and reason-mandatory audit delete dialog. |
+| `/expenses/reports` | `app/(app)/expenses/reports/page.tsx` | Expense Analytics & Summary reports grouped by category, branch, and top payees/vendors with responsive SVG charts and data table fallback. |
+| `/pos/register/close` | `app/(app)/pos/register/close/page.tsx` | 3-Step Cash Register Shift Close (Z Report) wizard: Step 1 physical cash breakdown by Bangladeshi denominations (1000, 500, 200, 100, 50, 20, 10, 5, 2, 1 notes & coins via Decimal.js) or direct entry -> Step 2 live server expected balance & discrepancy review -> Step 3 mandatory notes & final closure confirm. Includes manager view for closing peer shifts (`register.close_any`) and printable Z reports (`THERMAL_58`, `THERMAL_80`, `A4`). |
+| `/pos/register/cash-book` | `app/(app)/pos/register/cash-book/page.tsx` | Branch Daily Cash Book auditing all shifts for a date with opening float, expected cash, counted cash, net variance, and CSV export. |
+| `/reports/profit` | `app/(app)/reports/profit/page.tsx` | Profit & Loss Analysis report with Asia/Dhaka period filters (today, yesterday, this week, this month, custom), side-by-side branch comparisons, combined totals, and permission-gated cost/profit metrics (`report.view_profit`). |
+| `/reports/collections` | `app/(app)/reports/collections/page.tsx` | Collections Summary report tracking cash, bKash, Nagad, Bank, and Cards received (sales + due collections - refunds) per branch and across tender channels. |
+
+---
+
+### 2. Permissions Used & Enforced in UI
+
+| Permission Code | UI Enforcement & Gating |
+|---|---|
+| `return.create` | Access to Sales Return form, return buttons on sale detail, and return submission. |
+| `return.cross_branch` | Allows processing returns for sales originally transacted at another branch. Displays alert banner informing that refund is paid from and stock returned to current branch. Without this permission, cross-branch return is blocked with a friendly explanation. |
+| `exchange.create` | Access to Product Exchange guided wizard and atomic checkout. |
+| `due.collect` | Access to Due Collections Hub and customer due settlement forms. |
+| `expense.view` | Access to Showroom Expenses list and expense details. |
+| `expense.create` | Button to record new expense vouchers and create expense categories. |
+| `expense.update` | Button to edit expense vouchers; requires mandatory reason if linked register shift is closed. |
+| `expense.delete` | Button to delete expense vouchers; triggers `ConfirmDialog` requiring an audit reason. |
+| `expense.approve` | Enables recording expenses exceeding the approval threshold and displays approval badges. |
+| `cash.move` | Opens Pay-In and Pay-Out dialogs in POS header. |
+| `register.close` | Access to close cashier's own register shift (Z report). |
+| `register.close_any` | Manager feature allowing selection and closure of any open register shift in the branch. |
+| `report.view` | Access to Reports Hub, Aging reports, Daily Cash Book, and Collections summary. |
+| `report.view_profit` | Specifically gates COGS, Gross Profit, and Net Profit columns. If user lacks this permission, these metrics are completely hidden and a security banner is shown. |
+
+---
+
+### 3. Backend Endpoints Used in Phase F5
+
+| Endpoint | Method | Backend Controller / Service | Status | Implementation Notes |
+|---|---|---|---|---|
+| `/api/v1/sales/returns` | POST | `SaleReturnController` | Verified | Atomic sales return: stock restoration by condition, refund payment, and customer due reduction. |
+| `/api/v1/sales/returns` | GET | `SaleReturnController` | Verified | Paginated returns list with filters by sale, customer, and date. |
+| `/api/v1/sales/returns/:id` | GET | `SaleReturnController` | Verified | Single return details including returned item condition and refund split. |
+| `/api/v1/sales/returns/:id/slip` | GET | `SaleReturnController` | Verified | Returns formatted return slip payload for thermal and A4 printers. |
+| `/api/v1/sales/exchanges` | POST | `ExchangeController` | Verified | Atomic exchange in ONE request: returns items, deducts new items, calculates net difference, handles difference payment/refund. |
+| `/api/v1/sales/exchanges` | GET | `ExchangeController` | Verified | Lists completed exchanges linking original and new sales. |
+| `/api/v1/sales/exchanges/:id` | GET | `ExchangeController` | Verified | Detail view of single exchange transaction. |
+| `/api/v1/sales/due-collections` | POST | `DueCollectionController` | Verified | Collects debt with oldest-first FIFO sale invoice settlement and register link. |
+| `/api/v1/sales/due-collections` | GET | `DueCollectionController` | Verified | Paginated due collections history. |
+| `/api/v1/sales/due-collections/:id` | GET | `DueCollectionController` | Verified | Single due collection detail with full invoice allocation breakdown. |
+| `/api/v1/sales/due-collections/:id/receipt` | GET | `DueCollectionController` | Verified | Money receipt printable payload. |
+| `/api/v1/sales/due-collections/reports/outstanding` | GET | `DueCollectionController` | Verified | Customer due aging breakdown by buckets (0-30, 31-60, 61-90, 90+ days). |
+| `/api/v1/sales/due-collections/reports/branch-split` | GET | `DueCollectionController` | Verified | Customer due balances split across business branches. |
+| `/api/v1/expenses` | POST | `ExpenseController` | Verified | Records showroom expense voucher, computes tax and total, checks drawer cash link. |
+| `/api/v1/expenses` | GET | `ExpenseController` | Verified | Paginated branch expenses list with filters. |
+| `/api/v1/expenses/:id` | GET | `ExpenseController` | Verified | Expense voucher detail with attachments. |
+| `/api/v1/expenses/:id` | PUT | `ExpenseController` | Verified | Updates expense voucher; enforces reason if session closed. |
+| `/api/v1/expenses/:id` | DELETE | `ExpenseController` | Verified | Deletes expense voucher after capturing immutable snapshot in AuditLog. |
+| `/api/v1/expenses/reports/summary` | GET | `ExpenseController` | Verified | Expense analytics summarized by category, branch, and top vendors. |
+| `/api/v1/expenses/categories` | GET | `ExpenseCategoryController` | Verified | Lists business-wide expense categories. |
+| `/api/v1/expenses/categories` | POST | `ExpenseCategoryController` | Verified | Creates expense category with unique code check (maps 409). |
+| `/api/v1/sales/register-sessions/summary` | GET | `RegisterSessionController` | Verified | Live non-mutating X Report summary for active shift with full cash ledger breakdown. |
+| `/api/v1/sales/register-sessions/:id/summary` | GET | `RegisterSessionController` | Verified | Live X Report for specific shift UUID. |
+| `/api/v1/sales/register-sessions/cash-movements` | POST | `RegisterSessionController` | Verified | Records manual PAY_IN or PAY_OUT with live expected drawer cash limit check. |
+| `/api/v1/sales/register-sessions/cash-movements` | GET | `RegisterSessionController` | Verified | Lists manual cash movements for session. |
+| `/api/v1/sales/register-sessions/close` | POST | `RegisterSessionController` | Verified | Closes shift (Z Report): discrepancy check, threshold notes enforcement, unsynced sales blocker. |
+| `/api/v1/sales/register-sessions/cash-book` | GET | `RegisterSessionController` | Verified | Daily branch cash book showing all open and closed shifts for an accounting date. |
+| `/api/v1/sales/reports/profit` | GET | `ReportController` | Verified | Branch & combined P&L report: gross sales, returns, COGS, gross/net profit. |
+| `/api/v1/sales/reports/collections` | GET | `ReportController` | Verified | Tender summary: cash, bKash, Nagad, bank received minus refunds per branch per day. |
+
+*No endpoint shapes were guessed; all backend endpoints, DTO properties, and HTTP status codes match the verified NestJS backend modules.*
+
+---
+
+### 4. Architectural & Design Decisions (Phase F5)
+
+#### 1. Return Refund Split Presentation
+- **Authoritative Server Split**: The frontend never computes how a refund is partitioned. When the server calculates or confirms a refund, it returns `dueReduction` and `payoutAmount`.
+- **UI Display**: The return form and confirmation dialog present this clearly:
+  - *Reduces Customer Due First: BDT X.XX* (deducted directly from customer's account balance).
+  - *Paid Back to Customer: BDT Y.YY* (cash drawer disbursement or MFS payout).
+- This ensures cashiers can immediately explain to customers why they may not receive the full return amount in cash if they purchased on credit.
+
+#### 2. Exchange Credit Wording & Visual Clarity
+- **Strictly Labelled as Credit**: In the Exchange wizard and printed slips, the returned merchandise value is prominently labelled as:
+  `Exchange Credit (Returned Items Value)`.
+- **Customer Expectation Protection**: A clear explanatory notice states: *"Exchange credit is applied directly toward new items. It is not paid in cash."*
+- **Financial Balance Cases**:
+  - `EVEN`: Both totals match; no monetary transfer.
+  - `CUSTOMER_PAYS`: New items total exceeds credit; cashier opens payment dialog for the difference.
+  - `SHOP_REFUNDS`: Returned credit exceeds new items; drawer cash refund is issued (requires open shift).
+
+#### 3. Denomination Counter Storage Format
+- **Structured JSON in `closing_notes`**: In the Z Report shift close wizard, cashier physical cash counts across all Bangladeshi currency denominations (1000, 500, 200, 100, 50, 20, 10, 5, 2, 1 notes and coins) are serialized as clean JSON text inside the `closing_notes` database column:
+  ```json
+  {
+    "mode": "DENOMINATIONS",
+    "notesCount": { "1000": 5, "500": 4, "200": 10, "100": 15, "50": 10, "20": 5, "10": 8, "5": 4, "2": 5, "1": 0 },
+    "coinsCount": { "5": 6, "2": 5, "1": 4 },
+    "countedTotal": 11254,
+    "expectedBalance": 11254,
+    "discrepancy": 0,
+    "userNotes": "Shift handover balanced."
+  }
+  ```
+- This satisfies the backend schema without requiring any database migrations while providing rich historical audit records.
+
+#### 4. Report Charting Approach
+- **Lightweight SVG Visualizers**: We opted for pure, responsive SVG bar and progress metrics instead of external chart libraries (e.g. Chart.js or Recharts).
+- **Benefits**:
+  - Zero React 19 compatibility issues.
+  - 0 KB bundle weight overhead.
+  - Instantaneous rendering and hydration.
+  - Seamless dark mode support through Tailwind CSS classes.
+  - 100% full table fallback with exportable data.
+
+#### 5. Formula Injection Safe CSV Exports (CWE-1236)
+- All CSV download helpers across Expenses, Cash Book, Due Aging, Profit, and Collections reports sanitize cell contents via `escapeCsvCell`.
+- Any cell beginning with `=`, `+`, `-`, `@`, `\t`, or `\r` is automatically prepended with a single quote (`'`), neutralizing spreadsheet formula injection vulnerabilities.
+
+---
+
+## Phase F6 - Offline PWA, Sync Engine, Notifications & Dashboards
+
+### 1. How Offline Mode Works Step-by-Step
+
+#### A. For Cashiers:
+1. **Connection Awareness**:
+   - The header displays an interactive connection status pill:
+     - `ONLINE` (green): Live server connectivity and normal POS operations.
+     - `OFFLINE` (amber): Operating from local IndexedDB cache.
+     - `SYNCING` (blue pulsing): Outbox transactions actively transmitting to backend.
+   - Shows real-time counters of pending unsynced sales and any conflicts requiring manager attention.
+2. **Selling Offline**:
+   - **Local Catalog & Barcode Lookup**: Barcode scanning and product searches match instantaneously against IndexedDB (indexed by barcode, SKU, and product name).
+   - **Provisional Pricing**: Totals, line discounts, coupons, taxes, and round-offs are computed locally using Decimal.js.
+   - **Provisional Receipt**: Prints thermal/A4 receipts with prominent header marker:
+     `*** OFFLINE / PROVISIONAL INVOICE ***`
+     `*** অফলাইন / খসড়া রসিদ ***`
+   - **Invoice Numbers**: Consumes sequential numbers from the locally reserved pool (e.g. `INV-DHK-000101`). If exhausted, the UI prevents new sales and guides the cashier to reconnect.
+   - **Stock Snapshot**: Quantity shown with an informative *"may be outdated"* hint. Offline sales proceed even if stock temporarily dips negative.
+3. **Reconnection & Sync Reconcilation**:
+   - The moment internet connectivity returns, the Sync Engine automatically pushes the FIFO outbox queue in batches.
+   - The server recalculates authoritative amounts and replaces provisional totals. If a price changed on the server while the terminal was offline, the difference is flagged on the sale record for manager review.
+4. **Shift & Logout Safety Guard**:
+   - Cashiers cannot close their shift register or log out while unsynced sales exist in the outbox.
+   - If logout is attempted with unsynced sales, a warning dialog appears requiring explicit confirmation, with an emergency **"Export JSON"** button to back up pending items before wiping the device cache.
+
+#### B. For Developers:
+1. **Multi-Tenant IndexedDB Architecture (`db.ts`)**:
+   - Local databases are strictly namespaced: `pos_db_${businessId}_${branchId}_${userId}`.
+   - Prevents any data cross-contamination when multiple users or branches share the same device.
+   - Schema version 1 manages: `products`, `customers`, `priceLists`, `coupons`, `settings`, `reservedInvoices`, `outboxQueue`, `offlineSales`, `idMappings`, and `diagnostics`.
+2. **Multi-Tab Leader Election**:
+   - Uses the browser's native **Web Locks API** (`navigator.locks.request('pos_outbox_push')`) so that only one open browser tab processes and pushes the outbox at a time.
+3. **Outbox Batch Processing**:
+   - Outbox items carry an immutable UUID `client_sync_id`.
+   - `PROCESSED`: Local sale marked `SYNCED`, provisional difference recorded, item purged from outbox.
+   - `CONFLICT`: Retained in queue, flagged for manager resolution at `/sync/conflicts`.
+   - `FAILED`: Exponential backoff (`min(2^retry * 5s, 300s)`). One failed item never blocks subsequent independent items.
+4. **Offline Customer Reconciliation**:
+   - Offline customers receive client references (`cust-offline-...`). Upon sync, the backend maps them to existing or newly created server customer IDs; the Sync Engine automatically updates the local ID mappings table.
+
+---
+
+### 2. PWA Installation & Service Worker Lifecycle
+
+- **Web App Manifest (`public/manifest.json`)**: Configured with `display: "standalone"`, POS start URL (`/pos`), theme color `#10b981`, and high-resolution icons (192x192 and 512x512 PNG/SVG).
+- **Service Worker (`public/sw.js`)**:
+  - Precaches essential static assets and app shell navigation.
+  - Employs a network-first strategy for dynamic POS navigation with an offline fallback cache.
+- **Cart-Guarded Update Policy (`PwaUpdatePrompt.tsx`)**:
+  - When a new service worker version is detected, the "New update available, reload" prompt **only renders when the shopping cart is completely empty** (`useCartStore.items.length === 0`).
+  - Ensures a cashier in the middle of a customer checkout is never interrupted or prompted to reload.
+
+---
+
+### 3. Kiosk Printing Tips (Unchanged)
+
+For dedicated POS counter stations running Chrome/Edge on Windows:
+```bash
+chrome.exe --kiosk --kiosk-printing --disable-print-preview --app=http://localhost:3000/pos
+```
+- Direct thermal printing bypasses system dialogs and cuts receipt automatically.
+
+---
+
+### 4. How to Simulate Offline Mode
+
+Developers and testers can simulate offline scenarios using three methods:
+1. **In-App Dev Switch**: Click the connection indicator in the header to open the Sync Status Popover, and toggle **"Dev: Simulate Offline"**.
+2. **Manual Work Offline**: Toggle **"Work Offline Mode"** in the same popover to test cashier-initiated offline operation.
+3. **Browser DevTools**: Open Chrome DevTools -> `Network` tab -> select `Offline` from the throttling dropdown.
+
+---
+
+### 5. Local Data Wipe Rules & Security Trade-Offs
+
+- **No Sensitive Credentials Stored**: Tokens, password hashes, and user secrets are NEVER saved in IndexedDB.
+- **Selective Caching**: Customer directory is paginated and capped. Cost prices are hidden unless the user holds explicit profit/cost permissions.
+- **Isolation on Scope Switch**: Switching branches or users dynamically unbinds and re-namespaces the database connection, preventing data leakage.
+- **Logout Wipe**:
+  - If the outbox queue is completely empty: the local database namespace is deleted cleanly upon logout.
+  - If unsynced items exist: the logout guard modal blocks exit and requires explicit cashier override with mandatory JSON export fallback.
+
+---
+
+### 6. Shared Pricing Fixtures
+
+- **Fixtures Location**: [`frontend/test/fixtures/pricing-fixtures.json`](file:///d:/Projects/shop%20management%20sass%20project/frontend/test/fixtures/pricing-fixtures.json)
+- **Unit Test Suite**: [`frontend/test/local-pricing.test.ts`](file:///d:/Projects/shop%20management%20sass%20project/frontend/test/local-pricing.test.ts)
+- Contains shared test vectors for Retail/Wholesale pricing, item discounts, percentage coupons, tax calculations, and integer round-off. Both frontend Decimal.js engine and backend pricing service validate against these identical vectors.
+
+---
+
+### 7. Backend Endpoints Reference (Phase F6)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Lightweight connectivity and server heartbeat check |
+| `GET` | `/sync/bootstrap` | Initial and incremental catalog/customer cache bootstrap |
+| `POST` | `/sync/reserve-invoice-numbers` | Reserves blocks of consecutive offline invoice numbers |
+| `POST` | `/sync/push` | Idempotent FIFO outbox push (`client_sync_id`) |
+| `GET` | `/sync/status` | Branch-wide sync queue and conflict metrics |
+| `GET` | `/sync/conflicts` | List unresolved sync conflicts |
+| `POST` | `/sync/conflicts/:id/retry` | Retry sync for a conflicting outbox item |
+| `POST` | `/sync/conflicts/:id/resolve` | Resolve conflict manually with audit note |
+| `GET` | `/sync/negative-stock` | List variants that went negative after offline sync |
+| `GET` | `/notifications` | Paginated notification list with type filtering |
+| `GET` | `/notifications/unread-count` | Unread notifications badge counter |
+| `PATCH` | `/notifications/:id/read` | Mark single notification as read |
+| `PATCH` | `/notifications/read-all` | Mark all notifications as read |
+| `GET` | `/notifications/stream` | Authenticated Server-Sent Events (SSE) live push stream |
+| `GET` | `/dashboards/business` | Management metrics (Sales, Profit, Due, Payable, Stock) |
+| `GET` | `/dashboards/cashier` | Cashier shift overview and daily personal sales |
+| `GET` | `/audit-logs` | Audit trail with field-level change diff viewer |
+| `GET` | `/exports/sales` | Streaming CSV export of filtered sales records |
+| `GET` | `/exports/stock` | Streaming CSV export of current branch inventory |
+| `GET` | `/exports/expenses` | Streaming CSV export of branch expenses |
+| `GET` | `/exports/customer-due` | Streaming CSV export of customer due balances |
+| `GET` | `/exports/sms-logs` | Streaming CSV export of SMS transmission logs |
+| `GET` | `/exports/audit-logs` | Streaming CSV export of security audit logs |
+| `GET` | `/sms/logs` | Paginated SMS delivery logs |
+| `POST` | `/sms/due-reminders/preview` | Preview target audience and due balance for SMS campaign |
+| `POST` | `/sms/due-reminders/send` | Dispatches SMS payment reminders |
+| `POST` | `/sms/promotional/send` | Dispatches targeted promotional SMS with segment tracking |
+
+*No backend shapes were guessed; all endpoint contracts align strictly with NestJS backend modules.*
+
+---
+
+### 8. Architectural & Design Decisions (Phase F6)
+
+#### 1. Offline Token Expiry & Session Continuity Rule
+- **Design Decision**: When internet connectivity drops, the browser cannot reach the server to refresh expiring JWT access tokens.
+- **Rule**: If the token expires while offline, the frontend preserves the active POS session in a restricted "Offline Working Mode". Cashiers can continue scanning, cart building, and provisional receipt printing uninterrupted.
+- **Trade-off & Resolution**:
+  - To prevent security risks, sensitive operations (password changes, role modifications, financial exports) remain blocked.
+  - The moment network connectivity is re-established, the API client silently invokes `/api/auth/session` to obtain fresh tokens before transmitting queued outbox items. Queued sales are never purged due to an expired token.
+
+#### 2. Provisional Pricing Module & Divergence Resolution
+- **Design Decision**: The server is the sole financial authority; however, cashiers must print receipts offline without network round-trips.
+- **Rule**: `LocalPricingEngine` mirrors the backend's exact rounding, tax, and discount algorithms using `decimal.js`.
+- **Divergence Handling**:
+  - All offline receipts bear the explicit watermark: `*** OFFLINE / PROVISIONAL INVOICE ***`.
+  - When synced, the server's calculated total replaces the provisional total. If backend prices or tax rates were updated in the database while the terminal was offline, the UI computes and displays `provisionalDifference` (e.g. `Server total +BDT 50.00 vs provisional`). Managers can inspect these differences directly in the sale history.
+
+#### 3. Blocked Offline Operations & Rationale
+To guarantee ledger integrity, the following operations are strictly blocked offline:
+- **Cross-Branch Auto-Transfers**: Stock balance in other branches cannot be locked or verified locally.
+- **Voiding Online Sales**: An online sale might have already been returned or modified on another terminal.
+- **Customer Due Collection**: Live account balance cannot be verified; due collection requires server validation.
+- **Register Shift Closure**: Closing a shift with pending outbox sales would leave cash drawer discrepancies un-reconciled.
+
+#### 4. SMS Segment Calculation Standard
+- **GSM 7-bit (English/Standard ASCII)**: 160 characters for single SMS; 153 characters per concatenated segment.
+- **Unicode UTF-16 (Bangla & Emojis)**: 70 characters for single SMS; 67 characters per concatenated segment.
+- Integrated directly into the SMS Campaign Composer with live segment countdown, preview, and estimated cost estimation (BDT 0.35/segment).
+
+
+
 

@@ -26,6 +26,13 @@ import {
   PlusCircle,
   CheckCircle2,
   Printer,
+  DollarSign,
+  TrendingUp,
+  RefreshCw,
+  AlertTriangle,
+  Bell,
+  MessageSquare,
+  ShieldAlert,
 } from 'lucide-react';
 import React from 'react';
 
@@ -52,6 +59,53 @@ export const SIDEBAR_NAV_ITEMS: NavItemConfig[] = [
     href: '/sales',
     labelKey: 'pos.salesList',
     icon: Receipt,
+  },
+  {
+    href: '/sales/returns',
+    labelKey: 'nav.returnsList',
+    icon: RotateCcw,
+    requiredPermission: 'return.create',
+  },
+  {
+    href: '/sales/exchange',
+    labelKey: 'nav.exchange',
+    icon: ArrowLeftRight,
+    requiredPermission: 'exchange.create',
+  },
+  {
+    href: '/customers/due',
+    labelKey: 'nav.due',
+    icon: CreditCard,
+    requiredPermission: 'due.collect',
+  },
+  {
+    href: '/customers/due/aging',
+    labelKey: 'nav.dueAging',
+    icon: BarChart3,
+    requiredPermission: 'report.view',
+  },
+  {
+    href: '/expenses',
+    labelKey: 'nav.expenses',
+    icon: Receipt,
+    requiredPermission: 'expense.view',
+  },
+  {
+    href: '/pos/register/cash-book',
+    labelKey: 'nav.cashBook',
+    icon: FileText,
+  },
+  {
+    href: '/reports/profit',
+    labelKey: 'nav.profitReport',
+    icon: TrendingUp,
+    requiredPermission: 'report.view',
+  },
+  {
+    href: '/reports/collections',
+    labelKey: 'nav.collectionsReport',
+    icon: DollarSign,
+    requiredPermission: 'report.view',
   },
   {
     href: '/settings/printer',
@@ -159,6 +213,39 @@ export const SIDEBAR_NAV_ITEMS: NavItemConfig[] = [
     labelKey: 'nav.consistencyCheck',
     icon: CheckCircle2,
     requiredPermission: 'inventory:read',
+  },
+  {
+    href: '/sync',
+    labelKey: 'nav.syncHub',
+    icon: RefreshCw,
+  },
+  {
+    href: '/sync/conflicts',
+    labelKey: 'nav.syncConflicts',
+    icon: AlertTriangle,
+    requiredPermission: 'sync:manage',
+  },
+  {
+    href: '/notifications',
+    labelKey: 'nav.notifications',
+    icon: Bell,
+  },
+  {
+    href: '/sms',
+    labelKey: 'nav.smsHub',
+    icon: MessageSquare,
+  },
+  {
+    href: '/inventory/negative-stock',
+    labelKey: 'nav.negativeStock',
+    icon: AlertOctagon,
+    requiredPermission: 'inventory:read',
+  },
+  {
+    href: '/audit-logs',
+    labelKey: 'nav.auditLogs',
+    icon: ShieldAlert,
+    requiredPermission: 'audit:read',
   },
   {
     href: '/roles',

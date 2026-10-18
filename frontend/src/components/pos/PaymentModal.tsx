@@ -5,6 +5,9 @@ import Decimal from 'decimal.js';
 import { api } from '@/lib/api/endpoints';
 import { useCartStore } from '@/lib/store/cart-store';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { useBranchStore } from '@/lib/store/branch-store';
+import { useOfflineStore } from '@/lib/store/offline-store';
+import { createOfflineSale } from '@/lib/offline/offline-sales';
 import { useTranslation } from '@/lib/i18n';
 import { useToast } from '@/components/feedback/ToastContext';
 import {
@@ -16,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { MoneyInput } from '@/components/shared/MoneyInput';
 import {
   defaultPrinterAdapter,
@@ -232,55 +236,122 @@ export function PaymentModal({
     setCashAmount(rounded);
   };
 
+  const { isOnline, isManualOffline, isSimulatingOffline } = useOfflineStore();
+  const { currentBranchId } = useBranchStore();
+  const { user } = useAuthStore();
+
   const handleProcessSale = async () => {
     if (!canSubmit) return;
 
     setIsSubmitting(true);
     setSubmissionError(null);
 
+    const isCurrentlyOffline = !isOnline || isManualOffline || isSimulatingOffline;
+
     try {
-      const payload = {
-        idempotencyKey,
-        customerId: customer?.id,
-        saleType,
-        items: items.map((i) => ({
-          variantId: i.variantId,
-          barcode: i.barcode,
-          quantity: i.quantity,
-          unitPrice: i.isCustomPrice ? i.unitPrice : undefined,
-          discountAmount: i.discountAmount > 0 ? i.discountAmount : undefined,
-          sourceBranchId: i.sourceBranchId,
-          productUnitBarcode: i.productUnitBarcode,
-        })),
-        payments: payments.map((p, idx) => ({
-          paymentMethod: p.method,
-          amount: p.amount,
-          transactionNo: p.transactionNo || undefined,
-          idempotencyKey: `${idempotencyKey}:pay:${idx}`,
-        })),
-        couponCode: couponCode || undefined,
-        notes: saleNotes.trim() || undefined,
-        registerSessionId,
-      };
-
-      const result = await api.sales.create(payload);
-
-      soundFx.playSuccess();
-      setCompletedSale(result);
-
-      // Auto-print receipt if configured
-      const printSettings = getPrintSettings();
-      if (printSettings.autoPrint) {
-        const receiptData: SaleReceiptData = {
-          ...result,
-          businessName: business?.name,
-          cashierName: result.cashier?.name,
-        };
-        const html = generateReceiptHtml(receiptData, printSettings, false);
-        defaultPrinterAdapter.printReceipt(html, {
-          copies: printSettings.copies,
-          format: printSettings.format,
+      if (isCurrentlyOffline) {
+        // Create Offline Sale
+        const offlineResult = await createOfflineSale({
+          businessId: business?.id || '',
+          branchId: currentBranchId || '',
+          userId: user?.id || '',
+          registerSessionId,
+          customer,
+          saleType,
+          items: items.map((i) => ({
+            variantId: i.variantId,
+            sku: i.sku,
+            name: i.name,
+            barcode: i.barcode,
+            quantity: i.quantity,
+            unitPrice: i.isCustomPrice ? i.unitPrice : undefined,
+            basePrice: i.unitPrice,
+            discountAmount: i.discountAmount > 0 ? i.discountAmount : undefined,
+            sourceBranchId: i.sourceBranchId,
+            productUnitBarcode: i.productUnitBarcode,
+          })),
+          payments: payments.map((p) => ({
+            method: p.method,
+            amount: p.amount,
+            transactionNo: p.transactionNo,
+          })),
+          couponCode: couponCode || undefined,
+          notes: saleNotes.trim() || undefined,
         });
+
+        soundFx.playSuccess();
+        const saleForDisplay = {
+          ...offlineResult.receiptData,
+          isOffline: true,
+          isProvisional: true,
+          invoiceNo: offlineResult.invoiceNo,
+          totalAmount: offlineResult.provisionalTotals.totalAmount,
+          paidAmount: offlineResult.totalPaid,
+          dueAmount: offlineResult.dueAmount,
+          changeAmount: changePreview.toNumber(),
+          branch: { id: currentBranchId || '', name: 'Current Branch', code: 'BR' },
+        };
+        setCompletedSale(saleForDisplay);
+
+        // Auto-print receipt if configured
+        const printSettings = getPrintSettings();
+        if (printSettings.autoPrint) {
+          const receiptData: SaleReceiptData = {
+            ...saleForDisplay,
+            businessName: business?.name,
+            cashierName: user?.firstName || 'Cashier',
+          };
+          const html = generateReceiptHtml(receiptData, printSettings, false);
+          defaultPrinterAdapter.printReceipt(html, {
+            copies: printSettings.copies,
+            format: printSettings.format,
+          });
+        }
+      } else {
+        // Online Sale
+        const payload = {
+          idempotencyKey,
+          customerId: customer?.id,
+          saleType,
+          items: items.map((i) => ({
+            variantId: i.variantId,
+            barcode: i.barcode,
+            quantity: i.quantity,
+            unitPrice: i.isCustomPrice ? i.unitPrice : undefined,
+            discountAmount: i.discountAmount > 0 ? i.discountAmount : undefined,
+            sourceBranchId: i.sourceBranchId,
+            productUnitBarcode: i.productUnitBarcode,
+          })),
+          payments: payments.map((p, idx) => ({
+            paymentMethod: p.method,
+            amount: p.amount,
+            transactionNo: p.transactionNo || undefined,
+            idempotencyKey: `${idempotencyKey}:pay:${idx}`,
+          })),
+          couponCode: couponCode || undefined,
+          notes: saleNotes.trim() || undefined,
+          registerSessionId,
+        };
+
+        const result = await api.sales.create(payload);
+
+        soundFx.playSuccess();
+        setCompletedSale(result);
+
+        // Auto-print receipt if configured
+        const printSettings = getPrintSettings();
+        if (printSettings.autoPrint) {
+          const receiptData: SaleReceiptData = {
+            ...result,
+            businessName: business?.name,
+            cashierName: result.cashier?.name,
+          };
+          const html = generateReceiptHtml(receiptData, printSettings, false);
+          defaultPrinterAdapter.printReceipt(html, {
+            copies: printSettings.copies,
+            format: printSettings.format,
+          });
+        }
       }
     } catch (err: any) {
       soundFx.playError();
@@ -341,6 +412,13 @@ export function PaymentModal({
               <p className="text-xs text-muted-foreground font-mono">
                 {t('pos.invoiceNo')}: <strong className="text-foreground">{completedSale.invoiceNo}</strong>
               </p>
+              {(completedSale.isOffline || completedSale.isProvisional) && (
+                <div className="pt-1">
+                  <Badge className="bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300 text-[11px] font-bold">
+                    OFFLINE / PROVISIONAL INVOICE (অফলাইন খসড়া)
+                  </Badge>
+                </div>
+              )}
             </div>
 
             {/* Financial Summary Card */}
