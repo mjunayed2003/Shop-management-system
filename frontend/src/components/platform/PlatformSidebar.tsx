@@ -14,10 +14,13 @@ import {
   Users,
   ShieldAlert,
   LogOut,
-  Shield,
-  KeyRound,
+  Flame,
+  X,
+  Sparkles,
+  Lock,
+  ArrowUpRight,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { resetPlatformSessionCache } from './PlatformProtectedRoute';
 
 export interface PlatformNavItem {
   href: string;
@@ -39,7 +42,7 @@ export const PLATFORM_NAV_ITEMS: PlatformNavItem[] = [
   },
   {
     href: '/platform/invoices',
-    label: 'Invoices & Revenue',
+    label: 'Transactions & Revenue',
     icon: Receipt,
   },
   {
@@ -61,7 +64,7 @@ export const PLATFORM_NAV_ITEMS: PlatformNavItem[] = [
   },
   {
     href: '/platform/admins',
-    label: 'Platform Admins',
+    label: 'Staff & Admins',
     icon: Users,
     allowedRoles: ['SUPER_ADMIN'],
   },
@@ -78,6 +81,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   const { admin, clearPlatformAuth } = usePlatformAuthStore();
 
   const handleLogout = () => {
+    resetPlatformSessionCache();
     clearPlatformAuth();
     router.replace('/platform/login');
   };
@@ -85,27 +89,39 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   const role = admin?.role;
 
   return (
-    <aside className="w-64 bg-slate-950 border-r border-slate-800 text-slate-200 flex flex-col justify-between h-screen sticky top-0 select-none z-30">
-      <div>
-        {/* Brand Header */}
-        <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-500/20">
-              <Shield className="w-5 h-5" />
+    <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex flex-col justify-between h-screen sticky top-0 select-none z-30 shadow-xs">
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+        {/* Brand Logo Header (Foodpoint style) */}
+        <div className="flex items-center justify-between px-2">
+          <Link href="/platform/dashboard" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center font-black shadow-md shadow-orange-500/30 group-hover:scale-105 transition-transform">
+              <Flame className="w-6 h-6 fill-white" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm tracking-tight text-white">Shop POS BD</span>
-              </div>
-              <Badge className="bg-indigo-950 border border-indigo-700/60 text-indigo-300 font-extrabold text-[9px] px-1.5 py-0 uppercase tracking-widest">
-                Platform Admin
-              </Badge>
+              <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white uppercase font-sans">
+                SHOP<span className="text-orange-500">POINT</span>
+              </span>
+              <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider -mt-1">
+                Platform Console
+              </span>
             </div>
-          </div>
+          </Link>
+
+          {/* Close button for Mobile Drawer */}
+          {onCloseMobile && (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Close navigation"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-3 space-y-1">
+        <nav className="space-y-1.5">
           {PLATFORM_NAV_ITEMS.map((item) => {
             if (item.allowedRoles && role && !item.allowedRoles.includes(role)) {
               return null;
@@ -119,36 +135,68 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 key={item.href}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                className={`group flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900'
+                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
+                <Icon
+                  className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
+                    isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-orange-500'
+                  }`}
+                />
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
         </nav>
+
+        {/* Bottom Feature Card (Foodpoint "Unlock New Features" Card) */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500 text-white p-4.5 shadow-lg shadow-orange-500/20 space-y-3">
+          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+            <Lock className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-white tracking-tight">Enterprise Governance</h4>
+            <p className="text-[10px] text-white/80 mt-0.5 leading-snug">
+              Maximize SaaS multi-tenant telemetry and automated billing cycles.
+            </p>
+          </div>
+          <div className="pt-1 flex items-center justify-between text-[11px] font-bold">
+            <span className="text-white/90">Platform V2</span>
+            <Link
+              href="/platform/settings"
+              className="bg-white text-orange-600 hover:bg-orange-50 px-3 py-1 rounded-lg text-[10px] font-extrabold shadow-xs transition-all flex items-center gap-1"
+            >
+              <span>Manage</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Admin Profile & Logout Strip */}
-      <div className="p-3.5 border-t border-slate-800/80 bg-slate-950/80 space-y-2">
-        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800/60">
-          <div className="overflow-hidden pr-2">
-            <p className="text-xs font-bold text-white truncate">
-              {admin ? `${admin.firstName} ${admin.lastName}` : 'Platform Admin'}
-            </p>
-            <p className="text-[10px] text-indigo-400 font-mono font-bold tracking-tight">
-              {admin?.role || 'SUPER_ADMIN'}
-            </p>
+      <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-2xs">
+          <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center font-black text-xs shrink-0">
+              {admin ? admin.firstName.charAt(0) : 'A'}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                {admin ? `${admin.firstName} ${admin.lastName}` : 'Platform Admin'}
+              </p>
+              <p className="text-[10px] text-slate-400 font-mono truncate">
+                {admin?.email || 'admin@pos.com'}
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            title="Log out of Platform"
-            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg transition-colors"
+            title="Logout"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>

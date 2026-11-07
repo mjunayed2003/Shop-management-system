@@ -235,112 +235,138 @@ export default function PlatformInvoicesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Receipt className="w-6 h-6 text-indigo-400" />
-            Invoices & Payment Records
-          </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Monitor billing cycles, register payments with idempotency keys, and track overdue receivables.
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+            <Receipt className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Transactions &amp; Revenue
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Monitor billing cycles, register payments with idempotency keys, and track receivables.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <button
+            type="button"
             onClick={handleExportCsv}
-            className="border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800"
+            className="h-8 px-3.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-bold hover:border-orange-500 hover:text-orange-500 transition-colors shadow-2xs inline-flex flex-row items-center gap-1.5 whitespace-nowrap cursor-pointer shrink-0"
           >
-            <Download className="w-4 h-4 mr-1.5" />
-            Export CSV
-          </Button>
+            <Download className="w-3.5 h-3.5 shrink-0" />
+            <span>Export CSV</span>
+          </button>
         </div>
       </div>
 
-      {/* Revenue Summary Cards (BILLING_ADMIN / SUPER_ADMIN) */}
+      {/* Revenue Summary Cards (BILLING_ADMIN / SUPER_ADMIN) - Foodpoint SaaS Style */}
       {canManageBilling && revenueSummary && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-slate-400 font-medium">Monthly Recurring Revenue (MRR)</span>
-              <TrendingUp className="w-4 h-4 text-indigo-400" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                MRR Estimate
+              </span>
+              <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                {formatBDT(revenueSummary.mrrEstimate)}
+              </p>
+              <p className="text-[11px] text-slate-400 font-medium pt-1">
+                Active monthly &amp; yearly subs
+              </p>
             </div>
-            <div className="text-2xl font-bold text-slate-100">
-              {formatBDT(revenueSummary.mrrEstimate)}
+            <div className="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+              <TrendingUp className="w-6 h-6" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Based on active monthly & yearly subs</p>
-          </Card>
+          </div>
 
-          <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-slate-400 font-medium">Collected This Month</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                Collected This Month
+              </span>
+              <p className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                {formatBDT(revenueSummary.collectedThisMonth)}
+              </p>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-1">
+                Cleared subscription dues
+              </p>
             </div>
-            <div className="text-2xl font-bold text-emerald-400">
-              {formatBDT(revenueSummary.collectedThisMonth)}
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Cleared tenant subscription dues</p>
-          </Card>
+          </div>
 
-          <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-slate-400 font-medium">Overdue Amount</span>
-              <AlertCircle className="w-4 h-4 text-rose-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                Overdue Amount
+              </span>
+              <p className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">
+                {formatBDT(revenueSummary.overdueAmount)}
+              </p>
+              <p className="text-[11px] text-rose-600 dark:text-rose-400 font-medium pt-1">
+                Unpaid past grace deadline
+              </p>
             </div>
-            <div className="text-2xl font-bold text-rose-400">
-              {formatBDT(revenueSummary.overdueAmount)}
+            <div className="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/25 shrink-0">
+              <AlertCircle className="w-6 h-6" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Unpaid past grace deadline</p>
-          </Card>
+          </div>
 
-          <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-slate-400 font-medium">Active Subscriptions</span>
-              <Building2 className="w-4 h-4 text-indigo-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                Active Subscriptions
+              </span>
+              <p className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 font-mono">
+                {revenueSummary.activeSubscriptionsCount}
+              </p>
+              <p className="text-[11px] text-slate-400 font-medium pt-1">
+                Paid tenant businesses
+              </p>
             </div>
-            <div className="text-2xl font-bold text-indigo-400">
-              {revenueSummary.activeSubscriptionsCount}
+            <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
+              <Building2 className="w-6 h-6" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Paid tenant businesses</p>
-          </Card>
+          </div>
         </div>
       )}
 
       {/* Filter and Search Bar */}
-      <Card className="bg-slate-900 border-slate-800 p-4">
+      <Card className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-3xl shadow-sm shadow-slate-200/40 dark:shadow-none">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium mr-1 flex items-center gap-1">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-bold mr-1 flex items-center gap-1">
               <Filter className="w-3.5 h-3.5" />
               Status:
             </span>
             {['ALL', 'ISSUED', 'PAID', 'OVERDUE', 'VOID'].map((st) => (
-              <Button
+              <button
                 key={st}
-                size="sm"
-                variant={statusFilter === st ? 'default' : 'outline'}
+                type="button"
                 onClick={() => {
                   setStatusFilter(st);
                   setPage(1);
                 }}
-                className={`text-xs h-7 px-2.5 ${
+                className={`text-xs h-7 px-3 rounded-full font-bold cursor-pointer transition-all ${
                   statusFilter === st
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : 'border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                    : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:border-orange-500 hover:text-orange-500'
                 }`}
               >
                 {st}
-              </Button>
+              </button>
             ))}
           </div>
 
           <div className="w-full md:w-64">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               <Input
                 placeholder="Filter by Business UUID..."
                 value={businessSearch}
@@ -348,7 +374,7 @@ export default function PlatformInvoicesPage() {
                   setBusinessSearch(e.target.value);
                   setPage(1);
                 }}
-                className="pl-9 bg-slate-950 border-slate-800 text-xs text-slate-100 placeholder:text-slate-600"
+                className="pl-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-xl focus:bg-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
           </div>
@@ -356,11 +382,11 @@ export default function PlatformInvoicesPage() {
       </Card>
 
       {/* Invoices Table */}
-      <Card className="bg-slate-900 border-slate-800 text-slate-100">
+      <Card className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-3xl shadow-sm shadow-slate-200/40 dark:shadow-none overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-slate-950/60 text-slate-400 font-bold text-[11px] uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-4">Business</th>
@@ -373,11 +399,11 @@ export default function PlatformInvoicesPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                 {isLoading ? (
                   <tr>
                     <td colSpan={9} className="py-8 text-center text-slate-500">
-                      Loading subscription invoices...
+                      Loading subscription invoices from server...
                     </td>
                   </tr>
                 ) : !invoicesData?.data || invoicesData.data.length === 0 ? (
@@ -393,46 +419,46 @@ export default function PlatformInvoicesPage() {
                     const isVoid = inv.status === 'VOID';
 
                     return (
-                      <tr key={inv.id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-4 font-mono font-medium text-slate-100">
+                      <tr key={inv.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-mono font-medium text-slate-900 dark:text-slate-100">
                           {inv.invoice_number}
                         </td>
                         <td className="py-3 px-4">
-                          <p className="font-medium text-slate-200">{inv.business?.name || 'N/A'}</p>
+                          <p className="font-medium text-slate-900 dark:text-slate-200">{inv.business?.name || 'N/A'}</p>
                           <p className="text-xs text-slate-500 font-mono">{inv.business?.slug}</p>
                         </td>
-                        <td className="py-3 px-4 text-xs font-mono text-indigo-400">
+                        <td className="py-3 px-4 text-xs font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
                           {inv.plan?.name || 'N/A'}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-400">
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
                           {formatDate(inv.period_start)} - {formatDate(inv.period_end)}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-100">
+                        <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100 font-mono">
                           {formatBDT(inv.net_amount)}
                         </td>
                         <td className="py-3 px-4 text-xs">
-                          <span className="text-emerald-400 font-medium">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium font-mono">
                             {formatBDT(inv.paid_amount || 0)}
                           </span>
                           {!isFullyPaid && !isVoid && (
-                            <span className="block text-rose-400 font-medium">
+                            <span className="block text-rose-600 dark:text-rose-400 font-medium font-mono">
                               Due: {formatBDT(remaining.toNumber())}
                             </span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-400">
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
                           {formatDate(inv.due_date)}
                         </td>
                         <td className="py-3 px-4">
                           <Badge
                             className={
                               inv.status === 'PAID'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800'
                                 : inv.status === 'OVERDUE'
-                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-400 dark:border-rose-800'
                                 : inv.status === 'VOID'
-                                ? 'bg-slate-800 text-slate-500'
-                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                ? 'bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800'
                             }
                           >
                             {inv.status}
@@ -444,7 +470,7 @@ export default function PlatformInvoicesPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => setViewDetailInvoice(inv)}
-                              className="text-xs text-slate-300 hover:bg-slate-800 h-7 px-2"
+                              className="text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 h-7 px-2"
                             >
                               Detail
                             </Button>

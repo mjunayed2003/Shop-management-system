@@ -13,7 +13,7 @@ import { useToast } from '@/components/feedback/ToastContext';
 import { FormFieldWrapper } from '@/components/shared/FormFieldWrapper';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Lock, User, ShoppingBag, AlertTriangle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Lock, User, ShoppingBag, AlertTriangle, Loader2, Sparkles, Shield } from 'lucide-react';
 
 const loginSchema = z.object({
   identifier: z
@@ -50,16 +50,24 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      identifier: '',
-      password: '',
-      businessSlug: '',
+      identifier: 'owner@shop.com',
+      password: 'ShopOwner123!',
+      businessSlug: 'demo-fashion',
       rememberMe: true,
     },
   });
+
+  const fillStoreDemo = (id: string, pass: string, slug?: string) => {
+    setValue('identifier', id);
+    setValue('password', pass);
+    if (slug) setValue('businessSlug', slug);
+    setServerError(null);
+  };
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsSubmitting(true);
@@ -147,6 +155,30 @@ function LoginForm() {
           </div>
         )}
 
+        {/* Demo Credentials Quick-Fill */}
+        <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-200">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => fillStoreDemo('owner@shop.com', 'ShopOwner123!', 'demo-fashion')}
+              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-emerald-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+            >
+              Store Owner (মালিক)
+            </button>
+            <button
+              type="button"
+              onClick={() => fillStoreDemo('cashier@shop.com', 'Cashier123!', 'demo-fashion')}
+              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-emerald-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+            >
+              Cashier (ক্যাশিয়ার)
+            </button>
+          </div>
+        </div>
+
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <FormFieldWrapper
@@ -227,14 +259,25 @@ function LoginForm() {
         </form>
 
         {/* Footer Link */}
-        <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-          <span>{t('auth.noAccount')} </span>
-          <Link
-            href="/register"
-            className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
-          >
-            {t('auth.registerLink')}
-          </Link>
+        <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 space-y-1.5">
+          <div>
+            <span>{t('auth.noAccount')} </span>
+            <Link
+              href="/register"
+              className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+            >
+              {t('auth.registerLink')}
+            </Link>
+          </div>
+          <div>
+            <Link
+              href="/platform/login"
+              className="text-[11px] text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline inline-flex items-center gap-1"
+            >
+              <Shield className="w-3 h-3" />
+              <span>প্ল্যাটফর্ম সুপার অ্যাডমিন লগইন (Platform Console)</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

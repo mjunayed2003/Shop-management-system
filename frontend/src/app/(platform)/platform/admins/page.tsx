@@ -126,48 +126,52 @@ export default function PlatformAdminsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-8">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Users className="w-6 h-6 text-indigo-400" />
-            Platform Administrators
-          </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Manage platform operator accounts, role boundaries, and access credentials.
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Staff &amp; Admins
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Manage platform operator accounts, role boundaries, and access credentials.
+            </p>
+          </div>
         </div>
 
         <Button
           onClick={() => setCreateModalOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+          className="text-xs h-9 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20 cursor-pointer font-bold flex items-center gap-1.5 self-end sm:self-auto"
         >
-          <Plus className="w-4 h-4 mr-1.5" />
-          Create Platform Admin
+          <Plus className="w-4 h-4" />
+          <span>Create Platform Admin</span>
         </Button>
       </div>
 
       {/* Rules Notice */}
-      <Card className="bg-slate-900 border-slate-800 p-4 border-l-4 border-l-indigo-500">
+      <Card className="bg-slate-50/70 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 border-l-4 border-l-orange-500 rounded-3xl shadow-sm shadow-slate-200/40 dark:shadow-none">
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
-          <div className="text-xs text-slate-300 space-y-1">
-            <p className="font-semibold text-slate-100">Platform RBAC Safeguards</p>
-            <p className="text-slate-400">
+          <Shield className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+          <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
+            <p className="font-bold text-slate-900 dark:text-slate-100">Platform RBAC Safeguards</p>
+            <p className="text-slate-500 dark:text-slate-400">
               Administrators cannot deactivate or demote their own active session. The last remaining{' '}
-              <code className="text-indigo-400 font-mono">SUPER_ADMIN</code> is permanently protected from deactivation.
+              <code className="text-orange-600 dark:text-orange-400 font-mono font-bold">SUPER_ADMIN</code> is permanently protected from deactivation.
             </p>
           </div>
         </div>
       </Card>
 
       {/* Admins Table */}
-      <Card className="bg-slate-900 border-slate-800 text-slate-100">
+      <Card className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-3xl shadow-sm shadow-slate-200/40 dark:shadow-none overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-slate-950/60 text-slate-400 font-bold text-[11px] uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Admin Name</th>
                   <th className="py-3 px-4">Email</th>
@@ -177,11 +181,11 @@ export default function PlatformAdminsPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                 {isLoading ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-slate-500">
-                      Loading platform administrators...
+                      Loading platform administrators from server...
                     </td>
                   </tr>
                 ) : admins.length === 0 ? (
@@ -199,14 +203,14 @@ export default function PlatformAdminsPage() {
                       admin.is_active;
 
                     return (
-                      <tr key={admin.id} className="hover:bg-slate-800/30">
+                      <tr key={admin.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs uppercase">
+                            <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center font-bold text-xs uppercase">
                               {admin.first_name?.[0] || 'A'}
                             </div>
                             <div>
-                              <p className="font-semibold text-slate-100 flex items-center gap-1.5">
+                              <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                                 {admin.first_name} {admin.last_name}
                                 {isSelf && (
                                   <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 text-[10px] px-1 py-0">
@@ -224,7 +228,7 @@ export default function PlatformAdminsPage() {
                           </div>
                         </td>
 
-                        <td className="py-3 px-4 font-mono text-xs text-slate-300">
+                        <td className="py-3 px-4 font-mono text-xs text-slate-700 dark:text-slate-300">
                           {admin.email}
                         </td>
 
@@ -232,10 +236,10 @@ export default function PlatformAdminsPage() {
                           <Badge
                             className={
                               admin.role === PlatformRole.SUPER_ADMIN
-                                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
+                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30'
                                 : admin.role === PlatformRole.BILLING_ADMIN
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                : 'bg-slate-800 text-slate-300'
+                                ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                             }
                           >
                             {admin.role}
@@ -247,15 +251,15 @@ export default function PlatformAdminsPage() {
                             variant={admin.is_active ? 'default' : 'secondary'}
                             className={
                               admin.is_active
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
+                                : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30'
                             }
                           >
                             {admin.is_active ? 'Active' : 'Disabled'}
                           </Badge>
                         </td>
 
-                        <td className="py-3 px-4 text-xs text-slate-400 font-mono">
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400 font-mono">
                           {admin.last_login_at ? formatDateTime(admin.last_login_at) : 'Never'}
                         </td>
 
@@ -270,7 +274,7 @@ export default function PlatformAdminsPage() {
                                 setChangeRoleTarget(admin);
                                 setNewSelectedRole(admin.role);
                               }}
-                              className="border-slate-800 text-slate-300 hover:bg-slate-800 text-xs h-7 px-2"
+                              className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs h-7 px-2"
                               title={
                                 isSelf
                                   ? 'You cannot alter your own role.'
@@ -288,10 +292,10 @@ export default function PlatformAdminsPage() {
                               size="sm"
                               disabled={isSelf || (isLastSuperAdmin && admin.is_active)}
                               onClick={() => setToggleActiveTarget(admin)}
-                              className={`text-xs h-7 px-2 ${
+                              className={`text-xs h-7 px-2 bg-white dark:bg-slate-900 ${
                                 admin.is_active
-                                  ? 'border-slate-800 text-rose-400 hover:bg-rose-950/20'
-                                  : 'border-slate-800 text-emerald-400 hover:bg-emerald-950/20'
+                                  ? 'border-rose-200 dark:border-slate-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20'
+                                  : 'border-emerald-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20'
                               }`}
                               title={
                                 isSelf
@@ -320,45 +324,49 @@ export default function PlatformAdminsPage() {
 
       {/* CREATE ADMIN MODAL */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-indigo-400">
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-2xl rounded-3xl p-0 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/25 shrink-0">
               <Users className="w-5 h-5" />
-              Create Platform Administrator
-            </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
-              Provision a new internal platform operator account with defined role privileges.
-            </DialogDescription>
-          </DialogHeader>
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
+                Create Platform Administrator
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                Provision a new internal platform operator account with defined role privileges.
+              </DialogDescription>
+            </div>
+          </div>
 
-          <form onSubmit={handleCreateSubmit} className="space-y-3.5 py-2">
+          <form onSubmit={handleCreateSubmit} className="space-y-3.5 px-6 py-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-300">
-                  First Name <span className="text-rose-400">*</span>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  First Name <span className="text-rose-500">*</span>
                 </label>
                 <Input
                   required
                   placeholder="e.g. Tanzim"
                   value={createForm.firstName}
                   onChange={(e) => setCreateForm({ ...createForm, firstName: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-slate-100 mt-1 text-xs"
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 text-xs rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-300">Last Name</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Last Name</label>
                 <Input
                   placeholder="e.g. Ahmed"
                   value={createForm.lastName}
                   onChange={(e) => setCreateForm({ ...createForm, lastName: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-slate-100 mt-1 text-xs"
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 text-xs rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-medium text-slate-300">
-                Email Address <span className="text-rose-400">*</span>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Email Address <span className="text-rose-500">*</span>
               </label>
               <Input
                 type="email"
@@ -366,13 +374,13 @@ export default function PlatformAdminsPage() {
                 placeholder="admin@shopmanagement.com"
                 value={createForm.email}
                 onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-slate-100 mt-1 text-xs"
+                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 text-xs rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-medium text-slate-300">
-                Password <span className="text-rose-400">*</span>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Password <span className="text-rose-500">*</span>
               </label>
               <Input
                 type="password"
@@ -380,28 +388,28 @@ export default function PlatformAdminsPage() {
                 placeholder="Minimum 8 characters..."
                 value={createForm.password}
                 onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-slate-100 mt-1 text-xs"
+                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 text-xs rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-medium text-slate-300">Phone (Optional)</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Phone (Optional)</label>
               <Input
                 placeholder="017XXXXXXXX"
                 value={createForm.phone}
                 onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-slate-100 mt-1 text-xs font-mono"
+                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 text-xs font-mono rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
             <div>
-              <label className="text-xs font-medium text-slate-300">
-                Assigned Platform Role <span className="text-rose-400">*</span>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Assigned Platform Role <span className="text-rose-500">*</span>
               </label>
               <select
                 value={createForm.role}
                 onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as any })}
-                className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-md py-2 px-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer"
               >
                 <option value={PlatformRole.PLATFORM_SUPPORT}>
                   PLATFORM_SUPPORT — Support tickets, business view & suspension
@@ -415,22 +423,21 @@ export default function PlatformAdminsPage() {
               </select>
             </div>
 
-            <DialogFooter className="pt-2">
-              <Button
+            <DialogFooter className="px-6 py-3.5 -mx-6 -mb-4 mt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-end gap-2.5 rounded-b-3xl">
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => setCreateModalOpen(false)}
-                className="border-slate-800 text-slate-300"
+                className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-2xs cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="h-9 px-5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/25 cursor-pointer flex items-center gap-1.5"
               >
                 {createMutation.isPending ? 'Provisioning...' : 'Provision Admin'}
-              </Button>
+              </button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -464,24 +471,24 @@ export default function PlatformAdminsPage() {
 
       {/* CHANGE ROLE DIALOG */}
       <Dialog open={Boolean(changeRoleTarget)} onOpenChange={(open) => !open && setChangeRoleTarget(null)}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-xl rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-indigo-400">
+            <DialogTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
               <Shield className="w-5 h-5" />
               Change Administrator Role
             </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
+            <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs">
               Update role privileges for {changeRoleTarget?.first_name} {changeRoleTarget?.last_name}.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div>
-              <label className="text-xs font-medium text-slate-300">Select Role</label>
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Select Role</label>
               <select
                 value={newSelectedRole}
                 onChange={(e) => setNewSelectedRole(e.target.value as any)}
-                className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-md py-2 px-3 text-xs text-slate-200 focus:outline-none"
+                className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md py-2 px-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
               >
                 <option value={PlatformRole.PLATFORM_SUPPORT}>PLATFORM_SUPPORT</option>
                 <option value={PlatformRole.BILLING_ADMIN}>BILLING_ADMIN</option>
@@ -494,7 +501,7 @@ export default function PlatformAdminsPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setChangeRoleTarget(null)}
-                className="border-slate-800 text-slate-300"
+                className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
               >
                 Cancel
               </Button>

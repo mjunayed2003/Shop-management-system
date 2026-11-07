@@ -47,6 +47,10 @@ class PlatformApiClient {
       headers.set('Content-Type', 'application/json');
     }
 
+    // Prevent browser 304 caching
+    headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    headers.set('Pragma', 'no-cache');
+
     // Attach Platform Bearer Token ONLY
     const platformToken = usePlatformAuthStore.getState().accessToken;
     if (platformToken) {
@@ -61,6 +65,7 @@ class PlatformApiClient {
     usePlatformAuthStore.getState().updateActivity();
 
     const config: RequestInit = {
+      cache: 'no-store',
       ...customConfig,
       headers,
     };

@@ -1,5 +1,4 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.preferences.importModuleSpecifier": "relative"
 }

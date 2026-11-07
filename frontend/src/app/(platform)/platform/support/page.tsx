@@ -145,28 +145,32 @@ function PlatformSupportDeskContent() {
   const resolvedCount = (ticketsData?.data || []).filter((t: any) => t.status === 'RESOLVED' || t.status === 'CLOSED').length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <LifeBuoy className="w-6 h-6 text-indigo-400" />
-            Platform Support Desk
-          </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
-            Cross-tenant ticket resolution, billing issue escalations, and merchant communication.
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+            <LifeBuoy className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              Support Desk
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Cross-tenant ticket resolution, billing issue escalations, and merchant communication.
+            </p>
+          </div>
         </div>
 
         {initialBusinessId && (
-          <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 px-3 py-1.5 rounded-lg text-xs text-indigo-300">
+          <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900/40 px-3 py-1.5 rounded-lg text-xs text-blue-700 dark:text-blue-300 font-semibold self-end sm:self-auto">
             <span>Filtered for Business UUID:</span>
-            <span className="font-mono font-bold text-slate-100">{initialBusinessId.slice(0, 8)}...</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{initialBusinessId.slice(0, 8)}...</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => router.push('/platform/support')}
-              className="text-xs text-indigo-400 hover:text-indigo-200 h-6 px-1.5"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 h-6 px-1.5"
             >
               Clear
             </Button>
@@ -174,31 +178,58 @@ function PlatformSupportDeskContent() {
         )}
       </div>
 
-      {/* Stats Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-slate-900 border-slate-800 p-4">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-slate-400 font-medium">Open Tickets Awaiting Action</span>
-            <AlertCircle className="w-4 h-4 text-amber-400" />
+      {/* Stats Strip - Foodpoint SaaS Style */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              Open Tickets Awaiting Action
+            </span>
+            <p className="text-2xl sm:text-3xl font-black text-orange-500 font-mono">
+              {openCount}
+            </p>
+            <p className="text-[11px] text-slate-400 font-medium pt-1">
+              Needing operator response
+            </p>
           </div>
-          <div className="text-2xl font-bold text-amber-400">{openCount}</div>
-        </Card>
+          <div className="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+        </div>
 
-        <Card className="bg-slate-900 border-slate-800 p-4">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-slate-400 font-medium">In Progress Under Review</span>
-            <Clock className="w-4 h-4 text-indigo-400" />
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              In Progress Under Review
+            </span>
+            <p className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400 font-mono">
+              {inProgressCount}
+            </p>
+            <p className="text-[11px] text-slate-400 font-medium pt-1">
+              Currently being investigated
+            </p>
           </div>
-          <div className="text-2xl font-bold text-indigo-400">{inProgressCount}</div>
-        </Card>
+          <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
+            <Clock className="w-6 h-6" />
+          </div>
+        </div>
 
-        <Card className="bg-slate-900 border-slate-800 p-4">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-slate-400 font-medium">Resolved / Closed</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm shadow-slate-200/40 dark:shadow-none flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              Resolved / Closed
+            </span>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+              {resolvedCount}
+            </p>
+            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-1">
+              Successfully completed
+            </p>
           </div>
-          <div className="text-2xl font-bold text-emerald-400">{resolvedCount}</div>
-        </Card>
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+        </div>
       </div>
 
       {/* Master-Detail Layout */}
@@ -206,7 +237,7 @@ function PlatformSupportDeskContent() {
         {/* Left: Ticket List (5 cols) */}
         <div className="lg:col-span-5 space-y-3">
           {/* Filters Bar */}
-          <Card className="bg-slate-900 border-slate-800 p-3 space-y-2">
+          <Card className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3.5 space-y-2.5 shadow-sm shadow-slate-200/40 dark:shadow-none rounded-3xl">
             <div className="flex flex-wrap items-center gap-1.5">
               {['ALL', 'OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'].map((st) => (
                 <button
@@ -215,10 +246,10 @@ function PlatformSupportDeskContent() {
                     setStatusFilter(st);
                     setPage(1);
                   }}
-                  className={`text-[11px] px-2 py-1 rounded transition-colors ${
+                  className={`text-[11px] px-3 py-1 rounded-full font-bold transition-all cursor-pointer ${
                     statusFilter === st
-                      ? 'bg-indigo-600 text-white font-medium'
-                      : 'bg-slate-950 text-slate-400 hover:text-slate-200'
+                      ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                      : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:border-orange-500 hover:text-orange-500'
                   }`}
                 >
                   {st}
@@ -226,13 +257,13 @@ function PlatformSupportDeskContent() {
               ))}
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs">
-              <label className="flex items-center gap-2 cursor-pointer text-slate-400">
+            <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400">
                 <input
                   type="checkbox"
                   checked={assignedToMeOnly}
                   onChange={(e) => setAssignedToMeOnly(e.target.checked)}
-                  className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
+                  className="rounded border-slate-300 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
                 />
                 <span>Assigned to Me</span>
               </label>
@@ -243,7 +274,7 @@ function PlatformSupportDeskContent() {
                   setPriorityFilter(e.target.value);
                   setPage(1);
                 }}
-                className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-[11px] text-slate-300 focus:outline-none"
+                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-[11px] text-slate-700 dark:text-slate-300 focus:outline-none"
               >
                 <option value="ALL">All Priorities</option>
                 <option value="URGENT">Urgent</option>
@@ -259,11 +290,11 @@ function PlatformSupportDeskContent() {
             {listLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-20 bg-slate-900 border border-slate-800 rounded-lg animate-pulse" />
+                  <div key={i} className="h-20 bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl animate-pulse" />
                 ))}
               </div>
             ) : displayedTickets.length === 0 ? (
-              <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-lg text-slate-500 text-xs">
+              <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-slate-400 dark:text-slate-500 text-xs">
                 No tickets match selected criteria.
               </div>
             ) : (
@@ -273,14 +304,14 @@ function PlatformSupportDeskContent() {
                   <div
                     key={t.id}
                     onClick={() => setSelectedTicketId(t.id)}
-                    className={`p-3.5 rounded-lg border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-indigo-600/10 border-indigo-500/50 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                        ? 'bg-indigo-50/70 dark:bg-indigo-600/10 border-indigo-300 dark:border-indigo-500/50 shadow-sm'
+                        : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs'
                     }`}
                   >
                     <div className="flex justify-between items-start gap-2">
-                      <span className="font-mono text-xs font-semibold text-indigo-400">
+                      <span className="font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                         {t.ticket_no}
                       </span>
                       <div className="flex items-center gap-1.5">
@@ -288,10 +319,10 @@ function PlatformSupportDeskContent() {
                           variant="outline"
                           className={`text-[10px] px-1.5 py-0 ${
                             t.priority === 'URGENT'
-                              ? 'border-rose-500/50 text-rose-400'
+                              ? 'border-rose-200 dark:border-rose-500/50 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10'
                               : t.priority === 'HIGH'
-                              ? 'border-amber-500/50 text-amber-400'
-                              : 'border-slate-700 text-slate-400'
+                              ? 'border-amber-200 dark:border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
                           }`}
                         >
                           {t.priority}
@@ -299,10 +330,10 @@ function PlatformSupportDeskContent() {
                         <Badge
                           className={`text-[10px] px-1.5 py-0 ${
                             t.status === 'OPEN'
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                              ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30'
                               : t.status === 'IN_PROGRESS'
-                              ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
-                              : 'bg-slate-800 text-slate-400'
+                              ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                           }`}
                         >
                           {t.status}
@@ -310,13 +341,13 @@ function PlatformSupportDeskContent() {
                       </div>
                     </div>
 
-                    <p className="font-medium text-slate-200 text-sm mt-1 line-clamp-1">
+                    <p className="font-medium text-slate-900 dark:text-slate-200 text-sm mt-1 line-clamp-1">
                       {t.subject}
                     </p>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        <Building2 className="w-3 h-3 text-slate-500" />
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                      <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                        <Building2 className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                         {t.business?.name || 'Shop'}
                       </span>
                       <span className="flex items-center gap-1">
@@ -334,26 +365,26 @@ function PlatformSupportDeskContent() {
         {/* Right: Active Ticket Thread (7 cols) */}
         <div className="lg:col-span-7 flex flex-col">
           {selectedTicketId && ticketThread ? (
-            <Card className="bg-slate-900 border-slate-800 text-slate-100 flex-1 flex flex-col h-full">
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl flex-1 flex flex-col h-full">
               {/* Header */}
-              <CardHeader className="border-b border-slate-800 pb-3">
+              <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold text-indigo-400">
+                      <span className="font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400">
                         {ticketThread.ticket_no}
                       </span>
-                      <Badge variant="outline">{ticketThread.priority}</Badge>
+                      <Badge variant="outline" className="border-slate-200 dark:border-slate-700">{ticketThread.priority}</Badge>
                     </div>
-                    <CardTitle className="text-base text-slate-100 mt-1">
+                    <CardTitle className="text-base text-slate-900 dark:text-slate-100 mt-1">
                       {ticketThread.subject}
                     </CardTitle>
-                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
                       <span
                         onClick={() =>
                           router.push(`/platform/businesses/${ticketThread.business?.id}`)
                         }
-                        className="text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                        className="text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
                       >
                         <Building2 className="w-3.5 h-3.5" />
                         {ticketThread.business?.name}
@@ -376,7 +407,7 @@ function PlatformSupportDeskContent() {
                           adminId: e.target.value,
                         })
                       }
-                      className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none"
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="">Unassigned</option>
                       {currentAdmin && (
@@ -397,7 +428,7 @@ function PlatformSupportDeskContent() {
                           status: e.target.value,
                         })
                       }
-                      className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none"
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="OPEN">OPEN</option>
                       <option value="IN_PROGRESS">IN_PROGRESS</option>
@@ -409,7 +440,7 @@ function PlatformSupportDeskContent() {
               </CardHeader>
 
               {/* Messages Thread Scroll Area */}
-              <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[420px] bg-slate-950/40">
+              <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[420px] bg-slate-50/50 dark:bg-slate-950/40">
                 {ticketThread.messages?.map((msg: any) => {
                   const isPlatformAdmin = msg.sender_type === 'PLATFORM_ADMIN';
                   return (
@@ -419,10 +450,10 @@ function PlatformSupportDeskContent() {
                         isPlatformAdmin ? 'items-end' : 'items-start'
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1 text-[11px] text-slate-400">
+                      <div className="flex items-center gap-2 mb-1 text-[11px] text-slate-500 dark:text-slate-400">
                         {isPlatformAdmin ? (
                           <>
-                            <span className="font-semibold text-indigo-400 flex items-center gap-1">
+                            <span className="font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
                               <Shield className="w-3 h-3" />
                               Platform Support Specialist
                             </span>
@@ -431,7 +462,7 @@ function PlatformSupportDeskContent() {
                           </>
                         ) : (
                           <>
-                            <span className="font-semibold text-slate-300 flex items-center gap-1">
+                            <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                               <User className="w-3 h-3" />
                               {ticketThread.user?.first_name || 'Shop Staff'} ({ticketThread.business?.name})
                             </span>
@@ -442,10 +473,10 @@ function PlatformSupportDeskContent() {
                       </div>
 
                       <div
-                        className={`p-3 rounded-lg text-xs leading-relaxed max-w-[85%] whitespace-pre-wrap break-words ${
+                        className={`p-3 rounded-xl text-xs leading-relaxed max-w-[85%] whitespace-pre-wrap break-words ${
                           isPlatformAdmin
-                            ? 'bg-indigo-600/20 border border-indigo-500/30 text-slate-100 rounded-br-none'
-                            : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none'
+                            ? 'bg-orange-500 text-white shadow-sm rounded-br-none'
+                            : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-xs rounded-bl-none'
                         }`}
                       >
                         {msg.message}
@@ -456,36 +487,36 @@ function PlatformSupportDeskContent() {
               </div>
 
               {/* Reply Box Footer */}
-              <div className="p-3 border-t border-slate-800 bg-slate-900">
+              <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <form onSubmit={handleSendReply} className="space-y-2">
                   <Textarea
                     rows={3}
                     placeholder="Type official response to merchant (notifies shop instantly)..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="bg-slate-950 border-slate-800 text-xs text-slate-100 placeholder:text-slate-600 resize-none"
+                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 resize-none rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-slate-400">
                       Dispatched with server-side push notification to tenant.
                     </span>
-                    <Button
+                    <button
                       type="submit"
                       disabled={replyMutation.isPending || !replyText.trim()}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-8 px-3"
+                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs h-8 px-4 rounded-xl font-bold shadow-md shadow-orange-500/25 cursor-pointer inline-flex flex-row items-center gap-1.5 transition-all disabled:opacity-50"
                     >
-                      <Send className="w-3.5 h-3.5 mr-1.5" />
-                      {replyMutation.isPending ? 'Sending...' : 'Send Reply'}
-                    </Button>
+                      <Send className="w-3.5 h-3.5 shrink-0" />
+                      <span>{replyMutation.isPending ? 'Sending...' : 'Send Reply'}</span>
+                    </button>
                   </div>
                 </form>
               </div>
             </Card>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-900 border border-slate-800 rounded-lg text-center text-slate-500">
-              <MessageSquare className="w-12 h-12 text-slate-700 mb-3" />
-              <p className="font-medium text-slate-400 text-sm">No Ticket Selected</p>
-              <p className="text-xs text-slate-600 mt-1">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-center text-slate-400 dark:text-slate-500 shadow-sm">
+              <MessageSquare className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
+              <p className="font-medium text-slate-600 dark:text-slate-400 text-sm">No Ticket Selected</p>
+              <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">
                 Select a ticket from the left queue to inspect thread history and dispatch official support.
               </p>
             </div>

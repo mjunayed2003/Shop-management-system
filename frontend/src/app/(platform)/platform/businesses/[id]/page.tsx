@@ -165,19 +165,19 @@ export default function BusinessDetailPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-48 bg-slate-800 rounded animate-pulse" />
-        <div className="h-40 bg-slate-900 border border-slate-800 rounded-lg animate-pulse" />
-        <div className="h-96 bg-slate-900 border border-slate-800 rounded-lg animate-pulse" />
+        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+        <div className="h-40 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl animate-pulse" />
+        <div className="h-96 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl animate-pulse" />
       </div>
     );
   }
 
   if (error || !data?.business) {
     return (
-      <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl">
-        <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto mb-3" />
-        <h2 className="text-xl font-bold text-slate-100">Business Not Found</h2>
-        <p className="text-slate-400 text-sm mt-1">
+      <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm">
+        <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-3" />
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Business Not Found</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
           The requested tenant shop does not exist or has been removed.
         </p>
         <Button
@@ -239,55 +239,59 @@ export default function BusinessDetailPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-8">
       {/* Back button & Title Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-3.5">
+          <button
+            type="button"
             onClick={() => router.push('/platform/businesses')}
-            className="border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
+            className="text-xs h-8 px-3 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-orange-500 hover:text-orange-500 transition-colors shadow-2xs cursor-pointer font-bold inline-flex flex-row items-center gap-1 shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back</span>
+          </button>
+
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/25 shrink-0">
+            <Building2 className="w-6 h-6" />
+          </div>
+
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-slate-100">{business.name}</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">{business.name}</h1>
               <Badge
                 variant={business.status === 'ACTIVE' ? 'default' : 'destructive'}
                 className={
                   business.status === 'ACTIVE'
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 font-bold uppercase text-[10px] rounded-md'
+                    : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 font-bold uppercase text-[10px] rounded-md'
                 }
               >
                 {business.status}
               </Badge>
               {activeOverride && (
-                <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <Badge className="bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 font-bold text-[10px] rounded-md">
                   Custom Override Active
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Slug: <span className="text-slate-200 font-mono">{business.slug}</span> • ID:{' '}
-              <span className="text-slate-200 font-mono">{business.id}</span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Slug: <span className="text-slate-700 dark:text-slate-200 font-mono font-medium">{business.slug}</span> • ID:{' '}
+              <span className="text-slate-700 dark:text-slate-200 font-mono">{business.id}</span>
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
           {canManageOverrides && (
             <Button
               onClick={() => setOverrideModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+              className="text-xs h-9 px-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20 cursor-pointer font-bold inline-flex flex-row items-center gap-1.5"
               size="sm"
             >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              Manage Override
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>Manage Override</span>
             </Button>
           )}
 
@@ -298,18 +302,18 @@ export default function BusinessDetailPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => setSuspendDialogOpen(true)}
-                  className="bg-rose-600 hover:bg-rose-700 text-white"
+                  className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold shadow-md shadow-rose-500/20"
                 >
-                  <AlertTriangle className="w-4 h-4 mr-1.5" />
+                  <AlertTriangle className="w-4 h-4 mr-1.5 shrink-0" />
                   Suspend Business
                 </Button>
               ) : (
                 <Button
                   size="sm"
                   onClick={() => setReactivateDialogOpen(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-500/20"
                 >
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  <CheckCircle2 className="w-4 h-4 mr-1.5 shrink-0" />
                   Reactivate Business
                 </Button>
               )}
@@ -319,11 +323,11 @@ export default function BusinessDetailPage() {
       </div>
 
       {/* Security notice banner */}
-      <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-between text-xs text-slate-400">
+      <div className="p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
         <div className="flex items-center gap-2">
-          <Lock className="w-4 h-4 text-indigo-400 shrink-0" />
+          <Lock className="w-4 h-4 text-orange-500 shrink-0" />
           <span>
-            <strong className="text-slate-200">Strict Multi-Tenant Isolation:</strong> Platform administrators
+            <strong className="text-slate-900 dark:text-white">Strict Multi-Tenant Isolation:</strong> Platform administrators
             maintain tenant subscriptions and account limits. Private sales, orders, and customer databases are
             cryptographically locked to the tenant.
           </span>
@@ -331,7 +335,7 @@ export default function BusinessDetailPage() {
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex border-b border-slate-800 overflow-x-auto gap-2">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto gap-1">
         {[
           { key: 'overview', label: 'Overview', icon: Building2 },
           { key: 'subscription', label: 'Subscription & Overrides', icon: CreditCard },
@@ -347,10 +351,10 @@ export default function BusinessDetailPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
-                  ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400 bg-orange-50/60 dark:bg-orange-500/10'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -363,43 +367,43 @@ export default function BusinessDetailPage() {
       {/* TAB 1: OVERVIEW */}
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="pb-3 border-b border-slate-800">
-              <CardTitle className="text-base text-slate-200">Business Profile</CardTitle>
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Business Profile</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-sm">
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Business Name</span>
-                <span className="font-medium text-slate-100">{business.name}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Business Name</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">{business.name}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Slug</span>
-                <span className="font-mono text-slate-300">{business.slug}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Slug</span>
+                <span className="font-mono text-slate-700 dark:text-slate-300">{business.slug}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Phone</span>
-                <span className="text-slate-200">{business.phone || 'N/A'}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Phone</span>
+                <span className="text-slate-800 dark:text-slate-200">{business.phone || 'N/A'}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Email</span>
-                <span className="text-slate-200">{business.email || 'N/A'}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Email</span>
+                <span className="text-slate-800 dark:text-slate-200">{business.email || 'N/A'}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Currency</span>
-                <span className="font-medium text-indigo-400">{business.currency || 'BDT'}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Currency</span>
+                <span className="font-medium text-indigo-600 dark:text-indigo-400">{business.currency || 'BDT'}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Created At</span>
-                <span className="text-slate-300">{formatDate(business.created_at)}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Created At</span>
+                <span className="text-slate-700 dark:text-slate-300">{formatDate(business.created_at)}</span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-400">Status</span>
+                <span className="text-slate-500 dark:text-slate-400">Status</span>
                 <Badge
                   variant={business.is_active ? 'default' : 'destructive'}
                   className={
                     business.is_active
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                      ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
+                      : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30'
                   }
                 >
                   {business.is_active ? 'Active' : 'Suspended'}
@@ -408,9 +412,9 @@ export default function BusinessDetailPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="pb-3 border-b border-slate-800">
-              <CardTitle className="text-base text-slate-200">Owner & Subscription Summary</CardTitle>
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Owner & Subscription Summary</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-sm">
               {business.users?.find((u: any) => u.is_owner) ? (
@@ -418,40 +422,40 @@ export default function BusinessDetailPage() {
                   const owner = business.users.find((u: any) => u.is_owner);
                   return (
                     <>
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Owner Name</span>
-                        <span className="font-medium text-slate-100">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Owner Name</span>
+                        <span className="font-medium text-slate-900 dark:text-slate-100">
                           {owner.first_name} {owner.last_name}
                         </span>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Owner Email</span>
-                        <span className="text-slate-200">{owner.email}</span>
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Owner Email</span>
+                        <span className="text-slate-800 dark:text-slate-200">{owner.email}</span>
                       </div>
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Owner Phone</span>
-                        <span className="text-slate-200">{owner.phone || 'N/A'}</span>
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Owner Phone</span>
+                        <span className="text-slate-800 dark:text-slate-200">{owner.phone || 'N/A'}</span>
                       </div>
                     </>
                   );
                 })()
               ) : (
-                <p className="text-amber-400 text-xs">No owner user assigned.</p>
+                <p className="text-amber-600 dark:text-amber-400 text-xs">No owner user assigned.</p>
               )}
 
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Current Plan</span>
-                <span className="font-semibold text-indigo-400">{plan?.name || 'No Plan'}</span>
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Current Plan</span>
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{plan?.name || 'No Plan'}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Subscription Status</span>
-                <Badge className="bg-slate-800 text-slate-200 border-slate-700">
+              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                <span className="text-slate-500 dark:text-slate-400">Subscription Status</span>
+                <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700">
                   {subscription?.status || 'N/A'}
                 </Badge>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-400">Billing Cycle</span>
-                <span className="text-slate-200">{subscription?.billing_cycle || 'N/A'}</span>
+                <span className="text-slate-500 dark:text-slate-400">Billing Cycle</span>
+                <span className="text-slate-800 dark:text-slate-200">{subscription?.billing_cycle || 'N/A'}</span>
               </div>
             </CardContent>
           </Card>
@@ -463,61 +467,61 @@ export default function BusinessDetailPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Plan Baseline Card */}
-            <Card className="bg-slate-900 border-slate-800 text-slate-100">
-              <CardHeader className="border-b border-slate-800 pb-3">
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+              <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-base text-slate-200">Base Plan: {plan?.name}</CardTitle>
-                  <Badge variant="outline" className="border-indigo-500/40 text-indigo-400">
+                  <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Base Plan: {plan?.name}</CardTitle>
+                  <Badge variant="outline" className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">
                     {plan?.code}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="pt-4 space-y-3 text-sm">
-                <div className="flex justify-between py-1 border-b border-slate-800/60">
-                  <span className="text-slate-400">Monthly Standard Price</span>
-                  <span className="font-semibold text-slate-200">{formatBDT(plan?.monthly_price)}</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Monthly Standard Price</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{formatBDT(plan?.monthly_price)}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800/60">
-                  <span className="text-slate-400">Yearly Standard Price</span>
-                  <span className="font-semibold text-slate-200">{formatBDT(plan?.yearly_price)}</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Yearly Standard Price</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{formatBDT(plan?.yearly_price)}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800/60">
-                  <span className="text-slate-400">Default Trial Period</span>
-                  <span className="text-slate-300">{plan?.trial_days ?? 30} Days</span>
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Default Trial Period</span>
+                  <span className="text-slate-700 dark:text-slate-300">{plan?.trial_days ?? 30} Days</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-800/60">
-                  <span className="text-slate-400">Current Period</span>
-                  <span className="text-slate-300">
+                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Current Period</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     {formatDate(subscription?.current_period_start)} -{' '}
                     {formatDate(subscription?.current_period_end)}
                   </span>
                 </div>
                 {subscription?.trial_ends_at && (
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Trial Ends At</span>
-                    <span className="text-amber-400">{formatDate(subscription.trial_ends_at)}</span>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                    <span className="text-slate-500 dark:text-slate-400">Trial Ends At</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-medium">{formatDate(subscription.trial_ends_at)}</span>
                   </div>
                 )}
                 {subscription?.grace_ends_at && (
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Grace Ends At</span>
-                    <span className="text-rose-400">{formatDate(subscription.grace_ends_at)}</span>
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                    <span className="text-slate-500 dark:text-slate-400">Grace Ends At</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-medium">{formatDate(subscription.grace_ends_at)}</span>
                   </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Effective Overrides Card */}
-            <Card className="bg-slate-900 border-slate-800 text-slate-100">
-              <CardHeader className="border-b border-slate-800 pb-3">
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+              <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-base text-slate-200">Active Custom Overrides</CardTitle>
+                  <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Active Custom Overrides</CardTitle>
                   {activeOverride ? (
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
                       Active
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-slate-500 border-slate-700">
+                    <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
                       Standard Plan
                     </Badge>
                   )}
@@ -526,59 +530,59 @@ export default function BusinessDetailPage() {
               <CardContent className="pt-4 space-y-3 text-sm">
                 {activeOverride ? (
                   <>
-                    <div className="flex justify-between py-1 border-b border-slate-800/60">
-                      <span className="text-slate-400">Free Access Granted?</span>
-                      <span className="font-semibold text-emerald-400">
+                    <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                      <span className="text-slate-500 dark:text-slate-400">Free Access Granted?</span>
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                         {activeOverride.is_free_access ? 'YES (100% Waived)' : 'No'}
                       </span>
                     </div>
                     {activeOverride.custom_monthly_price !== null && (
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Custom Monthly Price</span>
-                        <span className="font-semibold text-emerald-400">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Custom Monthly Price</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                           {formatBDT(activeOverride.custom_monthly_price)}
                         </span>
                       </div>
                     )}
                     {activeOverride.discount_percentage !== null && (
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Discount Applied</span>
-                        <span className="font-semibold text-amber-400">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Discount Applied</span>
+                        <span className="font-semibold text-amber-600 dark:text-amber-400">
                           {activeOverride.discount_percentage}% OFF
                         </span>
                       </div>
                     )}
                     {activeOverride.override_max_branches && (
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Custom Max Branches</span>
-                        <span className="font-semibold text-indigo-400">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Custom Max Branches</span>
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                           {activeOverride.override_max_branches}
                         </span>
                       </div>
                     )}
                     {activeOverride.override_max_users && (
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Custom Max Users</span>
-                        <span className="font-semibold text-indigo-400">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Custom Max Users</span>
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                           {activeOverride.override_max_users}
                         </span>
                       </div>
                     )}
                     {activeOverride.override_max_products && (
-                      <div className="flex justify-between py-1 border-b border-slate-800/60">
-                        <span className="text-slate-400">Custom Max Products</span>
-                        <span className="font-semibold text-indigo-400">
+                      <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                        <span className="text-slate-500 dark:text-slate-400">Custom Max Products</span>
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                           {activeOverride.override_max_products}
                         </span>
                       </div>
                     )}
-                    <div className="flex justify-between py-1 border-b border-slate-800/60">
-                      <span className="text-slate-400">Override Reason</span>
-                      <span className="text-slate-300 italic">"{activeOverride.reason}"</span>
+                    <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
+                      <span className="text-slate-500 dark:text-slate-400">Override Reason</span>
+                      <span className="text-slate-700 dark:text-slate-300 italic">"{activeOverride.reason}"</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-slate-400">Valid Until</span>
-                      <span className="text-slate-300">
+                      <span className="text-slate-500 dark:text-slate-400">Valid Until</span>
+                      <span className="text-slate-700 dark:text-slate-300">
                         {activeOverride.valid_until ? formatDate(activeOverride.valid_until) : 'Indefinite'}
                       </span>
                     </div>
@@ -589,7 +593,7 @@ export default function BusinessDetailPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => setExpireOverrideId(activeOverride.id)}
-                          className="w-full border-rose-800/60 text-rose-400 hover:bg-rose-950/30"
+                          className="w-full border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
                         >
                           Expire Override Now
                         </Button>
@@ -597,7 +601,7 @@ export default function BusinessDetailPage() {
                     )}
                   </>
                 ) : (
-                  <div className="py-6 text-center text-slate-500">
+                  <div className="py-6 text-center text-slate-500 dark:text-slate-400">
                     <p>No active overrides for this business.</p>
                     <p className="text-xs mt-1">Tenant operates strictly under default plan rules.</p>
                   </div>
@@ -607,14 +611,14 @@ export default function BusinessDetailPage() {
           </div>
 
           {/* Overrides History */}
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="border-b border-slate-800 pb-3">
-              <CardTitle className="text-base text-slate-200">Subscription Overrides History</CardTitle>
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Subscription Overrides History</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+                  <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase border-b border-slate-200 dark:border-slate-800">
                     <tr>
                       <th className="py-3 px-4">Created Date</th>
                       <th className="py-3 px-4">Reason</th>
@@ -624,10 +628,10 @@ export default function BusinessDetailPage() {
                       <th className="py-3 px-4">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                     {overrides.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-slate-500">
+                        <td colSpan={6} className="py-6 text-center text-slate-400 dark:text-slate-500">
                           No overrides recorded.
                         </td>
                       </tr>
@@ -635,12 +639,12 @@ export default function BusinessDetailPage() {
                       overrides.map((ov: any) => {
                         const isExpired = ov.valid_until && new Date(ov.valid_until) <= new Date();
                         return (
-                          <tr key={ov.id} className="hover:bg-slate-800/30">
+                          <tr key={ov.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
                             <td className="py-3 px-4 text-xs font-mono">{formatDateTime(ov.created_at)}</td>
-                            <td className="py-3 px-4 font-medium">{ov.reason}</td>
+                            <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-200">{ov.reason}</td>
                             <td className="py-3 px-4 text-xs">
                               {ov.is_free_access && (
-                                <Badge className="bg-emerald-500/10 text-emerald-400 mr-1">Free</Badge>
+                                <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 mr-1">Free</Badge>
                               )}
                               {ov.discount_percentage && `${ov.discount_percentage}% off `}
                               {ov.custom_monthly_price && formatBDT(ov.custom_monthly_price)}
@@ -663,8 +667,8 @@ export default function BusinessDetailPage() {
                                 variant={isExpired ? 'outline' : 'default'}
                                 className={
                                   isExpired
-                                    ? 'text-slate-500 border-slate-700'
-                                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                    ? 'text-slate-500 border-slate-200 dark:border-slate-700'
+                                    : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
                                 }
                               >
                                 {isExpired ? 'Expired' : 'Active'}
@@ -692,21 +696,21 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_branches || plan?.limits?.max_branches || 1;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
               return (
-                <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-slate-400 font-medium">Branches</span>
-                    <Building2 className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Branches</span>
+                    <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
-                    <span className="text-sm font-normal text-slate-400">/ {max}</span>
+                    <span className="text-sm font-normal text-slate-500 dark:text-slate-400">/ {max}</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
                     <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{pct}% quota consumed</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">{pct}% quota consumed</p>
                 </Card>
               );
             })()}
@@ -717,21 +721,21 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_users || plan?.limits?.max_users || 3;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
               return (
-                <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-slate-400 font-medium">Active Users</span>
-                    <Users className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Active Users</span>
+                    <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
-                    <span className="text-sm font-normal text-slate-400">/ {max}</span>
+                    <span className="text-sm font-normal text-slate-500 dark:text-slate-400">/ {max}</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
                     <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{pct}% quota consumed</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">{pct}% quota consumed</p>
                 </Card>
               );
             })()}
@@ -742,21 +746,21 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_products || plan?.limits?.max_products || 500;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
               return (
-                <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-slate-400 font-medium">Catalog Products</span>
-                    <Package className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Catalog Products</span>
+                    <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
-                    <span className="text-sm font-normal text-slate-400">/ {max}</span>
+                    <span className="text-sm font-normal text-slate-500 dark:text-slate-400">/ {max}</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
                     <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{pct}% quota consumed</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">{pct}% quota consumed</p>
                 </Card>
               );
             })()}
@@ -767,58 +771,58 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_variants || plan?.limits?.max_variants || 2000;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
               return (
-                <Card className="bg-slate-900 border-slate-800 text-slate-100 p-4">
+                <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-slate-400 font-medium">SKU Variants</span>
-                    <Layers className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">SKU Variants</span>
+                    <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
-                    <span className="text-sm font-normal text-slate-400">/ {max}</span>
+                    <span className="text-sm font-normal text-slate-500 dark:text-slate-400">/ {max}</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
                     <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">{pct}% quota consumed</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">{pct}% quota consumed</p>
                 </Card>
               );
             })()}
           </div>
 
           {/* Feature Toggles */}
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="border-b border-slate-800 pb-3">
-              <CardTitle className="text-base text-slate-200">Plan Feature Inclusions</CardTitle>
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Plan Feature Inclusions</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/80 flex items-center justify-between">
+              <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300 font-medium">
                 <span>REST API Access</span>
                 {plan?.limits?.has_api_access ? (
-                  <Badge className="bg-emerald-500/10 text-emerald-400">Enabled</Badge>
+                  <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">Enabled</Badge>
                 ) : (
-                  <Badge variant="outline" className="text-slate-500 border-slate-700">
+                  <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
                     Not Included
                   </Badge>
                 )}
               </div>
-              <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/80 flex items-center justify-between">
+              <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300 font-medium">
                 <span>Custom Executive Reports</span>
                 {plan?.limits?.has_custom_reports ? (
-                  <Badge className="bg-emerald-500/10 text-emerald-400">Enabled</Badge>
+                  <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">Enabled</Badge>
                 ) : (
-                  <Badge variant="outline" className="text-slate-500 border-slate-700">
+                  <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
                     Not Included
                   </Badge>
                 )}
               </div>
-              <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/80 flex items-center justify-between">
+              <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300 font-medium">
                 <span>Multi-Register Offline Sync</span>
                 {plan?.limits?.has_offline_sync ? (
-                  <Badge className="bg-emerald-500/10 text-emerald-400">Enabled</Badge>
+                  <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">Enabled</Badge>
                 ) : (
-                  <Badge variant="outline" className="text-slate-500 border-slate-700">
+                  <Badge variant="outline" className="text-slate-500 border-slate-200 dark:border-slate-700">
                     Not Included
                   </Badge>
                 )}
@@ -830,14 +834,14 @@ export default function BusinessDetailPage() {
 
       {/* TAB 4: INVOICES & PAYMENTS */}
       {activeTab === 'invoices' && (
-        <Card className="bg-slate-900 border-slate-800 text-slate-100">
-          <CardHeader className="border-b border-slate-800 pb-3">
-            <CardTitle className="text-base text-slate-200">Subscription Invoices</CardTitle>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+            <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Subscription Invoices</CardTitle>
           </CardHeader>
           <CardContent className="pt-4 p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4">Invoice No</th>
                     <th className="py-3 px-4">Billing Period</th>
@@ -847,32 +851,32 @@ export default function BusinessDetailPage() {
                     <th className="py-3 px-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                   {invoicesLoading ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500">
+                      <td colSpan={6} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         Loading invoices...
                       </td>
                     </tr>
                   ) : !invoicesData?.data || invoicesData.data.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500">
+                      <td colSpan={6} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         No invoices generated for this business yet.
                       </td>
                     </tr>
                   ) : (
                     invoicesData.data.map((inv: any) => (
-                      <tr key={inv.id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-4 font-mono font-medium text-slate-100">
+                      <tr key={inv.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
+                        <td className="py-3 px-4 font-mono font-medium text-slate-900 dark:text-slate-100">
                           {inv.invoice_number}
                         </td>
                         <td className="py-3 px-4 text-xs">
                           {formatDate(inv.period_start)} - {formatDate(inv.period_end)}
                         </td>
-                        <td className="py-3 px-4 font-medium text-slate-100">
+                        <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">
                           {formatBDT(inv.net_amount)}
                         </td>
-                        <td className="py-3 px-4 text-emerald-400 font-medium">
+                        <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-medium">
                           {formatBDT(inv.paid_amount || 0)}
                         </td>
                         <td className="py-3 px-4 text-xs">{formatDate(inv.due_date)}</td>
@@ -880,10 +884,10 @@ export default function BusinessDetailPage() {
                           <Badge
                             className={
                               inv.status === 'PAID'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
                                 : inv.status === 'OVERDUE'
-                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30'
+                                : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30'
                             }
                           >
                             {inv.status}
@@ -903,32 +907,32 @@ export default function BusinessDetailPage() {
       {activeTab === 'branches_users' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Branches list */}
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="border-b border-slate-800 pb-3">
-              <CardTitle className="text-base text-slate-200">
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">
                 Branches ({business.branches?.length || 0})
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+              <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                 Registered physical or online branches
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 p-0">
-              <div className="divide-y divide-slate-800/60">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {business.branches?.map((b: any) => (
                   <div key={b.id} className="p-3 flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-slate-200">{b.name}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-200">{b.name}</p>
                       <p className="text-xs font-mono text-slate-500">{b.code}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {b.is_main && (
-                        <Badge variant="outline" className="text-indigo-400 border-indigo-500/40 text-[10px]">
+                        <Badge variant="outline" className="text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/40 text-[10px]">
                           Main HQ
                         </Badge>
                       )}
                       <Badge
                         variant={b.is_active ? 'default' : 'destructive'}
-                        className={b.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}
+                        className={b.is_active ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30'}
                       >
                         {b.is_active ? 'Active' : 'Inactive'}
                       </Badge>
@@ -940,36 +944,36 @@ export default function BusinessDetailPage() {
           </Card>
 
           {/* Users list */}
-          <Card className="bg-slate-900 border-slate-800 text-slate-100">
-            <CardHeader className="border-b border-slate-800 pb-3">
-              <CardTitle className="text-base text-slate-200">
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">
                 Users ({business.users?.length || 0})
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+              <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                 Shop staff accounts (passwords/tokens never shown)
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 p-0">
-              <div className="divide-y divide-slate-800/60">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {business.users?.map((u: any) => (
                   <div key={u.id} className="p-3 flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-slate-200">
+                      <p className="font-medium text-slate-900 dark:text-slate-200">
                         {u.first_name} {u.last_name}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {u.email} • {u.phone || 'No phone'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       {u.is_owner && (
-                        <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px]">
+                        <Badge className="bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 text-[10px]">
                           Owner
                         </Badge>
                       )}
                       <Badge
                         variant={u.is_active ? 'default' : 'destructive'}
-                        className={u.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}
+                        className={u.is_active ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30'}
                       >
                         {u.is_active ? 'Active' : 'Disabled'}
                       </Badge>
@@ -984,11 +988,11 @@ export default function BusinessDetailPage() {
 
       {/* TAB 6: SUPPORT TICKETS */}
       {activeTab === 'tickets' && (
-        <Card className="bg-slate-900 border-slate-800 text-slate-100">
-          <CardHeader className="border-b border-slate-800 pb-3 flex flex-row items-center justify-between">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base text-slate-200">Support Desk Tickets</CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+              <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Support Desk Tickets</CardTitle>
+              <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
                 Communications filed by this tenant
               </CardDescription>
             </div>
@@ -996,7 +1000,7 @@ export default function BusinessDetailPage() {
               size="sm"
               variant="outline"
               onClick={() => router.push(`/platform/support?businessId=${businessId}`)}
-              className="border-slate-700 bg-slate-950 text-slate-300 hover:bg-slate-800 text-xs"
+              className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs"
             >
               Open in Support Desk
               <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
@@ -1005,7 +1009,7 @@ export default function BusinessDetailPage() {
           <CardContent className="pt-4 p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4">Ticket #</th>
                     <th className="py-3 px-4">Subject</th>
@@ -1015,28 +1019,28 @@ export default function BusinessDetailPage() {
                     <th className="py-3 px-4">Updated</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                   {ticketsLoading ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500">
+                      <td colSpan={6} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         Loading tickets...
                       </td>
                     </tr>
                   ) : !ticketsData?.data || ticketsData.data.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500">
+                      <td colSpan={6} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         No support tickets opened by this business.
                       </td>
                     </tr>
                   ) : (
                     ticketsData.data.map((t: any) => (
-                      <tr key={t.id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-4 font-mono font-medium text-slate-100">
+                      <tr key={t.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
+                        <td className="py-3 px-4 font-mono font-medium text-slate-900 dark:text-slate-100">
                           {t.ticket_no}
                         </td>
-                        <td className="py-3 px-4 font-medium text-slate-200">{t.subject}</td>
+                        <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-200">{t.subject}</td>
                         <td className="py-3 px-4">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
                             {t.priority}
                           </Badge>
                         </td>
@@ -1044,19 +1048,19 @@ export default function BusinessDetailPage() {
                           <Badge
                             className={
                               t.status === 'RESOLVED' || t.status === 'CLOSED'
-                                ? 'bg-slate-800 text-slate-300'
-                                : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                                : 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30'
                             }
                           >
                             {t.status}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-400">
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
                           {t.assigned_admin
                             ? `${t.assigned_admin.first_name} ${t.assigned_admin.last_name}`
                             : 'Unassigned'}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-400">{formatDate(t.updated_at)}</td>
+                        <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">{formatDate(t.updated_at)}</td>
                       </tr>
                     ))
                   )}
@@ -1069,17 +1073,17 @@ export default function BusinessDetailPage() {
 
       {/* TAB 7: AUDIT */}
       {activeTab === 'audit' && (
-        <Card className="bg-slate-900 border-slate-800 text-slate-100">
-          <CardHeader className="border-b border-slate-800 pb-3">
-            <CardTitle className="text-base text-slate-200">Platform Audit Trail</CardTitle>
-            <CardDescription className="text-xs text-slate-400">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-sm rounded-xl">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
+            <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Platform Audit Trail</CardTitle>
+            <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
               Platform administration and subscription lifecycle events for this tenant
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4 p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase border-b border-slate-800">
+                <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="py-3 px-4">Timestamp</th>
                     <th className="py-3 px-4">Action</th>
@@ -1088,38 +1092,38 @@ export default function BusinessDetailPage() {
                     <th className="py-3 px-4">Details</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                   {auditLoading ? (
                     <tr>
-                      <td colSpan={5} className="py-6 text-center text-slate-500">
+                      <td colSpan={5} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         Loading audit logs...
                       </td>
                     </tr>
                   ) : !auditData?.data || auditData.data.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-6 text-center text-slate-500">
+                      <td colSpan={5} className="py-6 text-center text-slate-400 dark:text-slate-500">
                         No audit events recorded for this business.
                       </td>
                     </tr>
                   ) : (
                     auditData.data.map((log: any) => (
-                      <tr key={log.id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-4 text-xs font-mono text-slate-400">
+                      <tr key={log.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
+                        <td className="py-3 px-4 text-xs font-mono text-slate-500 dark:text-slate-400">
                           {formatDateTime(log.created_at)}
                         </td>
                         <td className="py-3 px-4">
-                          <Badge variant="outline" className="text-xs border-slate-700">
+                          <Badge variant="outline" className="text-xs border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                             {log.action}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 font-mono text-xs text-indigo-400">
+                        <td className="py-3 px-4 font-mono text-xs text-indigo-600 dark:text-indigo-400 font-medium">
                           {log.entity_table}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-300">
+                        <td className="py-3 px-4 text-xs text-slate-600 dark:text-slate-300">
                           {log.user ? `${log.user.first_name} (${log.user.email})` : 'System / Admin'}
                         </td>
                         <td className="py-3 px-4 text-xs">
-                          <pre className="bg-slate-950 p-2 rounded text-[11px] text-slate-400 max-h-24 overflow-y-auto">
+                          <pre className="bg-slate-50 dark:bg-slate-950 p-2 rounded text-[11px] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 max-h-24 overflow-y-auto">
                             {JSON.stringify(log.new_values, null, 2)}
                           </pre>
                         </td>
@@ -1208,13 +1212,13 @@ export default function BusinessDetailPage() {
 
       {/* CREATE OVERRIDE MODAL */}
       <Dialog open={overrideModalOpen} onOpenChange={setOverrideModalOpen}>
-        <DialogContent className="max-w-xl bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-indigo-400">
+            <DialogTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
               <Sparkles className="w-5 h-5" />
               Create Subscription Override
             </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
+            <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs">
               Apply customized prices, discount rates, or quota increases for {business.name}.
             </DialogDescription>
           </DialogHeader>
@@ -1222,7 +1226,7 @@ export default function BusinessDetailPage() {
           <form onSubmit={handleCreateOverrideSubmit} className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-300">Custom Monthly (BDT)</label>
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Custom Monthly (BDT)</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -1231,11 +1235,11 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, customMonthlyPrice: e.target.value })
                   }
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-300">Custom Yearly (BDT)</label>
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Custom Yearly (BDT)</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -1244,14 +1248,14 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, customYearlyPrice: e.target.value })
                   }
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-300">Discount (%)</label>
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Discount (%)</label>
                 <Input
                   type="number"
                   min="0"
@@ -1261,7 +1265,7 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, discountPercentage: e.target.value })
                   }
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
               <div className="flex items-center gap-2 pt-6">
@@ -1272,19 +1276,19 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, isFreeAccess: e.target.checked })
                   }
-                  className="rounded border-slate-800 text-indigo-600 focus:ring-indigo-500 w-4 h-4 bg-slate-950"
+                  className="rounded border-slate-300 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 w-4 h-4 bg-white dark:bg-slate-950"
                 />
-                <label htmlFor="isFreeAccess" className="text-xs font-medium text-amber-400">
+                <label htmlFor="isFreeAccess" className="text-xs font-medium text-amber-600 dark:text-amber-400">
                   Grant 100% Free Access
                 </label>
               </div>
             </div>
 
-            <div className="border-t border-slate-800 pt-3">
-              <p className="text-xs font-semibold text-slate-400 mb-2">Override Quota Limits</p>
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-3">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Override Quota Limits</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] text-slate-400">Max Branches</label>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Branches</label>
                   <Input
                     type="number"
                     placeholder="e.g. 5"
@@ -1292,11 +1296,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxBranches: e.target.value })
                     }
-                    className="bg-slate-950 border-slate-800 text-slate-100"
+                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-400">Max Users</label>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Users</label>
                   <Input
                     type="number"
                     placeholder="e.g. 10"
@@ -1304,11 +1308,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxUsers: e.target.value })
                     }
-                    className="bg-slate-950 border-slate-800 text-slate-100"
+                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-400">Max Products</label>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Products</label>
                   <Input
                     type="number"
                     placeholder="e.g. 5000"
@@ -1316,11 +1320,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxProducts: e.target.value })
                     }
-                    className="bg-slate-950 border-slate-800 text-slate-100"
+                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-400">Max Variants</label>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Variants</label>
                   <Input
                     type="number"
                     placeholder="e.g. 15000"
@@ -1328,15 +1332,15 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxVariants: e.target.value })
                     }
-                    className="bg-slate-950 border-slate-800 text-slate-100"
+                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 border-t border-slate-800 pt-3">
+            <div className="grid grid-cols-2 gap-3 border-t border-slate-100 dark:border-slate-800 pt-3">
               <div>
-                <label className="text-xs font-medium text-slate-300">Extend Trial (Days)</label>
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Extend Trial (Days)</label>
                 <Input
                   type="number"
                   placeholder="e.g. 14"
@@ -1344,25 +1348,25 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, trialExtendedDays: e.target.value })
                   }
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-300">Valid Until Date</label>
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Valid Until Date</label>
                 <Input
                   type="date"
                   value={overrideForm.validUntil}
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, validUntil: e.target.value })
                   }
-                  className="bg-slate-950 border-slate-800 text-slate-100"
+                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
                 />
               </div>
             </div>
 
-            <div className="border-t border-slate-800 pt-3">
-              <label className="text-xs font-medium text-slate-300">
-                Reason for Override <span className="text-rose-400">*</span>
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-3">
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Reason for Override <span className="text-rose-500">*</span>
               </label>
               <Textarea
                 required
@@ -1370,7 +1374,7 @@ export default function BusinessDetailPage() {
                 placeholder="Required explanation for the audit log..."
                 value={overrideForm.reason}
                 onChange={(e) => setOverrideForm({ ...overrideForm, reason: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-slate-100 mt-1"
+                className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1"
               />
             </div>
 
@@ -1379,7 +1383,7 @@ export default function BusinessDetailPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setOverrideModalOpen(false)}
-                className="border-slate-800 text-slate-300"
+                className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
               >
                 Cancel
               </Button>
