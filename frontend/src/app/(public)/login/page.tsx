@@ -65,7 +65,7 @@ function LoginForm() {
   const fillStoreDemo = (id: string, pass: string, slug?: string) => {
     setValue('identifier', id);
     setValue('password', pass);
-    if (slug) setValue('businessSlug', slug);
+    setValue('businessSlug', slug || undefined);
     setServerError(null);
   };
 
@@ -74,6 +74,15 @@ function LoginForm() {
     setServerError(null);
 
     try {
+      const isDemo =
+        values.identifier.trim().toLowerCase() === 'owner@shop.com' ||
+        values.identifier.trim().toLowerCase() === 'cashier@shop.com';
+
+      // For custom user emails/phones, do not lock to 'demo-fashion'
+      const effectiveSlug = isDemo
+        ? (values.businessSlug || 'demo-fashion')
+        : (values.businessSlug && values.businessSlug !== 'demo-fashion' ? values.businessSlug.trim() : undefined);
+
       // Authenticate via Next.js BFF proxy to set secure httpOnly cookie
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -81,7 +90,7 @@ function LoginForm() {
         body: JSON.stringify({
           identifier: values.identifier.trim(),
           password: values.password,
-          businessSlug: values.businessSlug?.trim() || undefined,
+          businessSlug: effectiveSlug,
           rememberMe: values.rememberMe,
         }),
       });

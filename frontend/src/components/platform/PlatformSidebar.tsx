@@ -115,7 +115,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   return (
-    <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex flex-col justify-between h-screen sticky top-0 select-none z-30 shadow-xs">
+    <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex flex-col justify-between h-full select-none z-30 shadow-xs">
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
         {/* Brand Logo Header (Foodpoint style) */}
         <div className="flex items-center justify-between px-2">

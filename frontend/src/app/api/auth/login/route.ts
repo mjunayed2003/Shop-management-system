@@ -5,13 +5,23 @@ import { ENV } from '@/lib/config/env';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const { identifier, password, businessSlug, rememberMe } = body;
+
+    const payload: Record<string, any> = {
+      identifier: identifier?.trim(),
+      password,
+    };
+
+    if (businessSlug && String(businessSlug).trim()) {
+      payload.businessSlug = String(businessSlug).trim();
+    }
 
     const response = await fetch(`${ENV.API_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();

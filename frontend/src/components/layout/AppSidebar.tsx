@@ -19,7 +19,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
   return (
     <aside className="w-64 h-full flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 select-none">
       {/* Brand Header */}
-      <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800/80">
+      <div className="h-16 shrink-0 flex items-center gap-3 px-5 border-b border-slate-800/80">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black shadow-md shadow-emerald-500/20">
           <ShoppingBag className="w-5 h-5 text-slate-950" />
         </div>
@@ -32,7 +32,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
       </div>
 
       {/* Nav Links */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
+      <div className="flex-1 overflow-y-auto p-3 space-y-1 [&::-webkit-scrollbar-thumb]:bg-slate-700/60 hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
         <p className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
           মূল মেনু
         </p>
@@ -48,7 +48,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
       </div>
 
       {/* Footer Info */}
-      <div className="p-3 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
+      <div className="p-3 shrink-0 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
         <span>সংস্করণ ১.০.০</span>
         <span className="w-2 h-2 rounded-full bg-emerald-500" />
       </div>

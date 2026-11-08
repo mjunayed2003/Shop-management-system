@@ -21,9 +21,9 @@ export function AppShell({
 
   return (
     <ProtectedRoute requiredPermission={requiredPermission}>
-      <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased">
+      <div className="h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block shrink-0">
+        <div className="hidden lg:block shrink-0 h-full">
           <AppSidebar />
         </div>
 
@@ -41,7 +41,7 @@ export function AppShell({
         )}
 
         {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
           <SubscriptionBanner />
           <AppTopBar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
 
