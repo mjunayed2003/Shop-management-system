@@ -85,7 +85,7 @@ export default function PlatformSettingsPage() {
         <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto mb-3" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Restricted Platform Zone</h2>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Only users with the <span className="text-indigo-600 dark:text-indigo-400 font-mono">SUPER_ADMIN</span> role can inspect
+          Only users with the <span className="text-orange-600 dark:text-orange-400 font-mono font-bold">SUPER_ADMIN</span> role can inspect
           or adjust low-level system configuration parameters.
         </p>
       </div>

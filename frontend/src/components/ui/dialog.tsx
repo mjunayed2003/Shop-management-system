@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface DialogProps {
@@ -42,10 +43,22 @@ interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className = '', children, ...props }, ref) => {
     const { onOpenChange } = React.useContext(DialogContext);
+    const [mounted, setMounted] = React.useState(false);
 
-    return (
+    React.useEffect(() => {
+      setMounted(true);
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }, []);
+
+    if (!mounted) return null;
+
+    const content = (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-fadeIn overflow-y-auto"
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             onOpenChange?.(false);
@@ -56,7 +69,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           ref={ref}
           role="dialog"
           aria-modal="true"
-          className={`relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden animate-scaleIn ${className}`}
+          className={`relative w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card text-card-foreground shadow-2xl my-auto animate-scaleIn ${className}`}
           onClick={(e) => e.stopPropagation()}
           {...props}
         >
@@ -64,7 +77,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           <button
             type="button"
             onClick={() => onOpenChange?.(false)}
-            className="absolute right-3.5 top-3.5 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+            className="absolute right-4 top-4 z-20 rounded-full p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white bg-slate-100/80 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 transition-colors focus:outline-none cursor-pointer"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
@@ -72,6 +85,8 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
         </div>
       </div>
     );
+
+    return createPortal(content, document.body);
   },
 );
 DialogContent.displayName = 'DialogContent';

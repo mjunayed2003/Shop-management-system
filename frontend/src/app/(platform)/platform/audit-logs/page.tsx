@@ -213,7 +213,7 @@ export default function PlatformAuditLogsPage() {
                         >
                           <td className="py-3 px-4 text-slate-400 dark:text-slate-500">
                             {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                              <ChevronDown className="w-4 h-4 text-orange-500" />
                             ) : (
                               <ChevronRight className="w-4 h-4" />
                             )}
@@ -229,7 +229,7 @@ export default function PlatformAuditLogsPage() {
                                   ? 'border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10'
                                   : log.action === 'DELETE'
                                   ? 'border-rose-200 dark:border-rose-500/40 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10'
-                                  : 'border-indigo-200 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
+                                  : 'border-orange-200 dark:border-orange-500/40 text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10'
                               }
                             >
                               {log.action}
@@ -265,7 +265,7 @@ export default function PlatformAuditLogsPage() {
                               </div>
                             ) : (
                               <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                <User className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                                <User className="w-3.5 h-3.5 text-orange-500" />
                                 Platform Admin / System
                               </span>
                             )}

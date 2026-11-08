@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import {
   Users,
   Shield,
+  ShieldCheck,
   Plus,
   Edit2,
   Power,
@@ -97,7 +98,7 @@ export default function PlatformAdminsPage() {
         <ShieldAlert className="w-12 h-12 text-rose-400 mx-auto mb-3" />
         <h2 className="text-xl font-bold text-slate-100">Access Restricted</h2>
         <p className="text-slate-400 text-sm mt-1">
-          Only <span className="text-indigo-400 font-mono">SUPER_ADMIN</span> administrators can provision
+          Only <span className="text-orange-500 font-mono font-bold">SUPER_ADMIN</span> administrators can provision
           or configure platform administrator accounts.
         </p>
       </div>
@@ -206,14 +207,14 @@ export default function PlatformAdminsPage() {
                       <tr key={admin.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center font-bold text-xs uppercase">
+                            <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 flex items-center justify-center font-bold text-xs uppercase shadow-2xs">
                               {admin.first_name?.[0] || 'A'}
                             </div>
                             <div>
                               <p className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                                 {admin.first_name} {admin.last_name}
                                 {isSelf && (
-                                  <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 text-[10px] px-1 py-0">
+                                  <Badge className="bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/30 text-[10px] px-1 py-0 font-bold">
                                     You
                                   </Badge>
                                 )}
@@ -236,10 +237,10 @@ export default function PlatformAdminsPage() {
                           <Badge
                             className={
                               admin.role === PlatformRole.SUPER_ADMIN
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30'
+                                ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 font-bold'
                                 : admin.role === PlatformRole.BILLING_ADMIN
-                                ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                                ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 font-bold'
+                                : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-bold'
                             }
                           >
                             {admin.role}
@@ -469,43 +470,63 @@ export default function PlatformAdminsPage() {
         isLoading={updateMutation.isPending}
       />
 
-      {/* CHANGE ROLE DIALOG */}
+      {/* CHANGE ROLE DIALOG (Foodpoint Theme) */}
       <Dialog open={Boolean(changeRoleTarget)} onOpenChange={(open) => !open && setChangeRoleTarget(null)}>
-        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-xl rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-              <Shield className="w-5 h-5" />
-              Change Administrator Role
-            </DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs">
-              Update role privileges for {changeRoleTarget?.first_name} {changeRoleTarget?.last_name}.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
+        <DialogContent className="max-w-md bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-2xl rounded-3xl p-0 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/25 shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
             <div>
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Select Role</label>
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
+                Change Administrator Role
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                Update role privileges for {changeRoleTarget?.first_name} {changeRoleTarget?.last_name}.
+              </DialogDescription>
+            </div>
+          </div>
+
+          <div className="space-y-4 px-6 py-5">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                Select Platform Role <span className="text-rose-500">*</span>
+              </label>
               <select
                 value={newSelectedRole}
                 onChange={(e) => setNewSelectedRole(e.target.value as any)}
-                className="w-full mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md py-2 px-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer font-medium"
               >
-                <option value={PlatformRole.PLATFORM_SUPPORT}>PLATFORM_SUPPORT</option>
-                <option value={PlatformRole.BILLING_ADMIN}>BILLING_ADMIN</option>
-                <option value={PlatformRole.SUPER_ADMIN}>SUPER_ADMIN</option>
+                <option value={PlatformRole.PLATFORM_SUPPORT}>
+                  PLATFORM_SUPPORT — Merchant support & shop view
+                </option>
+                <option value={PlatformRole.BILLING_ADMIN}>
+                  BILLING_ADMIN — Invoices, revenue, plans & overrides
+                </option>
+                <option value={PlatformRole.SUPER_ADMIN}>
+                  SUPER_ADMIN — Full system oversight & security governance
+                </option>
               </select>
             </div>
 
-            <DialogFooter className="pt-2">
-              <Button
+            <div className="p-3.5 rounded-2xl bg-orange-50/60 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/40 text-xs text-orange-950 dark:text-orange-300 space-y-1">
+              <span className="font-bold block text-[11px] text-orange-600 dark:text-orange-400">
+                Security Policy Notice:
+              </span>
+              <p className="text-[11px] leading-relaxed text-orange-900/80 dark:text-orange-300">
+                Role changes take effect upon the operator's next authenticated session. Revoking Super Admin role requires at least one active Super Admin to remain on the platform.
+              </p>
+            </div>
+
+            <DialogFooter className="px-6 py-3.5 -mx-6 -mb-5 mt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-end gap-2.5 rounded-b-3xl">
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => setChangeRoleTarget(null)}
-                className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+                className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-2xs cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
                 disabled={updateMutation.isPending}
                 onClick={() =>
@@ -515,10 +536,10 @@ export default function PlatformAdminsPage() {
                     payload: { role: newSelectedRole },
                   })
                 }
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="h-9 px-5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/25 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
               >
                 {updateMutation.isPending ? 'Updating...' : 'Save Role'}
-              </Button>
+              </button>
             </DialogFooter>
           </div>
         </DialogContent>

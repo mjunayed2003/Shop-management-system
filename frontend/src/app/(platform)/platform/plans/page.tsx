@@ -245,7 +245,7 @@ export default function PlatformPlansPage() {
         </div>
       ) : plans.length === 0 ? (
         <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm">
-          <Zap className="w-12 h-12 text-indigo-600 dark:text-indigo-400 mx-auto mb-3 opacity-60" />
+          <Zap className="w-12 h-12 text-orange-500 mx-auto mb-3 opacity-60" />
           <h3 className="text-lg font-bold text-slate-900 dark:text-slate-200">No Plans Configured</h3>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             Create your first subscription tier to begin onboarding tenant shops.
@@ -253,7 +253,7 @@ export default function PlatformPlansPage() {
           {canEditPlans && (
             <Button
               onClick={handleOpenCreate}
-              className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
+              className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/25 cursor-pointer"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Create Plan
@@ -269,7 +269,7 @@ export default function PlatformPlansPage() {
                 key={p.id}
                 className={`bg-white dark:bg-slate-900 border transition-all rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md ${
                   p.is_active
-                    ? 'border-slate-200/90 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700'
+                    ? 'border-slate-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500/30'
                     : 'border-slate-200/50 dark:border-slate-800/40 opacity-70'
                 }`}
               >
@@ -279,7 +279,7 @@ export default function PlatformPlansPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">{p.name}</CardTitle>
-                          <Badge variant="outline" className="font-mono text-xs border-indigo-200 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-400 bg-indigo-50/50 dark:bg-transparent">
+                          <Badge variant="outline" className="font-mono text-xs border-orange-200 dark:border-orange-500/40 text-orange-700 dark:text-orange-400 bg-orange-50/50 dark:bg-transparent">
                             {p.code}
                           </Badge>
                         </div>
@@ -314,7 +314,7 @@ export default function PlatformPlansPage() {
                   <CardContent className="pt-4 space-y-3 text-xs">
                     <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <Building2 className="w-3.5 h-3.5 text-orange-500" />
                         Max Branches
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">
@@ -324,7 +324,7 @@ export default function PlatformPlansPage() {
 
                     <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <Users className="w-3.5 h-3.5 text-orange-500" />
                         Max Users
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">
@@ -334,7 +334,7 @@ export default function PlatformPlansPage() {
 
                     <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <Package className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <Package className="w-3.5 h-3.5 text-orange-500" />
                         Max Products
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">
@@ -344,7 +344,7 @@ export default function PlatformPlansPage() {
 
                     <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <Layers className="w-3.5 h-3.5 text-orange-500" />
                         Max Variants
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">
@@ -354,7 +354,7 @@ export default function PlatformPlansPage() {
 
                     <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-orange-500" />
                         Monthly Invoices
                       </span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">

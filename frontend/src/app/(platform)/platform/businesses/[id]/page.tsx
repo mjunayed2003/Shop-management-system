@@ -182,7 +182,7 @@ export default function BusinessDetailPage() {
         </p>
         <Button
           onClick={() => router.push('/platform/businesses')}
-          className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white"
+          className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/25"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Businesses
@@ -390,7 +390,7 @@ export default function BusinessDetailPage() {
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                 <span className="text-slate-500 dark:text-slate-400">Currency</span>
-                <span className="font-medium text-indigo-600 dark:text-indigo-400">{business.currency || 'BDT'}</span>
+                <span className="font-bold text-orange-600 dark:text-orange-400">{business.currency || 'BDT'}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                 <span className="text-slate-500 dark:text-slate-400">Created At</span>
@@ -445,7 +445,7 @@ export default function BusinessDetailPage() {
 
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                 <span className="text-slate-500 dark:text-slate-400">Current Plan</span>
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{plan?.name || 'No Plan'}</span>
+                <span className="font-bold text-orange-600 dark:text-orange-400">{plan?.name || 'No Plan'}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                 <span className="text-slate-500 dark:text-slate-400">Subscription Status</span>
@@ -471,7 +471,7 @@ export default function BusinessDetailPage() {
               <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-200">Base Plan: {plan?.name}</CardTitle>
-                  <Badge variant="outline" className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">
+                  <Badge variant="outline" className="border-orange-500/40 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 font-bold">
                     {plan?.code}
                   </Badge>
                 </div>
@@ -555,7 +555,7 @@ export default function BusinessDetailPage() {
                     {activeOverride.override_max_branches && (
                       <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                         <span className="text-slate-500 dark:text-slate-400">Custom Max Branches</span>
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                        <span className="font-bold text-orange-600 dark:text-orange-400">
                           {activeOverride.override_max_branches}
                         </span>
                       </div>
@@ -563,7 +563,7 @@ export default function BusinessDetailPage() {
                     {activeOverride.override_max_users && (
                       <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                         <span className="text-slate-500 dark:text-slate-400">Custom Max Users</span>
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                        <span className="font-bold text-orange-600 dark:text-orange-400">
                           {activeOverride.override_max_users}
                         </span>
                       </div>
@@ -571,7 +571,7 @@ export default function BusinessDetailPage() {
                     {activeOverride.override_max_products && (
                       <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                         <span className="text-slate-500 dark:text-slate-400">Custom Max Products</span>
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                        <span className="font-bold text-orange-600 dark:text-orange-400">
                           {activeOverride.override_max_products}
                         </span>
                       </div>
@@ -696,12 +696,12 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_branches || plan?.limits?.max_branches || 1;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-orange-500';
               return (
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Branches</span>
-                    <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Building2 className="w-4 h-4 text-orange-500" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
@@ -721,12 +721,12 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_users || plan?.limits?.max_users || 3;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-orange-500';
               return (
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Active Users</span>
-                    <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Users className="w-4 h-4 text-orange-500" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
@@ -746,12 +746,12 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_products || plan?.limits?.max_products || 500;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-orange-500';
               return (
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Catalog Products</span>
-                    <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Package className="w-4 h-4 text-orange-500" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
@@ -771,12 +771,12 @@ export default function BusinessDetailPage() {
               const max = activeOverride?.override_max_variants || plan?.limits?.max_variants || 2000;
               const pct = Math.min(Math.round((current / max) * 100), 100);
               const color =
-                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-600 dark:bg-indigo-500';
+                pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-orange-500';
               return (
                 <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-slate-100 p-4 shadow-sm rounded-xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">SKU Variants</span>
-                    <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Layers className="w-4 h-4 text-orange-500" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {current}{' '}
@@ -926,7 +926,7 @@ export default function BusinessDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {b.is_main && (
-                        <Badge variant="outline" className="text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/40 text-[10px]">
+                        <Badge variant="outline" className="text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/40 text-[10px] font-bold">
                           Main HQ
                         </Badge>
                       )}
@@ -1049,7 +1049,7 @@ export default function BusinessDetailPage() {
                             className={
                               t.status === 'RESOLVED' || t.status === 'CLOSED'
                                 ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                                : 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30'
+                                : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30'
                             }
                           >
                             {t.status}
@@ -1116,7 +1116,7 @@ export default function BusinessDetailPage() {
                             {log.action}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 font-mono text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                        <td className="py-3 px-4 font-mono text-xs text-orange-600 dark:text-orange-400 font-bold">
                           {log.entity_table}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-600 dark:text-slate-300">
@@ -1210,23 +1210,27 @@ export default function BusinessDetailPage() {
         variant="destructive"
       />
 
-      {/* CREATE OVERRIDE MODAL */}
+      {/* CREATE OVERRIDE MODAL (Foodpoint Theme) */}
       <Dialog open={overrideModalOpen} onOpenChange={setOverrideModalOpen}>
-        <DialogContent className="max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-2xl rounded-3xl p-0">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/25 shrink-0">
               <Sparkles className="w-5 h-5" />
-              Create Subscription Override
-            </DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs">
-              Apply customized prices, discount rates, or quota increases for {business.name}.
-            </DialogDescription>
-          </DialogHeader>
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
+                Create Subscription Override
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                Apply customized prices, discount rates, or quota increases for {business.name}.
+              </DialogDescription>
+            </div>
+          </div>
 
-          <form onSubmit={handleCreateOverrideSubmit} className="space-y-4 py-2">
+          <form onSubmit={handleCreateOverrideSubmit} className="space-y-4 px-6 py-4 text-xs">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Custom Monthly (BDT)</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Custom Monthly (BDT)</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -1235,11 +1239,11 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, customMonthlyPrice: e.target.value })
                   }
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Custom Yearly (BDT)</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Custom Yearly (BDT)</label>
                 <Input
                   type="number"
                   step="0.01"
@@ -1248,14 +1252,14 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, customYearlyPrice: e.target.value })
                   }
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Discount (%)</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Discount (%)</label>
                 <Input
                   type="number"
                   min="0"
@@ -1265,7 +1269,7 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, discountPercentage: e.target.value })
                   }
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
               <div className="flex items-center gap-2 pt-6">
@@ -1276,19 +1280,21 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, isFreeAccess: e.target.checked })
                   }
-                  className="rounded border-slate-300 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 w-4 h-4 bg-white dark:bg-slate-950"
+                  className="rounded border-slate-300 dark:border-slate-800 text-orange-500 focus:ring-orange-500 w-4 h-4 bg-slate-50 dark:bg-slate-950 cursor-pointer"
                 />
-                <label htmlFor="isFreeAccess" className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                <label htmlFor="isFreeAccess" className="text-xs font-bold text-orange-600 dark:text-orange-400 cursor-pointer">
                   Grant 100% Free Access
                 </label>
               </div>
             </div>
 
             <div className="border-t border-slate-100 dark:border-slate-800 pt-3">
-              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Override Quota Limits</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2.5">
+                Override Quota Limits
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Branches</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Max Branches</label>
                   <Input
                     type="number"
                     placeholder="e.g. 5"
@@ -1296,11 +1302,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxBranches: e.target.value })
                     }
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Users</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Max Users</label>
                   <Input
                     type="number"
                     placeholder="e.g. 10"
@@ -1308,11 +1314,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxUsers: e.target.value })
                     }
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Products</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Max Products</label>
                   <Input
                     type="number"
                     placeholder="e.g. 5000"
@@ -1320,11 +1326,11 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxProducts: e.target.value })
                     }
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-500 dark:text-slate-400">Max Variants</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Max Variants</label>
                   <Input
                     type="number"
                     placeholder="e.g. 15000"
@@ -1332,7 +1338,7 @@ export default function BusinessDetailPage() {
                     onChange={(e) =>
                       setOverrideForm({ ...overrideForm, overrideMaxVariants: e.target.value })
                     }
-                    className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                    className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
               </div>
@@ -1340,7 +1346,7 @@ export default function BusinessDetailPage() {
 
             <div className="grid grid-cols-2 gap-3 border-t border-slate-100 dark:border-slate-800 pt-3">
               <div>
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Extend Trial (Days)</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Extend Trial (Days)</label>
                 <Input
                   type="number"
                   placeholder="e.g. 14"
@@ -1348,24 +1354,24 @@ export default function BusinessDetailPage() {
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, trialExtendedDays: e.target.value })
                   }
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Valid Until Date</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Valid Until Date</label>
                 <Input
                   type="date"
                   value={overrideForm.validUntil}
                   onChange={(e) =>
                     setOverrideForm({ ...overrideForm, validUntil: e.target.value })
                   }
-                  className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
             </div>
 
             <div className="border-t border-slate-100 dark:border-slate-800 pt-3">
-              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
                 Reason for Override <span className="text-rose-500">*</span>
               </label>
               <Textarea
@@ -1374,26 +1380,25 @@ export default function BusinessDetailPage() {
                 placeholder="Required explanation for the audit log..."
                 value={overrideForm.reason}
                 onChange={(e) => setOverrideForm({ ...overrideForm, reason: e.target.value })}
-                className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1"
+                className="text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
-            <DialogFooter className="pt-2">
-              <Button
+            <DialogFooter className="px-6 py-3.5 -mx-6 -mb-4 mt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-end gap-2.5 rounded-b-3xl">
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => setOverrideModalOpen(false)}
-                className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-2xs cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
                 disabled={createOverrideMutation.isPending}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="h-9 px-5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/25 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
               >
                 {createOverrideMutation.isPending ? 'Applying...' : 'Save & Apply Override'}
-              </Button>
+              </button>
             </DialogFooter>
           </form>
         </DialogContent>

@@ -427,7 +427,7 @@ export default function PlatformInvoicesPage() {
                           <p className="font-medium text-slate-900 dark:text-slate-200">{inv.business?.name || 'N/A'}</p>
                           <p className="text-xs text-slate-500 font-mono">{inv.business?.slug}</p>
                         </td>
-                        <td className="py-3 px-4 text-xs font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
+                        <td className="py-3 px-4 text-xs font-mono text-orange-600 dark:text-orange-400 font-bold">
                           {inv.plan?.name || 'N/A'}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
@@ -549,41 +549,45 @@ export default function PlatformInvoicesPage() {
         </CardContent>
       </Card>
 
-      {/* RECORD PAYMENT MODAL */}
+      {/* RECORD PAYMENT MODAL (Foodpoint Theme) */}
       <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
-        <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-slate-100">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-emerald-400">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-2xl rounded-3xl p-0">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/25 shrink-0">
               <DollarSign className="w-5 h-5" />
-              Record Manual Payment
-            </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
-              Record verified bank deposit, bKash, or cash receipt against invoice #{selectedInvoice?.invoice_number}.
-            </DialogDescription>
-          </DialogHeader>
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
+                Record Manual Payment
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                Record verified bank deposit, bKash, or cash receipt against #{selectedInvoice?.invoice_number}.
+              </DialogDescription>
+            </div>
+          </div>
 
           {selectedInvoice && (
-            <form onSubmit={handlePreSubmitPayment} className="space-y-4 py-2">
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg space-y-2 text-xs">
+            <form onSubmit={handlePreSubmitPayment} className="space-y-4 px-6 py-4 text-xs">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Business</span>
-                  <span className="font-semibold text-slate-200">{selectedInvoice.business?.name}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Business</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedInvoice.business?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Net Invoice Amount</span>
-                  <span className="font-semibold text-slate-100">{formatBDT(selectedInvoice.net_amount)}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Net Invoice Amount</span>
+                  <span className="font-bold text-slate-900 dark:text-white font-mono">{formatBDT(selectedInvoice.net_amount)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Remaining Balance Due</span>
-                  <span className="font-semibold text-rose-400">
+                <div className="flex justify-between pt-1 border-t border-slate-200/60 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400 font-medium">Remaining Balance Due</span>
+                  <span className="font-black text-rose-600 dark:text-rose-400 font-mono">
                     {formatBDT(getRemainingBalance(selectedInvoice).toNumber())}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-300">
-                  Payment Amount (BDT) <span className="text-rose-400">*</span>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                  Payment Amount (BDT) <span className="text-rose-500">*</span>
                 </label>
                 <Input
                   type="number"
@@ -592,19 +596,19 @@ export default function PlatformInvoicesPage() {
                   placeholder="0.00"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-slate-100 mt-1 font-semibold"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-mono font-bold focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-slate-400 mt-1">
                   Partial payment is accepted. UI strictly blocks overpayment beyond remaining balance.
                 </p>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-300">Payment Channel / Method</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Payment Channel / Method</label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-md py-2 px-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer font-medium"
                 >
                   <option value="BKASH">bKash Merchant / MFS</option>
                   <option value="NAGAD">Nagad MFS</option>
@@ -615,35 +619,35 @@ export default function PlatformInvoicesPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-slate-300">Transaction ID / Reference</label>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Transaction ID / Reference</label>
                 <Input
                   placeholder="e.g. 9B76XA34DF or Bank Deposit Slip #"
                   value={transactionId}
                   onChange={(e) => setTransactionId(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-slate-100 mt-1 font-mono text-xs"
+                  className="h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-mono focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               </div>
 
-              <div className="pt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-800">
+              <div className="pt-2 text-[11px] text-slate-400 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
                 <span>Idempotency Key:</span>
-                <span className="font-mono text-slate-400">{idempotencyKey.slice(0, 13)}...</span>
+                <span className="font-mono text-slate-500 dark:text-slate-400">{idempotencyKey.slice(0, 13)}...</span>
               </div>
 
-              <DialogFooter className="pt-2">
-                <Button
+              <DialogFooter className="px-6 py-3.5 -mx-6 -mb-4 mt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-end gap-2.5 rounded-b-3xl">
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() => setPaymentModalOpen(false)}
-                  className="border-slate-800 text-slate-300"
+                  className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-2xs cursor-pointer"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="h-9 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-500/25 cursor-pointer flex items-center gap-1.5"
                 >
-                  Review & Confirm Payment
-                </Button>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Review & Confirm Payment</span>
+                </button>
               </DialogFooter>
             </form>
           )}
@@ -689,68 +693,72 @@ export default function PlatformInvoicesPage() {
         isLoading={voidMutation.isPending}
       />
 
-      {/* INVOICE DETAIL MODAL */}
+      {/* INVOICE DETAIL MODAL (Foodpoint Theme) */}
       <Dialog open={Boolean(viewDetailInvoice)} onOpenChange={(open) => !open && setViewDetailInvoice(null)}>
-        <DialogContent className="max-w-xl bg-slate-900 border-slate-800 text-slate-100">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-slate-100">
-              <Receipt className="w-5 h-5 text-indigo-400" />
-              Invoice #{viewDetailInvoice?.invoice_number}
-            </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
-              Complete invoice breakdown and payment transaction logs
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-2xl rounded-3xl p-0">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/25 shrink-0">
+              <Receipt className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
+                Invoice #{viewDetailInvoice?.invoice_number}
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                Complete invoice breakdown and payment transaction logs
+              </DialogDescription>
+            </div>
+          </div>
 
           {viewDetailInvoice && (
-            <div className="space-y-4 py-2 text-sm">
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-950 border border-slate-800 rounded-lg text-xs">
+            <div className="space-y-4 px-6 py-5 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs">
                 <div>
-                  <span className="text-slate-400 block">Business Shop</span>
-                  <span className="font-semibold text-slate-200">{viewDetailInvoice.business?.name}</span>
+                  <span className="text-slate-400 block text-[11px] font-bold uppercase tracking-wider">Business Shop</span>
+                  <span className="font-bold text-slate-900 dark:text-white text-sm mt-0.5 block">{viewDetailInvoice.business?.name}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Plan Tier</span>
-                  <span className="font-semibold text-indigo-400">{viewDetailInvoice.plan?.name}</span>
+                  <span className="text-slate-400 block text-[11px] font-bold uppercase tracking-wider">Plan Tier</span>
+                  <span className="font-bold text-orange-600 dark:text-orange-400 text-sm mt-0.5 block font-mono">{viewDetailInvoice.plan?.name}</span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block">Billing Period</span>
-                  <span className="text-slate-200">
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Billing Period</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">
                     {formatDate(viewDetailInvoice.period_start)} - {formatDate(viewDetailInvoice.period_end)}
                   </span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block">Due Date</span>
-                  <span className="text-slate-200">{formatDate(viewDetailInvoice.due_date)}</span>
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Due Date</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">{formatDate(viewDetailInvoice.due_date)}</span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block">Net Amount</span>
-                  <span className="text-base font-bold text-slate-100">
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Net Amount</span>
+                  <span className="text-base font-black text-slate-900 dark:text-white font-mono">
                     {formatBDT(viewDetailInvoice.net_amount)}
                   </span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block">Status</span>
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Status</span>
                   <Badge className="mt-0.5">{viewDetailInvoice.status}</Badge>
                 </div>
               </div>
 
               {/* Payments History on this invoice */}
               <div>
-                <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2.5">
                   Recorded Payments ({(viewDetailInvoice.payments || []).length})
                 </h4>
                 {(!viewDetailInvoice.payments || viewDetailInvoice.payments.length === 0) ? (
-                  <p className="text-xs text-slate-500 py-3 text-center bg-slate-950/50 rounded border border-slate-800/60">
+                  <p className="text-xs text-slate-400 py-4 text-center bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-100 dark:border-slate-800">
                     No payments have been recorded for this invoice yet.
                   </p>
                 ) : (
-                  <div className="divide-y divide-slate-800/60 border border-slate-800 rounded-lg overflow-hidden">
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
                     {viewDetailInvoice.payments.map((pm: any) => (
-                      <div key={pm.id} className="p-3 bg-slate-950/40 flex items-center justify-between text-xs">
+                      <div key={pm.id} className="p-3 bg-slate-50/60 dark:bg-slate-950/40 flex items-center justify-between text-xs">
                         <div>
-                          <p className="font-semibold text-emerald-400">{formatBDT(pm.amount)}</p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">{formatBDT(pm.amount)}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
                             Channel: {pm.payment_method} {pm.transaction_id ? `• Trx: ${pm.transaction_id}` : ''}
                           </p>
                         </div>
@@ -765,14 +773,14 @@ export default function PlatformInvoicesPage() {
             </div>
           )}
 
-          <DialogFooter>
-            <Button
-              variant="outline"
+          <DialogFooter className="px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-end rounded-b-3xl">
+            <button
+              type="button"
               onClick={() => setViewDetailInvoice(null)}
-              className="border-slate-800 text-slate-300 text-xs"
+              className="h-9 px-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-2xs cursor-pointer"
             >
-              Close
-            </Button>
+              Close Breakdown
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
