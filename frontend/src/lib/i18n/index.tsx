@@ -24,14 +24,18 @@ const I18nContext = createContext<I18nContextType | null>(null);
 const STORAGE_KEY = 'pos_locale';
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  // Default to Bangla ('bn') as explicitly required
-  const [locale, setLocaleState] = useState<Locale>('bn');
+  // Default to English ('en')
+  const [locale, setLocaleState] = useState<Locale>('en');
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
       if (saved && (saved === 'bn' || saved === 'en')) {
         setLocaleState(saved);
+        document.documentElement.lang = saved;
+      } else {
+        setLocaleState('en');
+        document.documentElement.lang = 'en';
       }
     } catch {
       // ignore
@@ -110,12 +114,12 @@ export function useTranslation() {
   if (!context) {
     // Graceful fallback for non-provider usage (e.g. tests or isolated components)
     return {
-      locale: 'bn' as Locale,
+      locale: 'en' as Locale,
       setLocale: () => {},
       toggleLocale: () => {},
       t: (keyPath: string, params?: Record<string, string | number>) => {
         const keys = keyPath.split('.');
-        let current: any = bn;
+        let current: any = en;
         for (const k of keys) {
           if (current && typeof current === 'object' && k in current) {
             current = current[k];

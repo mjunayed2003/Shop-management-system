@@ -8,11 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Lock, Mail, AlertCircle, Loader2, Eye, EyeOff, Sparkles, Check } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
+import { useTranslation } from '@/lib/i18n';
 
 function PlatformLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setPlatformAuth, isAuthenticated } = usePlatformAuthStore();
+  const { locale, t } = useTranslation();
 
   const [email, setEmail] = useState('admin@pos.com');
   const [password, setPassword] = useState('SuperAdmin123!');
@@ -55,7 +59,9 @@ function PlatformLoginForm() {
     } catch (err: any) {
       setError(
         err?.message ||
-          'লগইন ব্যর্থ হয়েছে। দয়া করে সঠিক ইমেইল ও পাসওয়ার্ড প্রদান করুন অথবা ব্যাকএন্ড সার্ভার চালু আছে কিনা নিশ্চিত করুন।'
+          (locale === 'bn'
+            ? 'লগইন ব্যর্থ হয়েছে। দয়া করে সঠিক ইমেইল ও পাসওয়ার্ড প্রদান করুন।'
+            : 'Login failed. Please provide valid email and password.')
       );
     } finally {
       setIsLoading(false);
@@ -63,7 +69,13 @@ function PlatformLoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/20 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4 antialiased text-slate-800 dark:text-slate-100 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/20 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col items-center justify-center p-4 antialiased text-slate-800 dark:text-slate-100 font-sans relative">
+      {/* Top Floating Controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-2xl shadow-orange-500/10 space-y-6 animate-fadeIn">
         {/* Brand Header */}
         <div className="text-center space-y-2">
@@ -71,15 +83,17 @@ function PlatformLoginForm() {
             <Shield className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-            Platform Administration
+            {locale === 'bn' ? 'প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেশন' : 'Platform Administration'}
           </h1>
           <div className="inline-flex">
             <Badge className="bg-orange-50 dark:bg-orange-950/60 border border-orange-200 dark:border-orange-800 text-orange-600 dark:text-orange-400 font-bold text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full">
-              Master Console Login
+              {locale === 'bn' ? 'মাস্টার কনসোল লগইন' : 'Master Console Login'}
             </Badge>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            SaaS সেন্ট্রাল প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেশন ও সাপোর্ট প্যানেল
+            {locale === 'bn'
+              ? 'SaaS সেন্ট্রাল প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেশন ও সাপোর্ট প্যানেল'
+              : 'SaaS Central Platform Administration & Support Console'}
           </p>
         </div>
 
@@ -87,7 +101,7 @@ function PlatformLoginForm() {
         <div className="p-3 bg-orange-50/50 dark:bg-orange-950/20 rounded-2xl border border-orange-100 dark:border-orange-900/40 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-950 dark:text-orange-200">
             <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-            <span>ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:</span>
+            <span>{locale === 'bn' ? 'ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:' : 'Click to autofill demo credentials:'}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
@@ -119,14 +133,22 @@ function PlatformLoginForm() {
         {reason === 'idle_timeout' && (
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <span>Session expired due to 15 minutes of inactivity. Please log in again.</span>
+            <span>
+              {locale === 'bn'
+                ? '১৫ মিনিট নিষ্ক্রিয় থাকার কারণে সেশন শেষ হয়েছে। অনুগ্রহ করে পুনরায় লগইন করুন।'
+                : 'Session expired due to 15 minutes of inactivity. Please log in again.'}
+            </span>
           </div>
         )}
 
         {reason === 'session_expired' && (
           <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>Your session has expired. Please log in again.</span>
+            <span>
+              {locale === 'bn'
+                ? 'আপনার সেশন শেষ হয়েছে। অনুগ্রহ করে পুনরায় লগইন করুন।'
+                : 'Your session has expired. Please log in again.'}
+            </span>
           </div>
         )}
 
@@ -141,7 +163,7 @@ function PlatformLoginForm() {
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
             <label className="font-semibold block mb-1 text-slate-700 dark:text-slate-300">
-              Admin Email
+              {locale === 'bn' ? 'অ্যাডমিন ইমেইল' : 'Admin Email'}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -158,7 +180,7 @@ function PlatformLoginForm() {
 
           <div>
             <label className="font-semibold block mb-1 text-slate-700 dark:text-slate-300">
-              Password
+              {locale === 'bn' ? 'পাসওয়ার্ড' : 'Password'}
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -187,21 +209,21 @@ function PlatformLoginForm() {
             className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 mt-2 transition-all cursor-pointer disabled:opacity-50"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shield className="w-4 h-4" />}
-            <span>Sign In to Platform</span>
+            <span>{locale === 'bn' ? 'প্ল্যাটফর্মে সাইন ইন করুন' : 'Sign In to Platform'}</span>
           </button>
         </form>
 
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-center space-y-1.5">
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            দোকানদার বা শোরুম ক্যাশিয়ার লগইন করতে চান?{' '}
+            {locale === 'bn' ? 'দোকানদার বা শোরুম ক্যাশিয়ার লগইন করতে চান? ' : 'Looking for Store or Cashier POS Login? '}
             <a href="/login" className="text-orange-600 dark:text-orange-400 hover:underline font-bold">
-              দোকান লগইন (Store Login)
+              {locale === 'bn' ? 'দোকান লগইন (Store Login)' : 'Store Login'}
             </a>
           </p>
           <p className="text-[10px] text-slate-400">
-            নতুন দোকান রেজিস্টার করতে:{' '}
+            {locale === 'bn' ? 'নতুন দোকান রেজিস্টার করতে: ' : 'Want to register a new store? '}
             <a href="/register" className="text-slate-600 dark:text-slate-300 hover:underline font-semibold">
-              রেজিস্ট্রেশন পেইজ
+              {locale === 'bn' ? 'রেজিস্ট্রেশন পেইজ' : 'Registration Page'}
             </a>
           </p>
         </div>

@@ -21,6 +21,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { resetPlatformSessionCache } from './PlatformProtectedRoute';
+import { useTranslation } from '@/lib/i18n';
 
 export interface PlatformNavItem {
   href: string;
@@ -79,6 +80,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   const pathname = usePathname();
   const router = useRouter();
   const { admin, clearPlatformAuth } = usePlatformAuthStore();
+  const { locale, t } = useTranslation();
 
   const handleLogout = () => {
     resetPlatformSessionCache();
@@ -87,6 +89,30 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   const role = admin?.role;
+
+  const getNavLabel = (item: PlatformNavItem) => {
+    if (locale !== 'bn') return item.label;
+    switch (item.href) {
+      case '/platform/dashboard':
+        return t('platform.nav.dashboard') || 'ড্যাশবোর্ড';
+      case '/platform/businesses':
+        return t('platform.nav.businesses') || 'দোকান ও ব্যবসা';
+      case '/platform/invoices':
+        return t('platform.nav.invoices') || 'লেনদেন ও আয়';
+      case '/platform/support':
+        return t('platform.nav.support') || 'সাপোর্ট ডেস্ক';
+      case '/platform/plans':
+        return t('platform.nav.plans') || 'সাবস্ক্রিপশন প্ল্যান';
+      case '/platform/settings':
+        return t('platform.nav.settings') || 'সিস্টেম সেটিংস';
+      case '/platform/admins':
+        return t('platform.nav.admins') || 'স্টাফ ও অ্যাডমিন';
+      case '/platform/audit-logs':
+        return t('platform.nav.auditLogs') || 'অডিট ট্রেইল';
+      default:
+        return item.label;
+    }
+  };
 
   return (
     <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex flex-col justify-between h-screen sticky top-0 select-none z-30 shadow-xs">
@@ -102,7 +128,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                 SHOP<span className="text-orange-500">POINT</span>
               </span>
               <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider -mt-1">
-                Platform Console
+                {locale === 'bn' ? 'প্ল্যাটফর্ম কনসোল' : 'Platform Console'}
               </span>
             </div>
           </Link>
@@ -113,7 +139,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
               type="button"
               onClick={onCloseMobile}
               className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Close navigation"
+              title={locale === 'bn' ? 'মেনু বন্ধ করুন' : 'Close navigation'}
             >
               <X className="w-5 h-5" />
             </button>
@@ -146,7 +172,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                     isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-orange-500'
                   }`}
                 />
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{getNavLabel(item)}</span>
               </Link>
             );
           })}
@@ -158,18 +184,22 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             <Lock className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white tracking-tight">Enterprise Governance</h4>
+            <h4 className="text-xs font-bold text-white tracking-tight">
+              {t('platform.nav.governance')}
+            </h4>
             <p className="text-[10px] text-white/80 mt-0.5 leading-snug">
-              Maximize SaaS multi-tenant telemetry and automated billing cycles.
+              {t('platform.nav.governanceDesc')}
             </p>
           </div>
           <div className="pt-1 flex items-center justify-between text-[11px] font-bold">
-            <span className="text-white/90">Platform V2</span>
+            <span className="text-white/90">
+              {t('platform.nav.platformV2')}
+            </span>
             <Link
               href="/platform/settings"
               className="bg-white text-orange-600 hover:bg-orange-50 px-3 py-1 rounded-lg text-[10px] font-extrabold shadow-xs transition-all flex items-center gap-1"
             >
-              <span>Manage</span>
+              <span>{t('platform.nav.manage')}</span>
               <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
@@ -185,7 +215,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             </div>
             <div className="overflow-hidden">
               <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                {admin ? `${admin.firstName} ${admin.lastName}` : 'Platform Admin'}
+                {admin ? `${admin.firstName} ${admin.lastName}` : (locale === 'bn' ? 'প্ল্যাটফর্ম অ্যাডমিন' : 'Platform Admin')}
               </p>
               <p className="text-[10px] text-slate-400 font-mono truncate">
                 {admin?.email || 'admin@pos.com'}
@@ -195,7 +225,7 @@ export function PlatformSidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           <button
             type="button"
             onClick={handleLogout}
-            title="Logout"
+            title={t('platform.nav.logout')}
             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
           >
             <LogOut className="w-4 h-4" />

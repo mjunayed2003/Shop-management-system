@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bn" suppressHydrationWarning className={`${notoSansBengali.variable} ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${notoSansBengali.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
         <AppProviders>{children}</AppProviders>
       </body>
