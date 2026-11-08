@@ -167,7 +167,7 @@ export default function PurchaseOrdersPage() {
               <Button
                 size="sm"
                 onClick={() => router.push(`/purchases/new?poId=${po.id}`)}
-                className="h-7 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="h-7 text-xs gap-1 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-lg shadow-xs"
               >
                 <PackageCheck className="w-3 h-3" />
                 <span>Receive Goods</span>
@@ -197,7 +197,7 @@ export default function PurchaseOrdersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+          <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900 shadow-xs">
             <FileText className="w-6 h-6" />
           </div>
           <div>
@@ -213,7 +213,7 @@ export default function PurchaseOrdersPage() {
         <PermissionGate permission="purchases:create">
           <Button
             onClick={() => router.push('/purchases/orders/new')}
-            className="gap-1.5 text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="gap-1.5 text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>New Purchase Order</span>
@@ -222,7 +222,7 @@ export default function PurchaseOrdersPage() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs">
         <div className="w-full sm:w-80">
           <SearchInput
             value={search}

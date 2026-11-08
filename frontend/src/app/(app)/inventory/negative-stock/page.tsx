@@ -63,7 +63,7 @@ export default function NegativeStockPage() {
               <Button
                 type="button"
                 size="sm"
-                className="text-xs h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
+                className="text-xs h-9 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold shadow-xs"
               >
                 <span>Open Stock Adjustments</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />

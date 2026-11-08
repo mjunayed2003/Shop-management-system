@@ -101,7 +101,7 @@ export default function BarcodeLookupPage() {
         <div className="bg-card border rounded-xl p-6 shadow-sm space-y-6 animate-in fade-in-50">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
@@ -109,7 +109,7 @@ export default function BarcodeLookupPage() {
                   <h2 className="text-xl font-bold text-foreground">
                     {lookupResult.product?.name}
                   </h2>
-                  <Badge variant="default" className="bg-emerald-600 text-white text-xs">
+                  <Badge variant="default" className="bg-[#0284c7] text-white text-xs">
                     Active in {currentBranch?.name || 'Current Branch'}
                   </Badge>
                 </div>
@@ -190,7 +190,7 @@ export default function BarcodeLookupPage() {
             <div className="bg-muted/30 border rounded-lg p-4 flex flex-col justify-between">
               <div>
                 <span className="text-xs text-muted-foreground block font-semibold uppercase">Current Branch Stock</span>
-                <div className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2 flex items-baseline gap-1.5">
+                <div className="text-3xl font-extrabold text-sky-600 dark:text-sky-400 mt-2 flex items-baseline gap-1.5">
                   {lookupResult.variant?.stock ?? 0}
                   <span className="text-xs font-normal text-muted-foreground">
                     {lookupResult.product?.unit?.name || 'pcs'}

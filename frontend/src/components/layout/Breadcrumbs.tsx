@@ -32,7 +32,7 @@ export function Breadcrumbs() {
         <li className="inline-flex items-center">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            className="inline-flex items-center gap-1 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           >
             <Home className="w-3.5 h-3.5" />
             <span>{t('nav.dashboard')}</span>
@@ -53,7 +53,7 @@ export function Breadcrumbs() {
               ) : (
                 <Link
                   href={href}
-                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                  className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
                 >
                   {label}
                 </Link>

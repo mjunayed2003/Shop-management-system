@@ -3,28 +3,28 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 
 const buttonVariants = cva(
-  'inline-flex flex-row items-center justify-center font-medium transition-all duration-150 rounded-lg select-none disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 active:scale-[0.98] whitespace-nowrap cursor-pointer',
+  'inline-flex flex-row items-center justify-center font-medium transition-all duration-150 rounded-xl select-none disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 active:scale-[0.98] whitespace-nowrap cursor-pointer',
   {
     variants: {
       variant: {
         default:
-          'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 font-semibold',
+          'bg-[#0284c7] text-white hover:bg-[#0369a1] active:bg-[#075985] shadow-xs hover:shadow-sm font-semibold rounded-xl',
         secondary:
-          'bg-slate-100 text-slate-800 hover:bg-slate-200 active:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 font-semibold',
+          'bg-slate-100 text-slate-800 hover:bg-slate-200 active:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 font-semibold rounded-xl',
         destructive:
-          'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 shadow-sm shadow-rose-500/20 font-semibold',
+          'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 shadow-xs font-semibold rounded-xl',
         outline:
-          'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-2xs font-semibold',
+          'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-2xs font-semibold rounded-xl',
         ghost:
-          'bg-transparent hover:bg-slate-100 text-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80',
-        link: 'text-blue-600 dark:text-blue-400 underline-offset-4 hover:underline p-0 h-auto',
+          'bg-transparent hover:bg-slate-100 text-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80 rounded-xl',
+        link: 'text-[#0284c7] dark:text-sky-400 underline-offset-4 hover:underline p-0 h-auto',
       },
       size: {
-        sm: 'h-8 px-3 text-xs gap-1.5',
-        md: 'h-9 px-3.5 text-xs sm:text-sm gap-2',
-        lg: 'h-11 px-5 text-sm gap-2.5',
-        icon: 'h-9 w-9 p-0',
-        'icon-sm': 'h-8 w-8 p-0',
+        sm: 'h-8 px-3 text-xs gap-1.5 rounded-lg',
+        md: 'h-9 px-3.5 text-xs sm:text-sm gap-2 rounded-xl',
+        lg: 'h-11 px-5 text-sm gap-2.5 rounded-xl',
+        icon: 'h-9 w-9 p-0 rounded-xl',
+        'icon-sm': 'h-8 w-8 p-0 rounded-lg',
       },
     },
     defaultVariants: {

@@ -200,10 +200,10 @@ export default function TenantBillingPage() {
   return (
     <div className="space-y-8 animate-fadeIn text-slate-800 dark:text-slate-100">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <CreditCard className="w-8 h-8 text-emerald-600" />
+            <CreditCard className="w-8 h-8 text-sky-600" />
             <span>বিলিং ও সাবস্ক্রিপশন ব্যবস্থাপনা</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -314,7 +314,7 @@ export default function TenantBillingPage() {
               <Button
                 type="button"
                 onClick={() => setIsPayHelpOpen(true)}
-                className="w-full h-10 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2"
+                className="w-full h-10 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2"
               >
                 <Zap className="w-4 h-4 text-amber-300" />
                 <span>পেমেন্ট নির্দেশনা ও TrxID সাবমিট</span>
@@ -327,7 +327,7 @@ export default function TenantBillingPage() {
         <Card className="lg:col-span-2 rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
           <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
             <CardTitle className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <TrendingUp className="w-5 h-5 text-sky-600" />
               <span>প্ল্যান কোটা ও বর্তমান ব্যবহার (Usage vs Limits)</span>
             </CardTitle>
             <CardDescription className="text-xs">
@@ -494,7 +494,7 @@ export default function TenantBillingPage() {
               onClick={() => setBillingCycle('MONTHLY')}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 billingCycle === 'MONTHLY'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm font-bold'
+                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-sm font-bold'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -505,12 +505,12 @@ export default function TenantBillingPage() {
               onClick={() => setBillingCycle('YEARLY')}
               className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 ${
                 billingCycle === 'YEARLY'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-sm font-bold'
+                  ? 'bg-white dark:bg-slate-900 text-sky-600 shadow-sm font-bold'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <span>বার্ষিক বিলিং</span>
-              <span className="text-[10px] text-emerald-600 font-extrabold bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.2 rounded-full">
+              <span className="text-[10px] text-sky-600 font-extrabold bg-sky-100 dark:bg-sky-950 px-1.5 py-0.2 rounded-full">
                 -১৭% ছাড়
               </span>
             </button>
@@ -529,7 +529,7 @@ export default function TenantBillingPage() {
                 key={p.id}
                 className={`p-6 rounded-3xl border transition-all flex flex-col justify-between ${
                   p.isPopular
-                    ? 'border-emerald-500 bg-white dark:bg-slate-900 shadow-lg ring-2 ring-emerald-500/20'
+                    ? 'border-sky-500 bg-white dark:bg-slate-900 shadow-lg ring-2 ring-sky-500/20'
                     : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm'
                 }`}
               >
@@ -537,10 +537,10 @@ export default function TenantBillingPage() {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-base text-slate-900 dark:text-white">{p.name}</span>
                     {p.isPopular && (
-                      <Badge className="bg-emerald-500 text-white text-[10px] font-bold">জনপ্রিয়</Badge>
+                      <Badge className="bg-sky-500 text-white text-[10px] font-bold">জনপ্রিয়</Badge>
                     )}
                     {isCurrent && (
-                      <Badge variant="outline" className="border-emerald-500 text-emerald-600 text-[10px] font-bold">
+                      <Badge variant="outline" className="border-sky-500 text-sky-600 text-[10px] font-bold">
                         বর্তমান প্ল্যান
                       </Badge>
                     )}
@@ -560,7 +560,7 @@ export default function TenantBillingPage() {
                   <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 my-4 border-t border-slate-100 dark:border-slate-800 pt-3">
                     {p.features.map((feat, idx) => (
                       <li key={idx} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -591,7 +591,7 @@ export default function TenantBillingPage() {
                       type="button"
                       onClick={() => upgradeMutation.mutate(p.id)}
                       disabled={upgradeMutation.isPending || !isOwner}
-                      className="w-full h-10 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm"
+                      className="w-full h-10 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-xs"
                     >
                       {upgradeMutation.isPending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -611,7 +611,7 @@ export default function TenantBillingPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-emerald-600" />
+            <FileText className="w-5 h-5 text-sky-600" />
             <span>সাবস্ক্রিপশন ইনভয়েস হিস্ট্রি</span>
           </h2>
         </div>
@@ -634,7 +634,7 @@ export default function TenantBillingPage() {
                 {isInvoicesLoading ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-slate-400">
-                      <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600" />
+                      <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
                       ইনভয়েস লোড হচ্ছে...
                     </td>
                   </tr>
@@ -806,7 +806,7 @@ export default function TenantBillingPage() {
               size="sm"
               disabled={isSubmittingTicket}
               onClick={handlePaidTicketSubmit}
-              className="text-xs h-9 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl"
+              className="text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold rounded-xl shadow-xs"
             >
               {isSubmittingTicket ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-1" />

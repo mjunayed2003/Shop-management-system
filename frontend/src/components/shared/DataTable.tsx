@@ -84,7 +84,7 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div
-      className={`w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden ${className}`}
+      className={`w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden ${className}`}
     >
       {/* Table Container */}
       <div className="overflow-x-auto min-h-[220px]">
@@ -121,7 +121,7 @@ export function DataTable<T extends Record<string, any>>({
         ) : (
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/60 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold">
+              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/60 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold">
                 {columns.map((col, colIdx) => {
                   const alignClass =
                     col.align === 'center'
@@ -142,14 +142,14 @@ export function DataTable<T extends Record<string, any>>({
                         <button
                           type="button"
                           onClick={() => handleSort(col.key!)}
-                          className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 rounded"
+                          className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-500 rounded"
                         >
                           <span>{col.header}</span>
                           {sortBy === col.key ? (
                             sortOrder === 'asc' ? (
-                              <ArrowUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <ArrowUp className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                             ) : (
-                              <ArrowDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <ArrowDown className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                             )
                           ) : (
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-40 hover:opacity-100" />
@@ -163,11 +163,11 @@ export function DataTable<T extends Record<string, any>>({
                 })}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-800 dark:text-slate-200">
               {data.map((row, index) => (
                 <tr
                   key={row[keyField] || row.id || index}
-                  className="hover:bg-slate-50/60 dark:hover:bg-slate-850/40 transition-colors"
+                  className="hover:bg-slate-50/50 dark:hover:bg-slate-850/30 transition-colors"
                 >
                   {columns.map((col, colIdx) => {
                     const alignClass =
@@ -203,7 +203,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Pagination Footer */}
       {!isLoading && effectiveTotalRows > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40 text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
             <span>
               {t('showing')} <strong className="text-slate-800 dark:text-slate-200">{startRow}</strong> -{' '}
@@ -217,7 +217,7 @@ export function DataTable<T extends Record<string, any>>({
                 <select
                   value={effectiveLimit}
                   onChange={(e) => onLimitChange(Number(e.target.value))}
-                  className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
                   <option value={10}>10</option>
                   <option value={20}>20</option>

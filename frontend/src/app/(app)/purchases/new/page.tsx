@@ -521,7 +521,7 @@ export default function NewPurchasePage() {
                 setSupplierInvoiceNo('');
                 idempotencyKeyRef.current = generateIdempotencyKey('purchase');
               }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs w-full sm:w-auto"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white gap-1.5 text-xs w-full sm:w-auto font-semibold rounded-xl shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>Receive Another Consignment</span>
@@ -1012,7 +1012,7 @@ export default function NewPurchasePage() {
           <Button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[200px] gap-2 font-semibold shadow-lg shadow-emerald-600/20"
+            className="bg-[#0284c7] hover:bg-[#0369a1] text-white min-w-[200px] gap-2 font-semibold rounded-xl shadow-md shadow-sky-600/25"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>{isSubmitting ? 'Recording Purchase...' : 'Receive & Update Stock'}</span>

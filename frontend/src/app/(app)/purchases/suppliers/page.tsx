@@ -117,7 +117,7 @@ export default function SuppliersPage() {
         <div>
           <Link
             href={`/purchases/suppliers/${s.id}`}
-            className="font-semibold text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+            className="font-semibold text-slate-900 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1.5"
           >
             <span>{s.name}</span>
             <ExternalLink className="w-3.5 h-3.5 opacity-60" />
@@ -230,7 +230,7 @@ export default function SuppliersPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+          <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900 shadow-xs">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
@@ -247,9 +247,9 @@ export default function SuppliersPage() {
           <Button
             variant="outline"
             onClick={handleExportCsv}
-            className="gap-1.5 text-xs h-9"
+            className="gap-1.5 text-xs h-9 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <FileSpreadsheet className="w-4 h-4 text-sky-600" />
             <span>Export CSV</span>
           </Button>
 
@@ -259,7 +259,7 @@ export default function SuppliersPage() {
                 setSelectedSupplier(null);
                 setIsModalOpen(true);
               }}
-              className="gap-1.5 text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="gap-1.5 text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>Add Supplier</span>
@@ -269,7 +269,7 @@ export default function SuppliersPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs">
         <div className="w-full sm:w-80">
           <SearchInput
             value={search}
@@ -290,9 +290,9 @@ export default function SuppliersPage() {
                 setStatusFilter(st);
                 setPage(1);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 statusFilter === st
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                  ? 'bg-[#0284c7] text-white shadow-xs'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
               }`}
             >

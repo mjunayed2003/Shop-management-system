@@ -426,13 +426,13 @@ export default function ProductsPage() {
       accessor: (r: any) => (
         <div className="flex items-center gap-3">
           {/* Avatar / Placeholder */}
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-100 to-teal-50 dark:from-emerald-950 dark:to-teal-900 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-100 to-blue-50 dark:from-sky-950 dark:to-blue-900 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs uppercase shadow-xs">
             {r.name.slice(0, 2)}
           </div>
           <div>
             <Link
               href={`/products/${r.id}`}
-              className="font-bold text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors line-clamp-1"
+              className="font-bold text-slate-900 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 transition-colors line-clamp-1"
             >
               {r.name}
             </Link>
@@ -562,7 +562,7 @@ export default function ProductsPage() {
           {canPrintBarcode && (
             <Link
               href={`/catalog/barcodes?productId=${r.id}`}
-              className="p-1.5 rounded-lg hover:bg-emerald-50 text-slate-600 dark:text-slate-400 hover:text-emerald-600"
+              className="p-1.5 rounded-lg hover:bg-sky-50 text-slate-600 dark:text-slate-400 hover:text-sky-600"
               title="Print Barcode Labels"
             >
               <Barcode className="w-4 h-4" />
@@ -592,7 +592,7 @@ export default function ProductsPage() {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Boxes className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <Boxes className="w-5 h-5 text-sky-600 dark:text-sky-400" />
               {t('catalog.productsTitle')}
             </h1>
             <Badge variant="outline" className="text-xs font-semibold">
@@ -606,7 +606,7 @@ export default function ProductsPage() {
           {/* Barcode Scanner Shortcut */}
           <Link href="/catalog/lookup">
             <Button variant="outline" size="sm">
-              <ScanLine className="w-4 h-4 mr-1.5 text-emerald-600 dark:text-emerald-400" />
+              <ScanLine className="w-4 h-4 mr-1.5 text-sky-600 dark:text-sky-400" />
               Scan Barcode
             </Button>
           </Link>
@@ -677,7 +677,7 @@ export default function ProductsPage() {
               setCategoryId(e.target.value);
               setPage(1);
             }}
-            className="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           >
             <option value="">{t('catalog.filterCategory')}</option>
             {categories.map((c: any) => (
@@ -694,7 +694,7 @@ export default function ProductsPage() {
               setBrandId(e.target.value);
               setPage(1);
             }}
-            className="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           >
             <option value="">{t('catalog.filterBrand')}</option>
             {brands.map((b: any) => (
@@ -711,7 +711,7 @@ export default function ProductsPage() {
               setSeasonId(e.target.value);
               setPage(1);
             }}
-            className="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           >
             <option value="">{t('catalog.filterSeason')}</option>
             {seasons.map((s: any) => (
@@ -728,7 +728,7 @@ export default function ProductsPage() {
               setGender(e.target.value);
               setPage(1);
             }}
-            className="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           >
             <option value="">{t('catalog.filterGender')}</option>
             <option value="MEN">Men</option>
@@ -752,7 +752,7 @@ export default function ProductsPage() {
                 }}
                 className={`px-3 py-1 rounded-full font-medium transition-all ${
                   statusFilter === st
-                    ? 'bg-emerald-600 text-white font-bold'
+                    ? 'bg-[#0284c7] text-white font-bold shadow-xs'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
                 }`}
               >
@@ -784,7 +784,7 @@ export default function ProductsPage() {
           {/* Admin Multi-Branch Filter */}
           {isOwnerOrAdmin && (
             <div className="flex items-center gap-2">
-              <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Store className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
               <span className="text-slate-500 font-medium">Branch Scope:</span>
               <select
                 value={adminBranchId}
@@ -792,7 +792,7 @@ export default function ProductsPage() {
                   setAdminBranchId(e.target.value);
                   setPage(1);
                 }}
-                className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="h-8 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
                 <option value="">{t('catalog.allBranchesOption')}</option>
                 {branches.map((b: any) => (
@@ -864,7 +864,7 @@ export default function ProductsPage() {
           <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-scaleIn flex flex-col max-h-[85vh]">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-2">
-                <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <FileSpreadsheet className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 Product CSV Import Preview
               </h3>
               <button
@@ -884,7 +884,7 @@ export default function ProductsPage() {
                 <button
                   type="button"
                   onClick={handleDownloadSampleTemplate}
-                  className="text-emerald-600 hover:underline font-semibold"
+                  className="text-sky-600 hover:underline font-semibold"
                 >
                   Download Sample CSV
                 </button>
@@ -944,7 +944,7 @@ export default function ProductsPage() {
                   </div>
                   <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                     <div
-                      className="h-full bg-emerald-600 transition-all duration-300"
+                      className="h-full bg-sky-600 transition-all duration-300"
                       style={{
                         width: `${Math.round((importProgress.current / importProgress.total) * 100)}%`,
                       }}

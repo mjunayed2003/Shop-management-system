@@ -213,24 +213,24 @@ export default function SalesListPage() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               {t('pos.salesList')}
             </h1>
             <Badge variant="outline" className="text-xs font-mono">
               {currentBranch?.name || 'Branch'}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Audit trail of POS retail and wholesale invoices, receipts, and returns.
           </p>
         </div>
 
-        <Button asChild className="gap-2 bg-primary text-primary-foreground font-semibold">
+        <Button asChild className="gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs">
           <Link href="/pos">
             <Plus className="w-4 h-4" />
             <span>New Sale (POS)</span>
@@ -240,51 +240,63 @@ export default function SalesListPage() {
 
       {/* Summary Row */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="p-3.5 rounded-xl border border-border bg-card shadow-xs space-y-1">
-            <span className="text-[11px] font-semibold text-muted-foreground">
-              Total Invoices
-            </span>
-            <p className="text-xl font-bold text-foreground font-mono">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-medium">Total Invoices</span>
+              <div className="w-7 h-7 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center font-bold text-xs">
+                #
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
               {summary.totalSalesCount}
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-border bg-card shadow-xs space-y-1">
-            <span className="text-[11px] font-semibold text-muted-foreground">
-              Total Sales Volume
-            </span>
-            <p className="text-xl font-bold text-foreground font-mono">
-              ৳{Number(summary.totalSalesAmount || 0).toFixed(2)}
+          <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-medium">Total Sales Volume</span>
+              <div className="w-7 h-7 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center font-bold text-xs">
+                ৳
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+              ৳{Number(summary.totalSalesAmount || 0).toLocaleString()}
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-border bg-card shadow-xs space-y-1">
-            <span className="text-[11px] font-semibold text-muted-foreground">
-              Total Tendered Paid
-            </span>
-            <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-              ৳{Number(summary.totalPaidAmount || 0).toFixed(2)}
+          <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-medium">Total Tendered Paid</span>
+              <div className="w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ৳
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
+              ৳{Number(summary.totalPaidAmount || 0).toLocaleString()}
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-border bg-card shadow-xs space-y-1">
-            <span className="text-[11px] font-semibold text-muted-foreground">
-              Total Customer Due
-            </span>
-            <p className="text-xl font-bold text-rose-600 dark:text-rose-400 font-mono">
-              ৳{Number(summary.totalDueAmount || 0).toFixed(2)}
+          <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-medium">Total Customer Due</span>
+              <div className="w-7 h-7 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center font-bold text-xs">
+                !
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 font-mono tracking-tight">
+              ৳{Number(summary.totalDueAmount || 0).toLocaleString()}
             </p>
           </div>
         </div>
       )}
 
       {/* Filters Bar */}
-      <div className="p-3.5 rounded-2xl border border-border bg-card space-y-3 shadow-xs">
+      <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
           {/* Search by invoice / customer */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <Input
               value={search}
               onChange={(e) => {
@@ -292,7 +304,7 @@ export default function SalesListPage() {
                 setPage(1);
               }}
               placeholder="Search invoice number, customer name, phone..."
-              className="pl-9 text-xs h-9"
+              className="pl-9 text-xs h-9 rounded-xl border-slate-200 dark:border-slate-800 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
 
@@ -303,7 +315,7 @@ export default function SalesListPage() {
               setStatus(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary h-9"
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-sky-500 h-9"
           >
             <option value="">All Statuses</option>
             <option value="COMPLETED">Completed</option>
@@ -319,7 +331,7 @@ export default function SalesListPage() {
               setSaleType(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary h-9"
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-sky-500 h-9"
           >
             <option value="">All Sale Types</option>
             <option value="RETAIL">Retail</option>
@@ -334,7 +346,7 @@ export default function SalesListPage() {
               setStartDate(e.target.value);
               setPage(1);
             }}
-            className="w-36 h-9 text-xs font-mono"
+            className="w-36 h-9 text-xs font-mono rounded-xl border-slate-200 dark:border-slate-800 focus:ring-sky-500/20"
             title="Start Date"
           />
           <Input
@@ -344,7 +356,7 @@ export default function SalesListPage() {
               setEndDate(e.target.value);
               setPage(1);
             }}
-            className="w-36 h-9 text-xs font-mono"
+            className="w-36 h-9 text-xs font-mono rounded-xl border-slate-200 dark:border-slate-800 focus:ring-sky-500/20"
             title="End Date"
           />
 

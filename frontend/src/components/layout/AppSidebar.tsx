@@ -20,12 +20,12 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
     <aside className="w-64 h-full flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 select-none">
       {/* Brand Header */}
       <div className="h-16 shrink-0 flex items-center gap-3 px-5 border-b border-slate-800/80">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black shadow-md shadow-emerald-500/20">
-          <ShoppingBag className="w-5 h-5 text-slate-950" />
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center font-black shadow-md shadow-sky-500/25">
+          <ShoppingBag className="w-5 h-5 text-white" />
         </div>
         <div>
           <h1 className="text-sm font-extrabold text-white tracking-tight">দোকান পিওএস</h1>
-          <p className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">
+          <p className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider">
             Fashion Retail
           </p>
         </div>
@@ -50,7 +50,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
       {/* Footer Info */}
       <div className="p-3 shrink-0 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
         <span>সংস্করণ ১.০.০</span>
-        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+        <span className="w-2 h-2 rounded-full bg-sky-500 shadow-xs shadow-sky-500/50" />
       </div>
     </aside>
   );
@@ -87,13 +87,13 @@ function SidebarNavItem({
         flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all group
         ${
           isActive
-            ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30'
+            ? 'bg-[#0284c7] text-white font-semibold shadow-sm shadow-sky-600/30'
             : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
         }
       `}
     >
       <div className="flex items-center gap-3">
-        <Icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+        <Icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-sky-400'}`} />
         <span>{t(item.labelKey)}</span>
       </div>
       {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/70" />}

@@ -178,16 +178,16 @@ export default function PurchaseReturnsPage() {
           <Button
             variant="outline"
             onClick={handleExportCsv}
-            className="gap-1.5 text-xs h-9"
+            className="gap-1.5 text-xs h-9 rounded-xl border-slate-200"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <FileSpreadsheet className="w-4 h-4 text-sky-600" />
             <span>Export CSV</span>
           </Button>
 
           <PermissionGate permission="purchases:return">
             <Button
               onClick={() => router.push('/purchases/returns/new')}
-              className="gap-1.5 text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="gap-1.5 text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>Create Return Note</span>

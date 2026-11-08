@@ -1136,7 +1136,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           sel
-                            ? 'bg-emerald-600 text-white shadow-sm'
+                            ? 'bg-[#0284c7] text-white shadow-xs'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
                         }`}
                       >

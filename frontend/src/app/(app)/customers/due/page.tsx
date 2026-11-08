@@ -115,7 +115,7 @@ export default function DueCollectionsHubPage() {
       header: 'Amount Collected',
       align: 'right',
       render: (item) => (
-        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+        <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
           BDT {Number(item.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
         </span>
       ),
@@ -135,23 +135,23 @@ export default function DueCollectionsHubPage() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-emerald-600" />
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <Wallet className="w-6 h-6 text-sky-600 dark:text-sky-400" />
             <span>{t('due.title')}</span>
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Collect customer outstanding balances, view credit history, and inspect debt aging analysis.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" className="gap-1.5 text-xs font-semibold">
+          <Button asChild variant="outline" className="gap-1.5 text-xs font-semibold rounded-xl border-slate-200">
             <Link href="/customers/due/aging">
-              <Clock className="w-4 h-4 text-indigo-600" />
+              <Clock className="w-4 h-4 text-sky-600" />
               <span>{t('due.agingTitle')}</span>
             </Link>
           </Button>
@@ -159,17 +159,18 @@ export default function DueCollectionsHubPage() {
       </div>
 
       {/* Phone-First Customer Search Card */}
-      <Card className="border-emerald-200 dark:border-emerald-950/80 bg-emerald-50/30 dark:bg-emerald-950/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold flex items-center gap-2 text-emerald-900 dark:text-emerald-200">
-            <Phone className="w-4 h-4 text-emerald-600" />
+      <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs p-6 space-y-4">
+        <div>
+          <h3 className="text-sm font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+            <Phone className="w-4 h-4 text-sky-600" />
             <span>{t('due.customerLookup')}</span>
-          </CardTitle>
-          <CardDescription className="text-xs">
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
             {t('due.lookupPrompt')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+
+        <div className="space-y-4">
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 max-w-md">
             <Input
               value={lookupPhone}
@@ -178,12 +179,12 @@ export default function DueCollectionsHubPage() {
                 setSearchTriggered(false);
               }}
               placeholder="e.g. 017XXXXXXXX..."
-              className="text-xs bg-white dark:bg-slate-900"
+              className="text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-sky-500/20"
             />
             <Button
               type="submit"
               disabled={!lookupPhone.trim() || lookupFetching}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white gap-1.5 text-xs font-semibold rounded-xl shadow-xs"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Search</span>
@@ -192,28 +193,28 @@ export default function DueCollectionsHubPage() {
 
           {/* Customer Result Card */}
           {customerLookup && (
-            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-xl animate-in fade-in">
+            <div className="p-4 rounded-2xl bg-sky-50/30 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-xl animate-in fade-in">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-foreground text-sm">{customerLookup.name}</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">{customerLookup.name}</span>
                   <Badge variant="outline" className="font-mono text-xs">
                     {customerLookup.phone}
                   </Badge>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">
+                <div className="text-xs text-slate-500 mt-1">
                   Credit Limit: BDT {Number(customerLookup.credit_limit || 0).toLocaleString()}
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Outstanding Due</span>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold">Outstanding Due</span>
                   <div className="font-mono font-bold text-lg text-rose-600 dark:text-rose-400">
                     BDT {Number(customerLookup.current_due || 0).toFixed(2)}
                   </div>
                 </div>
 
-                <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1 text-xs">
+                <Button asChild size="sm" className="bg-[#0284c7] hover:bg-[#0369a1] text-white gap-1 text-xs font-semibold rounded-xl shadow-xs">
                   <Link href={`/customers/${customerLookup.id}/collect-due`}>
                     <span>Collect</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -224,18 +225,18 @@ export default function DueCollectionsHubPage() {
           )}
 
           {searchTriggered && lookupError && !customerLookup && (
-            <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>No customer found matching phone number &quot;{lookupPhone}&quot;.</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Recent Collections Table */}
       <div className="space-y-3">
-        <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-          <Receipt className="w-4 h-4 text-emerald-600" />
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <Receipt className="w-4 h-4 text-sky-600" />
           <span>{t('due.collectionsList')}</span>
         </h2>
 

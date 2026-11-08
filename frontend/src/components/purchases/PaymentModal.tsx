@@ -129,9 +129,9 @@ export function PaymentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
+        <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+            <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
@@ -241,7 +241,7 @@ export function PaymentModal({
           </FormFieldWrapper>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
             <Button
               type="button"
               variant="outline"
@@ -256,7 +256,7 @@ export function PaymentModal({
                 isSubmitting ||
                 (purchaseDue !== undefined && enteredAmount > purchaseDue)
               }
-              className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[120px]"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white min-w-[120px] rounded-xl shadow-xs"
             >
               {isSubmitting ? t('submitting') : 'Record Payment'}
             </Button>

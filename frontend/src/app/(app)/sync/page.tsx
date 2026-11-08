@@ -199,7 +199,7 @@ export default function SyncHubPage() {
             size="sm"
             onClick={handleSyncNow}
             disabled={isSyncingNow || (!isOnline && !isManualOffline)}
-            className="text-xs h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
+            className="text-xs h-9 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold shadow-xs"
           >
             {isSyncingNow ? (
               <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />

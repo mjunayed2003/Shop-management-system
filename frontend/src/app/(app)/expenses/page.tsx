@@ -328,12 +328,12 @@ export default function ExpensesPage() {
   ];
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 max-w-[1600px] mx-auto">
+    <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-5 border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-5 border-slate-100 dark:border-slate-800">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            <Receipt className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
+            <Receipt className="w-7 h-7 text-sky-600 dark:text-sky-400" />
             {t('expenses.title')}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -343,8 +343,8 @@ export default function ExpensesPage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link href="/expenses/reports">
-            <Button variant="outline" size="sm" className="gap-2">
-              <BarChart3 className="w-4 h-4 text-indigo-600" />
+            <Button variant="outline" size="sm" className="gap-2 rounded-xl border-slate-200">
+              <BarChart3 className="w-4 h-4 text-sky-600" />
               {t('expenses.reportsTitle')}
             </Button>
           </Link>
@@ -353,7 +353,7 @@ export default function ExpensesPage() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 rounded-xl border-slate-200"
               onClick={() => setIsCategoriesModalOpen(true)}
             >
               <Tag className="w-4 h-4 text-slate-500" />
@@ -364,18 +364,18 @@ export default function ExpensesPage() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-2"
+            className="gap-2 rounded-xl border-slate-200"
             onClick={handleExportCsv}
             disabled={items.length === 0}
           >
-            <Download className="w-4 h-4 text-emerald-600" />
+            <Download className="w-4 h-4 text-sky-600" />
             {t('expenses.exportCsv')}
           </Button>
 
           <PermissionGate permissions={['expense.create']}>
             <Button
               size="sm"
-              className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs"
               onClick={() => {
                 setSelectedExpense(null);
                 setIsExpenseModalOpen(true);
@@ -390,7 +390,7 @@ export default function ExpensesPage() {
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {t('expenses.totalExpenses')}
           </span>
@@ -403,17 +403,17 @@ export default function ExpensesPage() {
           </span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             {t('expenses.voucherCount')}
           </span>
-          <div className="mt-2 text-2xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
+          <div className="mt-2 text-2xl font-bold font-mono text-sky-600 dark:text-sky-400">
             {totals.count}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">Filtered vouchers</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Paid from Register
           </span>
@@ -423,7 +423,7 @@ export default function ExpensesPage() {
           <span className="text-xs text-slate-500 mt-1 block">Direct drawer disbursements</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Current Branch
           </span>
@@ -437,7 +437,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-wrap items-center gap-3">
+      <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-slate-400" />
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Filters:</span>

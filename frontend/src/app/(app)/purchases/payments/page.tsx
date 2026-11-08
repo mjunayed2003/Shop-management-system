@@ -80,7 +80,7 @@ export default function SupplierPaymentsPage() {
       render: (pm: any) => (
         <Link
           href={`/purchases/payments/${pm.id}`}
-          className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1.5"
+          className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 flex items-center gap-1.5"
         >
           <span>{pm.payment_no}</span>
           <ExternalLink className="w-3.5 h-3.5 opacity-60" />
@@ -110,7 +110,7 @@ export default function SupplierPaymentsPage() {
         pm.purchase?.purchase_no ? (
           <Link
             href={`/purchases/${pm.purchase.id}`}
-            className="font-mono text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="font-mono text-xs text-sky-600 dark:text-sky-400 hover:underline"
           >
             {pm.purchase.purchase_no}
           </Link>
@@ -145,7 +145,7 @@ export default function SupplierPaymentsPage() {
       key: 'amount',
       header: 'Amount Paid',
       render: (pm: any) => (
-        <div className="text-right font-mono font-bold text-sm text-emerald-600 dark:text-emerald-400">
+        <div className="text-right font-mono font-bold text-sm text-sky-600 dark:text-sky-400">
           {formatBDT(pm.amount)}
         </div>
       ),
@@ -172,7 +172,7 @@ export default function SupplierPaymentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+          <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900 shadow-xs">
             <CreditCard className="w-6 h-6" />
           </div>
           <div>
@@ -189,16 +189,16 @@ export default function SupplierPaymentsPage() {
           <Button
             variant="outline"
             onClick={handleExportCsv}
-            className="gap-1.5 text-xs h-9"
+            className="gap-1.5 text-xs h-9 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <FileSpreadsheet className="w-4 h-4 text-sky-600" />
             <span>Export CSV</span>
           </Button>
 
           <PermissionGate permission="purchases:create">
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="gap-1.5 text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="gap-1.5 text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-xl shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>Record Payment</span>
@@ -208,7 +208,7 @@ export default function SupplierPaymentsPage() {
       </div>
 
       {/* Filter */}
-      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs flex items-center justify-between">
         <div className="w-full sm:w-80">
           <SearchInput
             value={search}

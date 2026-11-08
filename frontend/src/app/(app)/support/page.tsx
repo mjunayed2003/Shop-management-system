@@ -174,7 +174,7 @@ export default function TenantSupportPage() {
         <Button
           type="button"
           onClick={() => setIsNewTicketOpen(true)}
-          className="h-10 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2"
+          className="h-10 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2"
         >
           <PlusCircle className="w-4 h-4" />
           <span>নতুন টিকিট খুলুন</span>
@@ -363,7 +363,7 @@ export default function TenantSupportPage() {
               size="sm"
               disabled={createTicketMutation.isPending || !newSubject.trim() || !newDescription.trim()}
               onClick={() => createTicketMutation.mutate()}
-              className="text-xs h-9 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl"
+              className="text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold rounded-xl shadow-xs"
             >
               {createTicketMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-1" />
@@ -482,7 +482,7 @@ export default function TenantSupportPage() {
                   size="sm"
                   onClick={() => replyMutation.mutate()}
                   disabled={replyMutation.isPending || !replyMessage.trim()}
-                  className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm"
+                  className="h-8 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-xs"
                 >
                   {replyMutation.isPending ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />

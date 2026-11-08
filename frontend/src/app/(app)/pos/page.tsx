@@ -871,7 +871,7 @@ export default function PosPage() {
                 type="button"
                 disabled={items.length === 0 || isCalculating}
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="w-full h-12 text-sm font-extrabold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg transition-transform active:scale-[0.99]"
+                className="w-full h-12 text-sm font-extrabold gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-lg shadow-sky-600/25 transition-transform active:scale-[0.99]"
               >
                 <CreditCard className="w-5 h-5" />
                 <span>{t('pos.payBtn')} • ৳{displayTotal.toFixed(2)}</span>

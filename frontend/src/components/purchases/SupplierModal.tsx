@@ -303,7 +303,7 @@ export function SupplierModal({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white min-w-[120px]"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white min-w-[120px] rounded-xl shadow-xs"
             >
               {isSubmitting ? t('submitting') : t('save')}
             </Button>

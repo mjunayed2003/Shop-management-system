@@ -191,27 +191,27 @@ export default function StockOverviewPage() {
     const available = quantity - allocated;
     if (quantity < 0) {
       return (
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40">
           Negative
         </span>
       );
     }
     if (quantity === 0) {
       return (
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200">
-          Zero
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+          Out of Stock
         </span>
       );
     }
     if (available <= reorderLevel) {
       return (
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40">
           Low Stock
         </span>
       );
     }
     return (
-      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+      <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
         In Stock
       </span>
     );
@@ -362,14 +362,14 @@ export default function StockOverviewPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+          <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900 shadow-xs">
             <Warehouse className="w-6 h-6" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <span>{t('inventory.stockOverview')}</span>
               {viewMode === 'ALL_BRANCHES' && (
-                <Badge className="bg-indigo-600 text-white text-xs">
+                <Badge className="bg-sky-600 text-white text-xs">
                   {t('inventory.multiBranchBadge')}
                 </Badge>
               )}
@@ -383,13 +383,13 @@ export default function StockOverviewPage() {
         <div className="flex items-center gap-2">
           {/* Admin Toggle for ALL-BRANCHES Matrix */}
           {isAllBranchAdmin && (
-            <div className="flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-0.5 text-xs">
+            <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-0.5 text-xs">
               <button
                 type="button"
                 onClick={() => setViewMode('CURRENT')}
-                className={`px-3 py-1.5 rounded-md font-semibold transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   viewMode === 'CURRENT'
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-[#0284c7] text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
@@ -398,9 +398,9 @@ export default function StockOverviewPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('ALL_BRANCHES')}
-                className={`px-3 py-1.5 rounded-md font-semibold transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   viewMode === 'ALL_BRANCHES'
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-[#0284c7] text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                 }`}
               >
@@ -412,9 +412,9 @@ export default function StockOverviewPage() {
           <Button
             variant="outline"
             onClick={handleExportCsv}
-            className="gap-1.5 text-xs h-9"
+            className="gap-1.5 text-xs h-9 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <FileSpreadsheet className="w-4 h-4 text-sky-600" />
             <span>Export CSV</span>
           </Button>
 

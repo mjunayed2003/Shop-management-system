@@ -216,7 +216,7 @@ export default function RolesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <ShieldCheck className="w-6 h-6 text-emerald-600" />
+            <ShieldCheck className="w-6 h-6 text-sky-600 dark:text-sky-400" />
             <span>{t('roles.title')}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -239,7 +239,7 @@ export default function RolesPage() {
             return (
               <div
                 key={role.id}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4"
+                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
@@ -272,7 +272,7 @@ export default function RolesPage() {
                       <strong>{role.usersCount}</strong> জন কর্মী
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
                       <strong>{isOwner ? 'সকল' : role.permissionsCount}</strong> টি অনুমতি
                     </span>
                   </div>

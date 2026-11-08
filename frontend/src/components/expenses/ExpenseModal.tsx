@@ -449,7 +449,7 @@ export default function ExpenseModal({
               type="button"
               disabled={!canSubmit || saveMutation.isPending}
               onClick={() => saveMutation.mutate()}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs gap-1.5 rounded-xl shadow-xs"
             >
               {saveMutation.isPending ? (
                 <>

@@ -442,7 +442,7 @@ export default function UsersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-emerald-600" />
+            <Users className="w-6 h-6 text-sky-600 dark:text-sky-400" />
             <span>{t('users.title')}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -456,7 +456,7 @@ export default function UsersPage() {
       </div>
 
       {/* Filters Toolbar */}
-      <div className="flex flex-col lg:flex-row items-center gap-3 justify-between bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col lg:flex-row items-center gap-3 justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
         <div className="w-full lg:w-72">
           <SearchInput
             value={search}
@@ -476,7 +476,7 @@ export default function UsersPage() {
               setFilterRoleId(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="">{t('users.allRoles')}</option>
             {roles.map((r) => (
@@ -493,7 +493,7 @@ export default function UsersPage() {
               setFilterBranchId(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="">{t('users.allBranches')}</option>
             {branches.map((b) => (
@@ -510,7 +510,7 @@ export default function UsersPage() {
               setFilterStatus(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="">{t('users.allStatus')}</option>
             <option value="active">{t('active')}</option>

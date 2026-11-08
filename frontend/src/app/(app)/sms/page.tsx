@@ -264,7 +264,7 @@ export default function SmsHubPage() {
                 type="button"
                 onClick={() => previewMutation.mutate()}
                 disabled={previewMutation.isPending}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs h-9 rounded-xl px-4"
+                className="bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold text-xs h-9 rounded-xl px-4 shadow-xs"
               >
                 {previewMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Users className="w-3.5 h-3.5 mr-1.5" />}
                 Preview Eligible Customers
@@ -459,7 +459,7 @@ export default function SmsHubPage() {
               type="button"
               disabled={sendPromoMutation.isPending || !promoMessage.trim()}
               onClick={() => sendPromoMutation.mutate()}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs h-9 rounded-xl px-4"
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold text-xs h-9 rounded-xl px-4 shadow-xs"
             >
               {sendPromoMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Send className="w-3.5 h-3.5 mr-1.5" />}
               Launch Campaign Broadcast
@@ -533,7 +533,7 @@ export default function SmsHubPage() {
                   size="sm"
                   disabled={sendRemindersMutation.isPending || previewResult.count === 0}
                   onClick={() => sendRemindersMutation.mutate()}
-                  className="text-xs h-8 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
+                  className="text-xs h-8 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold shadow-xs"
                 >
                   {sendRemindersMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null}
                   Send {previewResult.count} SMS
