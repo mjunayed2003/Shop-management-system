@@ -17,9 +17,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'দোকান পিওএস - পোশাক রিটেইল শপ ম্যানেজমেন্ট',
-  description: 'মাল্টি-টেন্যান্ট, মাল্টি-ব্রাঞ্চ আধুনিক পোশাক খুচরা বিক্রয় ও ইনভেন্টরি সিস্টেম (বাংলাদেশ বাজার)',
-  keywords: ['POS', 'Retail POS', 'Clothing POS', 'Bangladesh POS', 'দোকান ম্যানেজমেন্ট', 'ইনভেন্টরি'],
+  title: 'Shop POS - Clothing Retail Management',
+  description: 'Multi-tenant, multi-branch modern apparel retail sales and inventory system',
+  keywords: ['POS', 'Retail POS', 'Clothing POS', 'Bangladesh POS', 'Shop Management', 'Inventory'],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

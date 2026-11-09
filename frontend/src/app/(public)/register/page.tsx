@@ -31,25 +31,25 @@ import {
 
 const registerSchema = z
   .object({
-    businessName: z.string().min(2, 'দোকানের নাম কমপক্ষে ২ অক্ষরের হতে হবে'),
+    businessName: z.string().min(2, 'Shop name must be at least 2 characters'),
     businessSlug: z
       .string()
-      .min(2, 'দোকানের আইডি (Slug) আবশ্যক')
-      .regex(/^[a-z0-9-]+$/, 'আইডি অবশ্যই ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন হতে হবে'),
-    ownerFirstName: z.string().min(1, 'প্রথম নাম আবশ্যক'),
-    ownerLastName: z.string().min(1, 'শেষ নাম আবশ্যক'),
+      .min(2, 'Shop ID (Slug) is required')
+      .regex(/^[a-z0-9-]+$/, 'Slug must only contain lowercase letters, numbers, and hyphens'),
+    ownerFirstName: z.string().min(1, 'First name is required'),
+    ownerLastName: z.string().min(1, 'Last name is required'),
     phone: z
       .string()
-      .refine((val) => isValidBDPhone(val), 'সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)'),
-    email: z.string().email('সঠিক ইমেইল ঠিকানা দিন'),
-    password: z.string().min(6, 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে'),
-    confirmPassword: z.string().min(6, 'পাসওয়ার্ড নিশ্চিত করুন'),
-    branchName: z.string().min(2, 'প্রথম শাখার নাম আবশ্যক'),
-    branchAddress: z.string().min(3, 'শোরুমের ঠিকানা আবশ্যক'),
-    terms: z.boolean().refine((val) => val === true, 'শর্তাবলীতে সম্মতি প্রদান আবশ্যক'),
+      .refine((val) => isValidBDPhone(val), 'Please provide a valid 11-digit mobile number (e.g. 017XXXXXXXX)'),
+    email: z.string().email('Please enter a valid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    confirmPassword: z.string().min(6, 'Please confirm your password'),
+    branchName: z.string().min(2, 'Branch name is required'),
+    branchAddress: z.string().min(3, 'Showroom address is required'),
+    terms: z.boolean().refine((val) => val === true, 'You must agree to the terms and conditions'),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'পাসওয়ার্ড মিলছে না',
+    message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
 
@@ -57,7 +57,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const setAuth = useAuthStore((s) => s.setAuth);
   const setBranches = useBranchStore((s) => s.setBranches);
@@ -85,7 +85,7 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
-      branchName: 'প্রধান শোরুম (Main Showroom)',
+      branchName: 'Main Showroom',
       branchAddress: '',
       terms: false,
     },
@@ -105,9 +105,9 @@ export default function RegisterPage() {
     if (/\d/.test(pwd)) score++;
     if (/[^A-Za-z0-9]/.test(pwd)) score++;
 
-    if (score <= 2) return { score, label: 'দুর্বল (Weak)', color: 'bg-rose-500' };
-    if (score <= 3) return { score, label: 'মাঝারি (Medium)', color: 'bg-amber-500' };
-    return { score, label: 'শক্তিশালী (Strong)', color: 'bg-emerald-500' };
+    if (score <= 2) return { score, label: locale === 'bn' ? 'দুর্বল (Weak)' : 'Weak', color: 'bg-rose-500' };
+    if (score <= 3) return { score, label: locale === 'bn' ? 'মাঝারি (Medium)' : 'Medium', color: 'bg-amber-500' };
+    return { score, label: locale === 'bn' ? 'শক্তিশালী (Strong)' : 'Strong', color: 'bg-emerald-500' };
   };
 
   const pwdStrength = getPasswordStrength(watchPassword);
@@ -191,9 +191,9 @@ export default function RegisterPage() {
       router.push('/dashboard');
     } catch (err: any) {
       if (err.statusCode === 409) {
-        setServerError('এই শপ আইডি (Slug) ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য আইডি দিন।');
+        setServerError(locale === 'bn' ? 'এই শপ আইডি (Slug) ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য আইডি দিন।' : 'This Shop ID (Slug) is already in use. Please choose another.');
       } else {
-        setServerError(err.message || 'দোকান নিবন্ধন প্রক্রিয়া সম্পন্ন করা যায়নি');
+        setServerError(err.message || (locale === 'bn' ? 'দোকান নিবন্ধন প্রক্রিয়া সম্পন্ন করা যায়নি' : 'Could not complete registration process'));
       }
     } finally {
       setIsSubmitting(false);
@@ -457,7 +457,7 @@ export default function RegisterPage() {
         </form>
 
         <div className="text-center pt-2 text-xs text-slate-500">
-          <span>ইতিমধ্যে অ্যাকাউন্ট রয়েছে? </span>
+          <span>{locale === 'bn' ? 'ইতিমধ্যে অ্যাকাউন্ট রয়েছে?' : 'Already have an account?'} </span>
           <Link
             href="/login"
             className="font-semibold text-sky-600 dark:text-sky-400 hover:underline"

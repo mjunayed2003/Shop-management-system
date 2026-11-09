@@ -14,7 +14,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <aside className="w-64 h-full flex flex-col bg-slate-900 text-slate-300 border-r border-slate-800 select-none">
@@ -24,7 +24,9 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
           <ShoppingBag className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-sm font-extrabold text-white tracking-tight">দোকান পিওএস</h1>
+          <h1 className="text-sm font-extrabold text-white tracking-tight">
+            {locale === 'bn' ? 'দোকান পিওএস' : 'Shop POS'}
+          </h1>
           <p className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider">
             Fashion Retail
           </p>
@@ -34,7 +36,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
       {/* Nav Links */}
       <div className="flex-1 overflow-y-auto p-3 space-y-1 [&::-webkit-scrollbar-thumb]:bg-slate-700/60 hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
         <p className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-          মূল মেনু
+          {locale === 'bn' ? 'মূল মেনু' : 'MAIN MENU'}
         </p>
 
         {SIDEBAR_NAV_ITEMS.map((item) => (
@@ -49,7 +51,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
 
       {/* Footer Info */}
       <div className="p-3 shrink-0 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
-        <span>সংস্করণ ১.০.০</span>
+        <span>{locale === 'bn' ? 'সংস্করণ ১.০.০' : 'Version 1.0.0'}</span>
         <span className="w-2 h-2 rounded-full bg-sky-500 shadow-xs shadow-sky-500/50" />
       </div>
     </aside>

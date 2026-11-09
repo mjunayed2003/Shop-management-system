@@ -18,15 +18,15 @@ import { Eye, EyeOff, Lock, User, ShoppingBag, AlertTriangle, Loader2, Sparkles,
 const loginSchema = z.object({
   identifier: z
     .string()
-    .min(3, 'ইমেইল বা ফোন নম্বর আবশ্যক')
+    .min(3, 'Email or phone number is required')
     .refine((val) => {
       const clean = val.trim();
       // Allow email format OR phone (at least 10 digits)
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean);
       const isPhone = /^(\+?88)?01[3-9]\d{8}$/.test(clean.replace(/[\s-]/g, ''));
       return isEmail || isPhone;
-    }, 'বৈধ ইমেইল অথবা বাংলাদেশি মোবাইল নম্বর প্রদান করুন'),
-  password: z.string().min(6, 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে'),
+    }, 'Please enter a valid email or phone number'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
   businessSlug: z.string().optional(),
   rememberMe: z.boolean(),
 });
@@ -38,7 +38,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const setAuth = useAuthStore((s) => s.setAuth);
   const setBranches = useBranchStore((s) => s.setBranches);
@@ -168,7 +168,7 @@ function LoginForm() {
         <div className="p-3 bg-sky-50/70 dark:bg-sky-950/30 rounded-xl border border-sky-200/80 dark:border-sky-800/50 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-900 dark:text-sky-200">
             <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-            <span>ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:</span>
+            <span>{locale === 'bn' ? 'ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:' : 'Click to autofill demo account:'}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
@@ -176,14 +176,14 @@ function LoginForm() {
               onClick={() => fillStoreDemo('owner@shop.com', 'ShopOwner123!', 'demo-fashion')}
               className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-sky-200 dark:border-slate-700 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
-              Store Owner (মালিক)
+              {locale === 'bn' ? 'Store Owner (মালিক)' : 'Store Owner'}
             </button>
             <button
               type="button"
               onClick={() => fillStoreDemo('cashier@shop.com', 'Cashier123!', 'demo-fashion')}
               className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-sky-200 dark:border-slate-700 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
-              Cashier (ক্যাশিয়ার)
+              {locale === 'bn' ? 'Cashier (ক্যাশিয়ার)' : 'Cashier'}
             </button>
           </div>
         </div>
@@ -284,7 +284,7 @@ function LoginForm() {
               className="text-[11px] text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:underline inline-flex items-center gap-1"
             >
               <Shield className="w-3 h-3" />
-              <span>প্ল্যাটফর্ম সুপার অ্যাডমিন লগইন (Platform Console)</span>
+              <span>{locale === 'bn' ? 'প্ল্যাটফর্ম সুপার অ্যাডমিন লগইন (Platform Console)' : 'Platform Super Admin Login (Platform Console)'}</span>
             </Link>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function LoginPage() {
             <div className="p-3 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
               <Loader2 className="w-8 h-8 animate-spin" />
             </div>
-            <p className="text-sm font-medium text-slate-500">লোড হচ্ছে...</p>
+            <p className="text-sm font-medium text-slate-500">Loading...</p>
           </div>
         </div>
       }
