@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { AppSidebar } from './AppSidebar';
 import { AppTopBar } from './AppTopBar';
-import { Breadcrumbs } from './Breadcrumbs';
 import { SuspendedNotice } from '../feedback/SuspendedNotice';
 import { SubscriptionBanner } from '../feedback/SubscriptionBanner';
 import { PlanLimitReachedDialog } from '../feedback/PlanLimitReachedDialog';
@@ -46,7 +45,6 @@ export function AppShell({
           <AppTopBar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
 
           <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-[1600px] w-full mx-auto space-y-6">
-            <Breadcrumbs />
             {children}
           </main>
         </div>
