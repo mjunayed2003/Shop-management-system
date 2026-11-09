@@ -134,7 +134,7 @@ function LoginForm() {
       // Clean browser navigation to target to ensure fresh session cookies & avoid cross-layout RSC chunk collisions
       window.location.href = redirectTarget;
     } catch (err: any) {
-      setServerError(err?.message || 'সার্ভারে সংযোগ করা সম্ভব হচ্ছে না');
+      setServerError(err?.message || (locale === 'bn' ? 'সার্ভারে সংযোগ করা সম্ভব হচ্ছে না' : 'Unable to connect to the server.'));
     } finally {
       setIsSubmitting(false);
     }

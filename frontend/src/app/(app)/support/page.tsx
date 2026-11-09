@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 export default function TenantSupportPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
@@ -78,7 +78,7 @@ export default function TenantSupportPage() {
   const createTicketMutation = useMutation({
     mutationFn: () => {
       const fullDesc = invoiceRef
-        ? `[ইনভয়েস রেফারেন্স: ${invoiceRef}]\n\n${newDescription}`
+        ? `[${locale === 'bn' ? 'ইনভয়েস রেফারেন্স' : 'Invoice Reference'}: ${invoiceRef}]\n\n${newDescription}`
         : newDescription;
 
       return api.support.createTicket({
@@ -88,7 +88,7 @@ export default function TenantSupportPage() {
       });
     },
     onSuccess: () => {
-      toast.show('সাপোর্ট টিকিট সফলভাবে তৈরি হয়েছে।', 'success');
+      toast.show(locale === 'bn' ? 'সাপোর্ট টিকিট সফলভাবে তৈরি হয়েছে।' : 'Support ticket created successfully.', 'success');
       setIsNewTicketOpen(false);
       setNewSubject('');
       setNewDescription('');
@@ -97,7 +97,7 @@ export default function TenantSupportPage() {
       refetchTickets();
     },
     onError: (err: any) => {
-      toast.show(err.message || 'টিকিট তৈরি করা যায়নি।', 'error');
+      toast.show(err.message || (locale === 'bn' ? 'টিকিট তৈরি করা যায়নি।' : 'Failed to create support ticket.'), 'error');
     },
   });
 
@@ -111,7 +111,7 @@ export default function TenantSupportPage() {
       refetchTickets();
     },
     onError: (err: any) => {
-      toast.show(err.message || 'উত্তর পাঠানো যায়নি।', 'error');
+      toast.show(err.message || (locale === 'bn' ? 'উত্তর পাঠানো যায়নি।' : 'Failed to send reply.'), 'error');
     },
   });
 
@@ -119,39 +119,39 @@ export default function TenantSupportPage() {
   const closeMutation = useMutation({
     mutationFn: () => api.support.close(selectedTicketId!),
     onSuccess: () => {
-      toast.show('টিকিট সফলভাবে সম্পন্ন (Closed) করা হয়েছে।', 'info');
+      toast.show(locale === 'bn' ? 'টিকিট সফলভাবে সম্পন্ন (Closed) করা হয়েছে।' : 'Ticket successfully marked as closed.', 'info');
       queryClient.invalidateQueries({ queryKey: ['support', 'thread', selectedTicketId] });
       refetchThread();
       refetchTickets();
     },
     onError: (err: any) => {
-      toast.show(err.message || 'টিকিট সম্পন্ন করা যায়নি।', 'error');
+      toast.show(err.message || (locale === 'bn' ? 'টিকিট সম্পন্ন করা যায়নি।' : 'Failed to close ticket.'), 'error');
     },
   });
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return <Badge className="bg-rose-600 text-white text-[10px] font-bold">জরুরি (Urgent)</Badge>;
+        return <Badge className="bg-rose-600 text-white text-[10px] font-bold">{locale === 'bn' ? 'জরুরি (Urgent)' : 'Urgent'}</Badge>;
       case 'HIGH':
-        return <Badge className="bg-amber-500 text-white text-[10px] font-bold">উচ্চ (High)</Badge>;
+        return <Badge className="bg-amber-500 text-white text-[10px] font-bold">{locale === 'bn' ? 'উচ্চ (High)' : 'High'}</Badge>;
       case 'LOW':
-        return <Badge className="bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-[10px]">সাধারণ (Low)</Badge>;
+        return <Badge className="bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 text-[10px]">{locale === 'bn' ? 'সাধারণ (Low)' : 'Low'}</Badge>;
       default:
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px]">মাঝারি (Medium)</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px]">{locale === 'bn' ? 'মাঝারি (Medium)' : 'Medium'}</Badge>;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'OPEN':
-        return <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-bold">উন্মুক্ত (Open)</Badge>;
+        return <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-bold">{locale === 'bn' ? 'উন্মুক্ত (Open)' : 'Open'}</Badge>;
       case 'IN_PROGRESS':
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px] font-bold">প্রক্রিয়াধীন (In Progress)</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px] font-bold">{locale === 'bn' ? 'প্রক্রিয়াধীন (In Progress)' : 'In Progress'}</Badge>;
       case 'RESOLVED':
-        return <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 text-[10px] font-bold">সমাধানকৃত (Resolved)</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 text-[10px] font-bold">{locale === 'bn' ? 'সমাধানকৃত (Resolved)' : 'Resolved'}</Badge>;
       case 'CLOSED':
-        return <Badge variant="outline" className="text-slate-400 text-[10px]">সম্পন্ন (Closed)</Badge>;
+        return <Badge variant="outline" className="text-slate-400 text-[10px]">{locale === 'bn' ? 'সম্পন্ন (Closed)' : 'Closed'}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -164,10 +164,12 @@ export default function TenantSupportPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
             <LifeBuoy className="w-8 h-8 text-sky-600" />
-            <span>সাপোর্ট ও হেল্পডেস্ক</span>
+            <span>{locale === 'bn' ? 'সাপোর্ট ও হেল্পডেস্ক' : 'Support & Helpdesk'}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            সফটওয়্যার ব্যবহার, সাবস্ক্রিপশন বা পেমেন্ট সংক্রান্ত যেকোনো সমস্যায় সরাসরি টিকিট খুলুন।
+            {locale === 'bn'
+              ? 'সফটওয়্যার ব্যবহার, সাবস্ক্রিপশন বা পেমেন্ট সংক্রান্ত যেকোনো সমস্যায় সরাসরি টিকিট খুলুন।'
+              : 'Need help with software usage, subscriptions, or payments? Open a ticket directly.'}
           </p>
         </div>
 
@@ -177,7 +179,7 @@ export default function TenantSupportPage() {
           className="h-10 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2"
         >
           <PlusCircle className="w-4 h-4" />
-          <span>নতুন টিকিট খুলুন</span>
+          <span>{locale === 'bn' ? 'নতুন টিকিট খুলুন' : 'New Ticket'}</span>
         </Button>
       </div>
 
@@ -186,12 +188,12 @@ export default function TenantSupportPage() {
         <CardHeader className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-sky-600" />
-            <span>আপনার টিকিটের তালিকা</span>
+            <span>{locale === 'bn' ? 'আপনার টিকিটের তালিকা' : 'Your Tickets'}</span>
           </CardTitle>
 
           {/* Status filter */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-medium">ফিল্টার:</span>
+            <span className="text-slate-400 font-medium">{locale === 'bn' ? 'ফিল্টার:' : 'Filter:'}</span>
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -200,11 +202,11 @@ export default function TenantSupportPage() {
               }}
               className="h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-2.5 text-xs text-slate-700 dark:text-slate-200"
             >
-              <option value="">সকল স্ট্যাটাস</option>
-              <option value="OPEN">OPEN (উন্মুক্ত)</option>
-              <option value="IN_PROGRESS">IN_PROGRESS (প্রক্রিয়াধীন)</option>
-              <option value="RESOLVED">RESOLVED (সমাধানকৃত)</option>
-              <option value="CLOSED">CLOSED (সম্পন্ন)</option>
+              <option value="">{locale === 'bn' ? 'সকল স্ট্যাটাস' : 'All Statuses'}</option>
+              <option value="OPEN">{locale === 'bn' ? 'OPEN (উন্মুক্ত)' : 'Open'}</option>
+              <option value="IN_PROGRESS">{locale === 'bn' ? 'IN_PROGRESS (প্রক্রিয়াধীন)' : 'In Progress'}</option>
+              <option value="RESOLVED">{locale === 'bn' ? 'RESOLVED (সমাধানকৃত)' : 'Resolved'}</option>
+              <option value="CLOSED">{locale === 'bn' ? 'CLOSED (সম্পন্ন)' : 'Closed'}</option>
             </select>
           </div>
         </CardHeader>
@@ -214,13 +216,13 @@ export default function TenantSupportPage() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase">
                 <tr>
-                  <th className="p-3.5">টিকিট নং</th>
-                  <th className="p-3.5">বিষয় (Subject)</th>
-                  <th className="p-3.5">অগ্রাধিকার</th>
-                  <th className="p-3.5">স্ট্যাটাস</th>
-                  <th className="p-3.5">বার্তা সংখ্যা</th>
-                  <th className="p-3.5">সর্বশেষ আপডেট</th>
-                  <th className="p-3.5 text-right">অ্যাকশন</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'টিকিট নং' : 'Ticket #'}</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'বিষয় (Subject)' : 'Subject'}</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'অগ্রাধিকার' : 'Priority'}</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'স্ট্যাটাস' : 'Status'}</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'বার্তা সংখ্যা' : 'Messages'}</th>
+                  <th className="p-3.5">{locale === 'bn' ? 'সর্বশেষ আপডেট' : 'Last Updated'}</th>
+                  <th className="p-3.5 text-right">{locale === 'bn' ? 'অ্যাকশন' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -228,13 +230,13 @@ export default function TenantSupportPage() {
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-slate-400">
                       <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600" />
-                      টিকিট লোড হচ্ছে...
+                      {locale === 'bn' ? 'টিকিট লোড হচ্ছে...' : 'Loading tickets...'}
                     </td>
                   </tr>
                 ) : !ticketsData?.data || ticketsData.data.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-slate-400">
-                      কোনো সাপোর্ট টিকিট পাওয়া যায়নি।
+                      {locale === 'bn' ? 'কোনো সাপোর্ট টিকিট পাওয়া যায়নি।' : 'No support tickets found.'}
                     </td>
                   </tr>
                 ) : (
@@ -253,7 +255,7 @@ export default function TenantSupportPage() {
                       <td className="p-3.5">{getPriorityBadge(t.priority)}</td>
                       <td className="p-3.5">{getStatusBadge(t.status)}</td>
                       <td className="p-3.5 text-slate-500 font-mono">
-                        {t._count?.messages || 1} টি
+                        {locale === 'bn' ? `${t._count?.messages || 1} টি` : `${t._count?.messages || 1} msgs`}
                       </td>
                       <td className="p-3.5 text-slate-500">
                         {new Date(t.updated_at).toLocaleDateString()}
@@ -268,7 +270,7 @@ export default function TenantSupportPage() {
                           }}
                           className="h-7 text-xs rounded-lg text-emerald-600 hover:text-emerald-700"
                         >
-                          কথোপকথন দেখুন
+                          {locale === 'bn' ? 'কথোপকথন দেখুন' : 'View Thread'}
                         </Button>
                       </td>
                     </tr>
@@ -288,43 +290,49 @@ export default function TenantSupportPage() {
               <LifeBuoy className="w-5 h-5" />
             </div>
             <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
-              নতুন সাপোর্ট টিকিট তৈরি করুন
+              {locale === 'bn' ? 'নতুন সাপোর্ট টিকিট তৈরি করুন' : 'Create New Support Ticket'}
             </DialogTitle>
             <DialogDescription className="text-xs">
-              সমস্যা বা প্রশ্নের বিবরণ লিখুন। আমাদের সাপোর্ট টিম দ্রুত উত্তর প্রদান করবে।
+              {locale === 'bn'
+                ? 'সমস্যা বা প্রশ্নের বিবরণ লিখুন। আমাদের সাপোর্ট টিম দ্রুত উত্তর প্রদান করবে।'
+                : 'Describe your issue or question. Our support team will reply as soon as possible.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 text-xs">
             <div>
               <label className="font-semibold block mb-1">
-                বিষয় (Subject) <span className="text-rose-500">*</span>
+                {locale === 'bn' ? 'বিষয় (Subject)' : 'Subject'} <span className="text-rose-500">*</span>
               </label>
               <Input
                 value={newSubject}
                 onChange={(e) => setNewSubject(e.target.value)}
-                placeholder="উদাঃ পেমেন্ট ভেরিফিকেশন বা স্টক ক্যালকুলেশন সমস্যা"
+                placeholder={locale === 'bn' ? 'উদাঃ পেমেন্ট ভেরিফিকেশন বা স্টক ক্যালকুলেশন সমস্যা' : 'e.g. Payment verification or inventory sync issue'}
                 className="h-9 text-xs rounded-xl"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="font-semibold block mb-1">অগ্রাধিকার (Priority)</label>
+                <label className="font-semibold block mb-1">
+                  {locale === 'bn' ? 'অগ্রাধিকার (Priority)' : 'Priority'}
+                </label>
                 <select
                   value={newPriority}
                   onChange={(e) => setNewPriority(e.target.value as any)}
                   className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 text-xs"
                 >
-                  <option value="LOW">LOW (সাধারণ)</option>
-                  <option value="MEDIUM">MEDIUM (মাঝারি)</option>
-                  <option value="HIGH">HIGH (জরুরি)</option>
-                  <option value="URGENT">URGENT (অতি জরুরি)</option>
+                  <option value="LOW">{locale === 'bn' ? 'LOW (সাধারণ)' : 'Low'}</option>
+                  <option value="MEDIUM">{locale === 'bn' ? 'MEDIUM (মাঝারি)' : 'Medium'}</option>
+                  <option value="HIGH">{locale === 'bn' ? 'HIGH (জরুরি)' : 'High'}</option>
+                  <option value="URGENT">{locale === 'bn' ? 'URGENT (অতি জরুরি)' : 'Urgent'}</option>
                 </select>
               </div>
 
               <div>
-                <label className="font-semibold block mb-1">ইনভয়েস রেফারেন্স (ঐচ্ছিক)</label>
+                <label className="font-semibold block mb-1">
+                  {locale === 'bn' ? 'ইনভয়েস রেফারেন্স (ঐচ্ছিক)' : 'Invoice Reference (Optional)'}
+                </label>
                 <Input
                   value={invoiceRef}
                   onChange={(e) => setInvoiceRef(e.target.value)}
@@ -336,12 +344,12 @@ export default function TenantSupportPage() {
 
             <div>
               <label className="font-semibold block mb-1">
-                বিস্তারিত বিবরণ (Description) <span className="text-rose-500">*</span>
+                {locale === 'bn' ? 'বিস্তারিত বিবরণ (Description)' : 'Detailed Description'} <span className="text-rose-500">*</span>
               </label>
               <textarea
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
-                placeholder="সমস্যাটি বিস্তারিতভাবে বর্ণনা করুন..."
+                placeholder={locale === 'bn' ? 'সমস্যাটি বিস্তারিতভাবে বর্ণনা করুন...' : 'Describe the issue or query in detail...'}
                 rows={5}
                 className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               />
@@ -356,7 +364,7 @@ export default function TenantSupportPage() {
               onClick={() => setIsNewTicketOpen(false)}
               className="text-xs h-9 rounded-xl"
             >
-              বাতিল
+              {locale === 'bn' ? 'বাতিল' : 'Cancel'}
             </Button>
             <Button
               type="button"
@@ -370,7 +378,7 @@ export default function TenantSupportPage() {
               ) : (
                 <Send className="w-3.5 h-3.5 mr-1" />
               )}
-              টিকিট সাবমিট করুন
+              {locale === 'bn' ? 'টিকিট সাবমিট করুন' : 'Submit Ticket'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -397,7 +405,7 @@ export default function TenantSupportPage() {
                   disabled={closeMutation.isPending}
                   className="h-7 text-xs rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-300"
                 >
-                  টিকিট ক্লোজ করুন
+                  {locale === 'bn' ? 'টিকিট ক্লোজ করুন' : 'Close Ticket'}
                 </Button>
               )}
             </div>
@@ -411,10 +419,12 @@ export default function TenantSupportPage() {
             {isThreadLoading ? (
               <div className="p-8 text-center text-slate-400">
                 <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
-                মেসেজ লোড হচ্ছে...
+                {locale === 'bn' ? 'মেসেজ লোড হচ্ছে...' : 'Loading messages...'}
               </div>
             ) : !activeTicket?.messages || activeTicket.messages.length === 0 ? (
-              <div className="p-8 text-center text-slate-400">কোনো বার্তা নেই।</div>
+              <div className="p-8 text-center text-slate-400">
+                {locale === 'bn' ? 'কোনো বার্তা নেই।' : 'No messages in this thread.'}
+              </div>
             ) : (
               activeTicket.messages.map((m: any) => {
                 const isPlatformAdmin = m.sender_type === 'PLATFORM_ADMIN';
@@ -434,14 +444,14 @@ export default function TenantSupportPage() {
                           <>
                             <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
                             <span className="text-sky-700 dark:text-sky-400">
-                              সাপোর্ট টিম (Platform Admin)
+                              {locale === 'bn' ? 'সাপোর্ট টিম (Platform Admin)' : 'Support Team (Platform Admin)'}
                             </span>
                           </>
                         ) : (
                           <>
                             <User className="w-3.5 h-3.5 text-slate-500" />
                             <span className="text-slate-800 dark:text-slate-200">
-                              আপনি ({user?.fullName || 'দোকান ইউজার'})
+                              {locale === 'bn' ? `আপনি (${user?.fullName || 'দোকান ইউজার'})` : `You (${user?.fullName || 'Store User'})`}
                             </span>
                           </>
                         )}
@@ -464,14 +474,16 @@ export default function TenantSupportPage() {
           {/* Reply Form */}
           {activeTicket?.status === 'CLOSED' ? (
             <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-center text-xs text-slate-400">
-              এই সাপোর্ট টিকিটটি সম্পন্ন (Closed) করা হয়েছে। নতুন অনুসন্ধানের জন্য নতুন টিকিট খুলুন।
+              {locale === 'bn'
+                ? 'এই সাপোর্ট টিকিটটি সম্পন্ন (Closed) করা হয়েছে। নতুন অনুসন্ধানের জন্য নতুন টিকিট খুলুন।'
+                : 'This support ticket has been closed. Please open a new ticket for further assistance.'}
             </div>
           ) : (
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
               <textarea
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder="এখানে আপনার উত্তর বা প্রতিক্রিয়া লিখুন..."
+                placeholder={locale === 'bn' ? 'এখানে আপনার উত্তর বা প্রতিক্রিয়া লিখুন...' : 'Type your reply or response here...'}
                 rows={3}
                 className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
               />
@@ -489,7 +501,7 @@ export default function TenantSupportPage() {
                   ) : (
                     <Send className="w-3.5 h-3.5 mr-1" />
                   )}
-                  উত্তর পাঠান
+                  {locale === 'bn' ? 'উত্তর পাঠান' : 'Send Reply'}
                 </Button>
               </div>
             </div>

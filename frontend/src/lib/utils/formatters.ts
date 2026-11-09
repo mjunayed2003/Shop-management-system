@@ -2,18 +2,26 @@
  * Currency & Date formatting utilities
  */
 
-export function formatBDT(amount: number | string | null | undefined): string {
-  if (amount === null || amount === undefined || isNaN(Number(amount))) {
-    return '৳ 0.00';
+export function formatBDT(
+  amount: number | string | { toString(): string } | null | undefined,
+  locale: 'bn' | 'en' = 'en',
+): string {
+  const symbol = locale === 'bn' ? '৳' : 'BDT';
+  if (amount === null || amount === undefined) {
+    return `${symbol} 0.00`;
   }
-  const num = Number(amount);
-  return `৳ ${num.toLocaleString('en-IN', {
+  const str = typeof amount === 'object' && amount !== null && 'toString' in amount ? amount.toString() : String(amount);
+  const num = Number(str);
+  if (isNaN(num)) {
+    return `${symbol} 0.00`;
+  }
+  return `${symbol} ${num.toLocaleString('en-IN', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 }
 
-export function formatDate(dateInput: string | Date | null | undefined, locale: 'bn' | 'en' = 'bn'): string {
+export function formatDate(dateInput: string | Date | null | undefined, locale: 'bn' | 'en' = 'en'): string {
   if (!dateInput) return '-';
   const date = new Date(dateInput);
   if (isNaN(date.getTime())) return '-';
@@ -33,7 +41,7 @@ export function formatDate(dateInput: string | Date | null | undefined, locale: 
   });
 }
 
-export function formatDateTime(dateInput: string | Date | null | undefined, locale: 'bn' | 'en' = 'bn'): string {
+export function formatDateTime(dateInput: string | Date | null | undefined, locale: 'bn' | 'en' = 'en'): string {
   if (!dateInput) return '-';
   const date = new Date(dateInput);
   if (isNaN(date.getTime())) return '-';

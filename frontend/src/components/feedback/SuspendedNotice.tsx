@@ -11,7 +11,7 @@ import { Button } from '../ui/button';
 export function SuspendedNotice() {
   const isSuspended = useAuthStore((s) => s.isSuspended);
   const business = useAuthStore((s) => s.business);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const pathname = usePathname();
 
   // Re-check session on window focus
@@ -54,21 +54,23 @@ export function SuspendedNotice() {
         <div className="flex items-center gap-2">
           <ShieldAlert className="w-4 h-4 shrink-0" />
           <span>
-            সাবস্ক্রিপশন স্থগিত (Suspended): সেবা পুনরায় সক্রিয় করতে বকেয়া বিল পরিশোধ করুন অথবা সাপোর্টে যোগাযোগ করুন।
+            {locale === 'bn'
+              ? 'সাবস্ক্রিপশন স্থগিত (Suspended): সেবা পুনরায় সক্রিয় করতে বকেয়া বিল পরিশোধ করুন অথবা সাপোর্টে যোগাযোগ করুন।'
+              : 'Subscription Suspended: Please pay outstanding balance or contact support to reactivate your services.'}
           </span>
         </div>
         <div className="flex items-center gap-2">
           {!pathname.startsWith('/billing') && (
             <Link href="/billing">
               <Button size="sm" variant="outline" className="h-6 text-[11px] bg-white text-rose-700 hover:bg-rose-50 border-none font-bold">
-                বিলিং ও ইনভয়েস
+                {locale === 'bn' ? 'বিলিং ও ইনভয়েস' : 'Billing & Invoices'}
               </Button>
             </Link>
           )}
           {!pathname.startsWith('/support') && (
             <Link href="/support">
               <Button size="sm" variant="outline" className="h-6 text-[11px] bg-white text-rose-700 hover:bg-rose-50 border-none font-bold">
-                সাপোর্ট টিকিট
+                {locale === 'bn' ? 'সাপোর্ট টিকিট' : 'Support Tickets'}
               </Button>
             </Link>
           )}
@@ -92,39 +94,42 @@ export function SuspendedNotice() {
         <div className="space-y-2">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
             {subStatus === 'CANCELLED'
-              ? 'সাবস্ক্রিপশন বাতিল করা হয়েছে (Subscription Cancelled)'
-              : 'সাবস্ক্রিপশন স্থগিত রয়েছে (Subscription Suspended)'}
+              ? (locale === 'bn' ? 'সাবস্ক্রিপশন বাতিল করা হয়েছে (Subscription Cancelled)' : 'Subscription Cancelled')
+              : (locale === 'bn' ? 'সাবস্ক্রিপশন স্থগিত রয়েছে (Subscription Suspended)' : 'Subscription Suspended')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
-            {business?.name || 'আপনার দোকান'} এর সফটওয়্যার সাবস্ক্রিপশন ফি অপরিশোধিত বা নির্ধারিত মেয়াদ উত্তীর্ণ হয়েছে।
-            ডেটা সুরক্ষার জন্য সাধারণ বিক্রয় ও ইনভেন্টরি লেনদেন সাময়িকভাবে স্থগিত রয়েছে।
+            {locale === 'bn' ? (
+              `${business?.name || 'আপনার দোকান'} এর সফটওয়্যার সাবস্ক্রিপশন ফি অপরিশোধিত বা নির্ধারিত মেয়াদ উত্তীর্ণ হয়েছে। ডেটা সুরক্ষার জন্য সাধারণ বিক্রয় ও ইনভেন্টরি লেনদেন সাময়িকভাবে স্থগিত রয়েছে।`
+            ) : (
+              `Software subscription fee for ${business?.name || 'your store'} is unpaid or expired. To safeguard data, POS sales and inventory mutations are temporarily frozen.`
+            )}
           </p>
         </div>
 
         <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs text-left space-y-2 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
           <div className="flex justify-between items-center">
-            <span>দোকানের নাম:</span>
+            <span>{locale === 'bn' ? 'দোকানের নাম:' : 'Store Name:'}</span>
             <strong className="text-slate-900 dark:text-slate-100">{business?.name}</strong>
           </div>
           <div className="flex justify-between items-center">
-            <span>বর্তমান স্ট্যাটাস:</span>
+            <span>{locale === 'bn' ? 'বর্তমান স্ট্যাটাস:' : 'Current Status:'}</span>
             <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
               {subStatus || 'SUSPENDED'}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span>জরুরি হটলাইন:</span>
-            <strong className="text-emerald-600 dark:text-emerald-400">+৮৮০ ১৭০০০০০০০০</strong>
+            <span>{locale === 'bn' ? 'জরুরি হটলাইন:' : 'Urgent Hotline:'}</span>
+            <strong className="text-sky-600 dark:text-sky-400">+880 1700000000</strong>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link href="/billing" className="flex-1">
             <Button
-              className="w-full h-11 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm"
+              className="w-full h-11 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm"
             >
               <CreditCard className="w-4 h-4" />
-              <span>বিলিং ও ইনভয়েস দেখুন</span>
+              <span>{locale === 'bn' ? 'বিলিং ও ইনভয়েস দেখুন' : 'View Billing & Invoices'}</span>
             </Button>
           </Link>
 
@@ -133,8 +138,8 @@ export function SuspendedNotice() {
               variant="outline"
               className="w-full h-11 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs rounded-xl flex items-center justify-center gap-2"
             >
-              <MessageSquare className="w-4 h-4 text-emerald-600" />
-              <span>সাপোর্ট টিকিট খুলুন</span>
+              <MessageSquare className="w-4 h-4 text-sky-600" />
+              <span>{locale === 'bn' ? 'সাপোর্ট টিকিট খুলুন' : 'Open Support Ticket'}</span>
             </Button>
           </Link>
         </div>

@@ -28,11 +28,20 @@ import {
 type PeriodType = 'today' | 'yesterday' | 'this_week' | 'this_month' | 'custom';
 
 export default function CollectionsReportPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const currentBranch = useBranchStore((s) => s.currentBranch);
   const user = useAuthStore((s) => s.user);
   const isOwner = user?.isOwner;
+
+  const fmtMoney = (val: any) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   // Period State (Asia/Dhaka helper)
   const [period, setPeriod] = useState<PeriodType>('today');
@@ -271,11 +280,11 @@ export default function CollectionsReportPage() {
               {tender}
             </span>
             <div className="mt-1.5 text-xl font-bold font-mono text-slate-900 dark:text-white">
-              ৳{Number(data.net.toFixed(2)).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+              {fmtMoney(data.net)}
             </div>
             <div className="text-[10px] text-slate-400 mt-0.5 space-y-0.5">
-              <div>In: ৳{Number(data.collected.toFixed(2)).toLocaleString('en-BD')}</div>
-              <div>Out: -৳{Number(data.refunded.toFixed(2)).toLocaleString('en-BD')}</div>
+              <div>In: {fmtMoney(data.collected)}</div>
+              <div>Out: -{fmtMoney(data.refunded)}</div>
             </div>
           </div>
         ))}
@@ -288,7 +297,7 @@ export default function CollectionsReportPage() {
             {t('reports.totalNet')}
           </span>
           <div className="text-3xl sm:text-4xl font-mono font-bold mt-1">
-            ৳{aggregatedTenders.totalNet.toFixed(2)}
+            {fmtMoney(aggregatedTenders.totalNet)}
           </div>
           <span className="text-xs text-emerald-100 mt-1 block">
             Net cash and digital liquidity acquired (sales + due collections - refunds)
@@ -349,13 +358,13 @@ export default function CollectionsReportPage() {
                         </span>
                       </td>
                       <td className="py-2.5 px-4 text-right text-emerald-600 font-semibold">
-                        +৳{Number(tData.collected).toFixed(2)}
+                        +{fmtMoney(tData.collected)}
                       </td>
                       <td className="py-2.5 px-4 text-right text-rose-600">
-                        -৳{Number(tData.refunded).toFixed(2)}
+                        -{fmtMoney(tData.refunded)}
                       </td>
                       <td className="py-2.5 px-4 text-right font-bold text-slate-900 dark:text-white">
-                        ৳{Number(tData.net).toFixed(2)}
+                        {fmtMoney(tData.net)}
                       </td>
                     </tr>
                   )),

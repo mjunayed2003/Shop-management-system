@@ -32,11 +32,20 @@ import {
 import { generateZReportHtml, printHtml } from '@/lib/utils/receipt-template';
 
 export default function DailyCashBookPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const currentBranch = useBranchStore((s) => s.currentBranch);
   const user = useAuthStore((s) => s.user);
   const isOwner = user?.isOwner;
+
+  const fmtMoney = (val: number | string | Decimal) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().slice(0, 10),
@@ -228,7 +237,7 @@ export default function DailyCashBookPage() {
       align: 'right',
       accessor: (r) => (
         <span className="font-mono text-xs text-slate-600 dark:text-slate-400">
-          ৳{Number(r.openingBalance).toFixed(2)}
+          {fmtMoney(r.openingBalance)}
         </span>
       ),
     },
@@ -237,7 +246,7 @@ export default function DailyCashBookPage() {
       align: 'right',
       accessor: (r) => (
         <span className="font-mono text-xs text-slate-800 dark:text-slate-200 font-medium">
-          ৳{Number(r.expectedBalance).toFixed(2)}
+          {fmtMoney(r.expectedBalance)}
         </span>
       ),
     },
@@ -246,7 +255,7 @@ export default function DailyCashBookPage() {
       align: 'right',
       accessor: (r) => (
         <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
-          ৳{Number(r.closingBalance).toFixed(2)}
+          {fmtMoney(r.closingBalance)}
         </span>
       ),
     },
@@ -265,7 +274,7 @@ export default function DailyCashBookPage() {
                 : 'text-rose-600'
             }`}
           >
-            {disc.isZero() ? 'Balanced' : `${disc.greaterThan(0) ? '+' : ''}৳${disc.toFixed(2)}`}
+            {disc.isZero() ? 'Balanced' : `${disc.greaterThan(0) ? '+' : ''}${fmtMoney(disc)}`}
           </span>
         );
       },
@@ -386,7 +395,7 @@ export default function DailyCashBookPage() {
             Total Opening Float
           </span>
           <div className="mt-2 text-2xl font-bold font-mono text-slate-800 dark:text-slate-200">
-            ৳{Number(totals.opening).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+            {fmtMoney(totals.opening)}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">Combined initial drawer cash</span>
         </div>
@@ -396,7 +405,7 @@ export default function DailyCashBookPage() {
             Total Counted Cash
           </span>
           <div className="mt-2 text-2xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
-            ৳{Number(totals.closing).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+            {fmtMoney(totals.closing)}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">
             Physical cash accounted for
@@ -418,9 +427,7 @@ export default function DailyCashBookPage() {
           >
             {Number(totals.discrepancy) === 0
               ? 'Balanced'
-              : `${Number(totals.discrepancy) > 0 ? '+' : ''}৳${Number(
-                  totals.discrepancy,
-                ).toLocaleString('en-BD', { minimumFractionDigits: 2 })}`}
+              : `${Number(totals.discrepancy) > 0 ? '+' : ''}${fmtMoney(totals.discrepancy)}`}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">
             Variance across all cashier drawers

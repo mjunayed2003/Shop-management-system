@@ -238,7 +238,7 @@ export function generateReceiptHtml(
 <body>
   ${
     (sale as any).isOffline || (sale as any).isProvisional
-      ? `<div class="reprint-banner" style="background: #fef3c7; border: 1px dashed #d97706; color: #92400e; padding: 4px; text-align: center; font-weight: 800; font-size: 11px; margin-bottom: 6px;">*** OFFLINE / PROVISIONAL INVOICE ***<br/><span style="font-size: 9px; font-weight: 700;">*** অফলাইন / খসড়া রসিদ ***</span></div>`
+      ? `<div class="reprint-banner" style="background: #fef3c7; border: 1px dashed #d97706; color: #92400e; padding: 4px; text-align: center; font-weight: 800; font-size: 11px; margin-bottom: 6px;">*** OFFLINE / PROVISIONAL INVOICE ***</div>`
       : ''
   }
   ${
@@ -517,7 +517,7 @@ export function generateReturnSlipHtml(
   </style>
 </head>
 <body>
-  ${isReprint ? `<div class="copy-banner">*** COPY / DUPLICATE RETURN SLIP / অনুলিপি ***</div>` : ''}
+  ${isReprint ? `<div class="copy-banner">*** COPY / DUPLICATE RETURN SLIP ***</div>` : ''}
 
   <div class="center">
     <div class="bold" style="font-size: 14px;">${data.businessName || 'SHOP POS BD'}</div>
@@ -653,7 +653,7 @@ export function generateExchangeSlipHtml(
   </style>
 </head>
 <body>
-  ${isReprint ? `<div style="border:1px solid #000; text-align:center; padding:2px; font-weight:bold; margin-bottom:4px;">*** COPY / DUPLICATE EXCHANGE SLIP / অনুলিপি ***</div>` : ''}
+  ${isReprint ? `<div style="border:1px solid #000; text-align:center; padding:2px; font-weight:bold; margin-bottom:4px;">*** COPY / DUPLICATE EXCHANGE SLIP ***</div>` : ''}
   <div class="center">
     <div class="bold" style="font-size: 13px;">${data.businessName || 'SHOP POS BD'}</div>
     <div>${data.branchName}</div>
@@ -765,7 +765,7 @@ export function generateDueReceiptHtml(
   </style>
 </head>
 <body>
-  ${isReprint ? `<div style="border:1px solid #000; text-align:center; padding:2px; font-weight:bold; margin-bottom:4px;">*** COPY / DUPLICATE RECEIPT / অনুলিপি ***</div>` : ''}
+  ${isReprint ? `<div style="border:1px solid #000; text-align:center; padding:2px; font-weight:bold; margin-bottom:4px;">*** COPY / DUPLICATE RECEIPT ***</div>` : ''}
   <div class="center">
     <div class="bold" style="font-size: 13px;">${data.businessName || 'SHOP POS BD'}</div>
     <div>${data.branchName}</div>
@@ -879,7 +879,7 @@ export function generateZReportHtml(
   </style>
 </head>
 <body>
-  ${isReprint ? '<div class="copy-watermark">*** DUPLICATE COPY / পুনঃমুদ্রণ ***</div>' : ''}
+  ${isReprint ? '<div class="copy-watermark">*** DUPLICATE COPY ***</div>' : ''}
   <div class="center">
     <div class="bold" style="font-size: 13px;">${data.businessName || 'SHOP POS BD'}</div>
     <div>${data.branchName}</div>

@@ -46,7 +46,7 @@ const COIN_DENOMINATIONS = [5, 2, 1];
 
 export default function CloseRegisterPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const currentBranch = useBranchStore((s) => s.currentBranch);
@@ -55,6 +55,12 @@ export default function CloseRegisterPage() {
   const canCloseAny = canCloseAnyPerm || Boolean(user?.isOwner);
   const { pendingCount, conflictCount } = useOfflineStore();
   const hasUnsyncedItems = pendingCount > 0 || conflictCount > 0;
+
+  const fmtMoney = (val: number | string | Decimal) => {
+    const num = Number(val || 0);
+    const formatted = num.toFixed(2);
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   // Selected Target Session (for manager view)
   const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>(undefined);
@@ -338,7 +344,7 @@ export default function CloseRegisterPage() {
                 .filter((s: any) => s.sessionId !== mySession?.id)
                 .map((s: any) => (
                   <option key={s.sessionId} value={s.sessionId}>
-                    Cashier: {s.cashier} ({s.register}) - Opened ৳{s.openingBalance}
+                    Cashier: {s.cashier} ({s.register}) - Opened {fmtMoney(s.openingBalance)}
                   </option>
                 ))}
             </select>
@@ -461,10 +467,10 @@ export default function CloseRegisterPage() {
                         >
                           <div className="flex justify-between items-center text-xs">
                             <span className="font-bold text-slate-800 dark:text-slate-200">
-                              ৳{denom}
+                              {locale === 'bn' ? `৳${denom}` : `BDT ${denom}`}
                             </span>
                             <span className="font-mono text-slate-500">
-                              ৳{subtotal.toFixed(0)}
+                              {fmtMoney(subtotal)}
                             </span>
                           </div>
                           <Input
@@ -503,10 +509,10 @@ export default function CloseRegisterPage() {
                         >
                           <div className="flex justify-between items-center text-xs">
                             <span className="font-bold text-slate-800 dark:text-slate-200">
-                              ৳{denom} Coin
+                              {locale === 'bn' ? `৳${denom} কয়েন` : `BDT ${denom} Coin`}
                             </span>
                             <span className="font-mono text-slate-500">
-                              ৳{subtotal.toFixed(0)}
+                              {fmtMoney(subtotal)}
                             </span>
                           </div>
                           <Input
@@ -536,7 +542,7 @@ export default function CloseRegisterPage() {
                   {t('reconciliation.countedCash')}
                 </span>
                 <div className="text-2xl sm:text-3xl font-mono font-bold text-slate-900 dark:text-white mt-1">
-                  ৳{countedTotal.toFixed(2)}
+                  {fmtMoney(countedTotal)}
                 </div>
               </div>
 
@@ -574,7 +580,7 @@ export default function CloseRegisterPage() {
                   {t('reconciliation.expectedBalance')}
                 </span>
                 <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-2">
-                  ৳{expectedBalance.toFixed(2)}
+                  {fmtMoney(expectedBalance)}
                 </div>
                 <span className="text-[11px] text-slate-400 font-sans mt-1 block">
                   Authoritative Server Balance
@@ -586,7 +592,7 @@ export default function CloseRegisterPage() {
                   {t('reconciliation.countedCash')}
                 </span>
                 <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-2">
-                  ৳{countedTotal.toFixed(2)}
+                  {fmtMoney(countedTotal)}
                 </div>
                 <span className="text-[11px] text-slate-400 font-sans mt-1 block">
                   Physical Cash Counted
@@ -607,8 +613,8 @@ export default function CloseRegisterPage() {
                 </span>
                 <div className="text-2xl font-bold mt-2">
                   {discrepancy.isZero()
-                    ? '৳0.00'
-                    : `${discrepancy.greaterThan(0) ? '+' : ''}৳${discrepancy.toFixed(2)}`}
+                    ? (locale === 'bn' ? '৳0.00' : 'BDT 0.00')
+                    : `${discrepancy.greaterThan(0) ? '+' : ''}${fmtMoney(discrepancy)}`}
                 </div>
                 <span className="text-[11px] font-sans mt-1 block font-semibold">
                   {discrepancy.isZero()
@@ -681,7 +687,7 @@ export default function CloseRegisterPage() {
               <Textarea
                 value={closingNotes}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setClosingNotes(e.target.value)}
-                placeholder="e.g., Handed over to night shift cashier. ৳20 shortage due to coin rounding..."
+                placeholder={locale === 'bn' ? 'যেমন: রাতের শিফটের ক্যাশিয়ারকে দায়িত্ব হস্তান্তর। কয়েন রাউন্ডিংয়ে ২০ টাকা কম...' : 'e.g., Handed over to night shift cashier. 20 BDT shortage due to coin rounding...'}
                 rows={4}
                 className="text-xs"
                 required={hasDiscrepancy}
@@ -745,11 +751,11 @@ export default function CloseRegisterPage() {
               </div>
               <div className="flex justify-between py-1 border-b dark:border-slate-800">
                 <span className="text-slate-500">Expected Cash:</span>
-                <span>৳{expectedBalance.toFixed(2)}</span>
+                <span>{fmtMoney(expectedBalance)}</span>
               </div>
               <div className="flex justify-between py-1 border-b dark:border-slate-800">
                 <span className="text-slate-500">Counted Cash:</span>
-                <span className="font-bold text-indigo-600">৳{countedTotal.toFixed(2)}</span>
+                <span className="font-bold text-indigo-600">{fmtMoney(countedTotal)}</span>
               </div>
               <div className="flex justify-between py-1 border-b dark:border-slate-800">
                 <span className="text-slate-500">Discrepancy:</span>
@@ -762,7 +768,7 @@ export default function CloseRegisterPage() {
                       : 'text-rose-600'
                   }`}
                 >
-                  {discrepancy.isZero() ? '৳0.00' : `৳${discrepancy.toFixed(2)}`}
+                  {discrepancy.isZero() ? (locale === 'bn' ? '৳0.00' : 'BDT 0.00') : fmtMoney(discrepancy)}
                 </span>
               </div>
             </div>
@@ -830,14 +836,14 @@ export default function CloseRegisterPage() {
           <div className="space-y-2 text-xs">
             <p>{t('reconciliation.confirmCloseDesc')}</p>
             <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-mono space-y-1">
-              <div>Counted Cash: ৳{countedTotal.toFixed(2)}</div>
-              <div>Expected Cash: ৳{expectedBalance.toFixed(2)}</div>
+              <div>Counted Cash: {fmtMoney(countedTotal)}</div>
+              <div>Expected Cash: {fmtMoney(expectedBalance)}</div>
               <div
                 className={`font-bold ${
                   discrepancy.isZero() ? 'text-emerald-600' : 'text-rose-600'
                 }`}
               >
-                Discrepancy: ৳{discrepancy.toFixed(2)}
+                Discrepancy: {fmtMoney(discrepancy)}
               </div>
             </div>
           </div>

@@ -27,9 +27,18 @@ import {
 } from 'lucide-react';
 
 export default function ExpenseReportsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const currentBranch = useBranchStore((s) => s.currentBranch);
+
+  const fmtMoney = (val: number | string) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   // Date filters
   const [startDate, setStartDate] = useState('');
@@ -209,7 +218,7 @@ export default function ExpenseReportsPage() {
             {t('expenses.totalExpenses')}
           </span>
           <div className="mt-2 text-3xl font-bold font-mono text-slate-900 dark:text-white">
-            ৳{Number(totalAmount.toFixed(2)).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+            {fmtMoney(totalAmount.toFixed(2))}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">
             Aggregated across filtered time window
@@ -275,7 +284,7 @@ export default function ExpenseReportsPage() {
                             {cat.categoryName}
                           </span>
                           <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                            ৳{Number(cat.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                            {fmtMoney(cat.total)}
                           </span>
                         </div>
                         <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -315,7 +324,7 @@ export default function ExpenseReportsPage() {
                               {cat.categoryName}
                             </td>
                             <td className="py-2 text-right font-mono font-semibold text-slate-900 dark:text-white">
-                              ৳{Number(cat.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                              {fmtMoney(cat.total)}
                             </td>
                             <td className="py-2 text-right font-mono text-slate-500">{share}%</td>
                           </tr>
@@ -363,7 +372,7 @@ export default function ExpenseReportsPage() {
                             {b.branchName}
                           </span>
                           <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                            ৳{Number(b.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                            {fmtMoney(b.total)}
                           </span>
                         </div>
                         <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -403,7 +412,7 @@ export default function ExpenseReportsPage() {
                               {b.branchName}
                             </td>
                             <td className="py-2 text-right font-mono font-semibold text-slate-900 dark:text-white">
-                              ৳{Number(b.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                              {fmtMoney(b.total)}
                             </td>
                             <td className="py-2 text-right font-mono text-slate-500">{share}%</td>
                           </tr>
@@ -448,7 +457,7 @@ export default function ExpenseReportsPage() {
                           {idx + 1}. {v.vendorName}
                         </span>
                         <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                          ৳{Number(v.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                          {fmtMoney(v.total)}
                         </span>
                       </div>
                       <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -480,7 +489,7 @@ export default function ExpenseReportsPage() {
                           {v.vendorName}
                         </td>
                         <td className="py-2 text-right font-mono font-semibold text-slate-900 dark:text-white">
-                          ৳{Number(v.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                          {fmtMoney(v.total)}
                         </td>
                       </tr>
                     ))}

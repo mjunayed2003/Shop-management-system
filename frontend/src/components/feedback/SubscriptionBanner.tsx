@@ -9,7 +9,7 @@ import { Button } from '../ui/button';
 
 export function SubscriptionBanner() {
   const { business } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [isDismissed, setIsDismissed] = useState(false);
 
   const sub = business?.subscription;
@@ -31,12 +31,24 @@ export function SubscriptionBanner() {
           <AlertCircle className="w-4 h-4 shrink-0 text-amber-100 animate-bounce" />
           <div className="truncate">
             <span className="font-bold">
-              {status === 'GRACE' ? 'গ্রেস পিরিয়ড চলমান (Grace Period)' : 'সাবস্ক্রিপশন ফি বকেয়া (Payment Due)'}:
+              {status === 'GRACE'
+                ? (locale === 'bn' ? 'গ্রেস পিরিয়ড চলমান (Grace Period)' : 'Grace Period Active')
+                : (locale === 'bn' ? 'সাবস্ক্রিপশন ফি বকেয়া (Payment Due)' : 'Subscription Payment Due')}:
             </span>{' '}
             {daysLeft > 0 ? (
-              <span>গ্রেস শেষ হতে আর মাত্র <strong>{daysLeft} দিন</strong> বাকি। সাময়িক স্থগিতাদেশ এড়াতে দ্রুত পরিশোধ করুন।</span>
+              <span>
+                {locale === 'bn' ? (
+                  <>গ্রেস শেষ হতে আর মাত্র <strong>{daysLeft} দিন</strong> বাকি। সাময়িক স্থগিতাদেশ এড়াতে দ্রুত পরিশোধ করুন।</>
+                ) : (
+                  <>Only <strong>{daysLeft} day(s)</strong> left in grace period. Please pay to avoid service suspension.</>
+                )}
+              </span>
             ) : (
-              <span>বিলিং মেয়াদ শেষ। সার্ভিস সচল রাখতে অবিলম্বে বকেয়া পরিশোধ করুন।</span>
+              <span>
+                {locale === 'bn'
+                  ? 'বিলিং মেয়াদ শেষ। সার্ভিস সচল রাখতে অবিলম্বে বকেয়া পরিশোধ করুন।'
+                  : 'Billing cycle expired. Please pay outstanding balance to maintain active service.'}
+              </span>
             )}
           </div>
         </div>
@@ -49,7 +61,7 @@ export function SubscriptionBanner() {
               className="bg-white/90 hover:bg-white text-orange-950 font-bold border-none text-xs h-7 px-3 rounded-lg shadow-sm"
             >
               <CreditCard className="w-3.5 h-3.5 mr-1 text-orange-600" />
-              <span>বিল পরিশোধ করুন</span>
+              <span>{locale === 'bn' ? 'বিল পরিশোধ করুন' : 'Pay Bill'}</span>
             </Button>
           </Link>
         </div>
@@ -68,7 +80,11 @@ export function SubscriptionBanner() {
         <div className="flex items-center gap-2 overflow-hidden">
           <Sparkles className="w-4 h-4 text-amber-200 shrink-0" />
           <span className="truncate">
-            ফ্রি ট্রায়াল চলছে: আপনার ট্রায়াল শেষ হতে <strong>{daysLeft} দিন</strong> বাকি।
+            {locale === 'bn' ? (
+              <>ফ্রি ট্রায়াল চলছে: আপনার ট্রায়াল শেষ হতে <strong>{daysLeft} দিন</strong> বাকি।</>
+            ) : (
+              <>Free Trial Active: <strong>{daysLeft} day(s)</strong> remaining in your trial.</>
+            )}
           </span>
         </div>
 
@@ -79,7 +95,7 @@ export function SubscriptionBanner() {
               variant="outline"
               className="bg-white/95 hover:bg-white text-sky-900 font-bold border-none text-[11px] h-6 px-2.5 rounded-lg shadow-xs"
             >
-              <span>প্ল্যান আপগ্রেড করুন</span>
+              <span>{locale === 'bn' ? 'প্ল্যান আপগ্রেড করুন' : 'Upgrade Plan'}</span>
             </Button>
           </Link>
           <button

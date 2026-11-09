@@ -18,7 +18,7 @@ export const PlanLimitDialog: React.FC<PlanLimitDialogProps> = ({
   message,
   planName,
 }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -53,7 +53,7 @@ export const PlanLimitDialog: React.FC<PlanLimitDialogProps> = ({
 
         {planName && (
           <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/80 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200">
-            বর্তমান প্ল্যান: <strong>{planName}</strong>
+            {locale === 'bn' ? 'বর্তমান প্ল্যান:' : 'Current Plan:'} <strong>{planName}</strong>
           </div>
         )}
 

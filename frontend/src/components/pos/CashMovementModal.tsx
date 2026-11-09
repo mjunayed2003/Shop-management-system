@@ -28,6 +28,7 @@ import {
   Clock,
   User,
 } from 'lucide-react';
+import { formatBDT } from '@/lib/utils/formatters';
 
 interface CashMovementModalProps {
   isOpen: boolean;
@@ -42,7 +43,8 @@ export function CashMovementModal({
   defaultType = 'PAY_IN',
   onSuccess,
 }: CashMovementModalProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const fmtMoney = (v: any) => formatBDT(v, locale);
   const toast = useToast();
   const queryClient = useQueryClient();
   const currentBranch = useBranchStore((s) => s.currentBranch);
@@ -197,7 +199,7 @@ export function CashMovementModal({
             <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
               <span className="text-slate-500">{t('cashMovements.drawerBalance')}:</span>
               <span className="font-mono font-bold text-slate-900 dark:text-white">
-                ৳{availableCash.toFixed(2)}
+                {fmtMoney(availableCash)}
               </span>
             </div>
 
@@ -299,7 +301,7 @@ export function CashMovementModal({
                           m.type === 'PAY_IN' ? 'text-emerald-600' : 'text-rose-600'
                         }`}
                       >
-                        {m.type === 'PAY_IN' ? '+' : '-'}৳{Number(m.amount).toFixed(2)}
+                        {m.type === 'PAY_IN' ? '+' : '-'}{fmtMoney(m.amount)}
                       </span>
                     </div>
                   </div>

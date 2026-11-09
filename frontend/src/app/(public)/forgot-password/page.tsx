@@ -13,7 +13,7 @@ import { KeyRound, ArrowLeft, Mail, Lock, CheckCircle2, AlertTriangle } from 'lu
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
 
   const [step, setStep] = useState<'request' | 'reset'>('request');
@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim()) {
-      setErrorMsg('ইমেইল বা ফোন নম্বর আবশ্যক');
+      setErrorMsg(locale === 'bn' ? 'ইমেইল বা ফোন নম্বর আবশ্যক' : 'Email or phone number is required');
       return;
     }
 
@@ -37,10 +37,14 @@ export default function ForgotPasswordPage() {
 
     try {
       await api.auth.forgotPassword(identifier.trim());
-      toast.info('পাসওয়ার্ড রিসেট ওটিপি আপনার নম্বরে/ইমেইলে পাঠানো হয়েছে (অথবা ব্যাকএন্ড লগ দেখুন)');
+      toast.info(
+        locale === 'bn'
+          ? 'পাসওয়ার্ড রিসেট ওটিপি আপনার নম্বরে/ইমেইলে পাঠানো হয়েছে (অথবা ব্যাকএন্ড লগ দেখুন)'
+          : 'Password reset OTP has been sent to your phone/email (or check backend logs)'
+      );
       setStep('reset');
     } catch (err: any) {
-      setErrorMsg(err.message || 'অনুরোধ সম্পন্ন করা যায়নি');
+      setErrorMsg(err.message || (locale === 'bn' ? 'অনুরোধ সম্পন্ন করা যায়নি' : 'Could not complete request'));
     } finally {
       setIsLoading(false);
     }
@@ -49,15 +53,15 @@ export default function ForgotPasswordPage() {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp.trim()) {
-      setErrorMsg('ওটিপি কোড দিন');
+      setErrorMsg(locale === 'bn' ? 'ওটিপি কোড দিন' : 'Please provide OTP code');
       return;
     }
     if (newPassword.length < 6) {
-      setErrorMsg('নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+      setErrorMsg(locale === 'bn' ? 'নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'New password must be at least 6 characters');
       return;
     }
     if (newPassword !== confirmPassword) {
-      setErrorMsg('পাসওয়ার্ড নিশ্চিতকরণ মিলছে না');
+      setErrorMsg(locale === 'bn' ? 'পাসওয়ার্ড নিশ্চিতকরণ মিলছে না' : 'Password confirmation does not match');
       return;
     }
 
@@ -71,10 +75,14 @@ export default function ForgotPasswordPage() {
         newPassword,
       });
 
-      toast.success('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! নতুন পাসওয়ার্ড দিয়ে লগইন করুন।');
+      toast.success(
+        locale === 'bn'
+          ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! নতুন পাসওয়ার্ড দিয়ে লগইন করুন।'
+          : 'Password updated successfully! Please log in with your new password.'
+      );
       router.push('/login');
     } catch (err: any) {
-      setErrorMsg(err.message || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে');
+      setErrorMsg(err.message || (locale === 'bn' ? 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে' : 'Failed to reset password'));
     } finally {
       setIsLoading(false);
     }
@@ -88,12 +96,14 @@ export default function ForgotPasswordPage() {
             <KeyRound className="w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-            {step === 'request' ? 'পাসওয়ার্ড পুনরুদ্ধার' : 'নতুন পাসওয়ার্ড সেট করুন'}
+            {step === 'request'
+              ? (locale === 'bn' ? 'পাসওয়ার্ড পুনরুদ্ধার' : 'Reset Password')
+              : (locale === 'bn' ? 'নতুন পাসওয়ার্ড সেট করুন' : 'Set New Password')}
           </h1>
           <p className="text-xs text-slate-500">
             {step === 'request'
-              ? 'আপনার নিবন্ধিত ইমেইল বা মোবাইল নম্বর দিন'
-              : `ওটিপি কোড এবং নতুন পাসওয়ার্ড প্রদান করুন (${identifier})`}
+              ? (locale === 'bn' ? 'আপনার নিবন্ধিত ইমেইল বা মোবাইল নম্বর দিন' : 'Enter your registered email or phone number')
+              : (locale === 'bn' ? `ওটিপি কোড এবং নতুন পাসওয়ার্ড প্রদান করুন (${identifier})` : `Enter OTP code and new password for ${identifier}`)}
           </p>
         </div>
 
@@ -106,57 +116,57 @@ export default function ForgotPasswordPage() {
 
         {step === 'request' ? (
           <form onSubmit={handleRequestOtp} className="space-y-4">
-            <FormFieldWrapper label="ইমেইল অথবা মোবাইল নম্বর" required>
+            <FormFieldWrapper label={locale === 'bn' ? 'ইমেইল অথবা মোবাইল নম্বর' : 'Email or Phone Number'} required>
               <Input
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="01XXXXXXXXX বা email@shop.com"
+                placeholder={locale === 'bn' ? '01XXXXXXXXX বা email@shop.com' : '01XXXXXXXXX or email@shop.com'}
                 leftIcon={<Mail className="w-4 h-4" />}
                 required
               />
             </FormFieldWrapper>
 
             <Button type="submit" className="w-full" isLoading={isLoading} disabled={isLoading}>
-              ওটিপি পাঠান
+              {locale === 'bn' ? 'ওটিপি পাঠান' : 'Send OTP'}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
-            <FormFieldWrapper label="ওটিপি (OTP) কোড" required>
+            <FormFieldWrapper label={locale === 'bn' ? 'ওটিপি (OTP) কোড' : 'OTP Code'} required>
               <Input
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="যেমন: 123456"
+                placeholder={locale === 'bn' ? 'যেমন: 123456' : 'e.g. 123456'}
                 required
               />
             </FormFieldWrapper>
 
-            <FormFieldWrapper label="নতুন পাসওয়ার্ড" required>
+            <FormFieldWrapper label={locale === 'bn' ? 'নতুন পাসওয়ার্ড' : 'New Password'} required>
               <Input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড"
+                placeholder={locale === 'bn' ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড' : 'Minimum 6 characters'}
                 leftIcon={<Lock className="w-4 h-4" />}
                 required
               />
             </FormFieldWrapper>
 
-            <FormFieldWrapper label="পাসওয়ার্ড নিশ্চিত করুন" required>
+            <FormFieldWrapper label={locale === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'} required>
               <Input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="নতুন পাসওয়ার্ড আবার লিখুন"
+                placeholder={locale === 'bn' ? 'নতুন পাসওয়ার্ড আবার লিখুন' : 'Re-enter new password'}
                 leftIcon={<Lock className="w-4 h-4" />}
                 required
               />
             </FormFieldWrapper>
 
             <Button type="submit" className="w-full" isLoading={isLoading} disabled={isLoading}>
-              পাসওয়ার্ড রিসেট সম্পন্ন করুন
+              {locale === 'bn' ? 'পাসওয়ার্ড রিসেট সম্পন্ন করুন' : 'Complete Password Reset'}
             </Button>
           </form>
         )}
@@ -167,7 +177,7 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-emerald-600"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>লগইন পাতায় ফিরে যান</span>
+            <span>{locale === 'bn' ? 'লগইন পাতায় ফিরে যান' : 'Back to Login'}</span>
           </Link>
         </div>
       </div>

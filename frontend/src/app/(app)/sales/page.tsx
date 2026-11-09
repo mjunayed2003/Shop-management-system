@@ -34,9 +34,18 @@ import {
 } from 'lucide-react';
 
 export default function SalesListPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { business } = useAuthStore();
   const { currentBranchId, currentBranch } = useBranchStore();
+
+  const fmtMoney = (val: number | string) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
@@ -165,11 +174,11 @@ export default function SalesListPage() {
       render: (row: any) => (
         <div className="text-right space-y-0.5">
           <span className="font-extrabold text-xs text-foreground font-mono block">
-            ৳{Number(row.totalAmount).toFixed(2)}
+            {fmtMoney(row.totalAmount)}
           </span>
           {Number(row.dueAmount) > 0 && (
             <span className="text-[10px] text-rose-600 font-bold block">
-              Due: ৳{Number(row.dueAmount).toFixed(2)}
+              Due: {fmtMoney(row.dueAmount)}
             </span>
           )}
         </div>
@@ -257,11 +266,11 @@ export default function SalesListPage() {
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span className="font-medium">Total Sales Volume</span>
               <div className="w-7 h-7 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center font-bold text-xs">
-                ৳
+                {locale === 'bn' ? '৳' : 'BDT'}
               </div>
             </div>
             <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
-              ৳{Number(summary.totalSalesAmount || 0).toLocaleString()}
+              {fmtMoney(summary.totalSalesAmount || 0)}
             </p>
           </div>
 
@@ -269,11 +278,11 @@ export default function SalesListPage() {
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span className="font-medium">Total Tendered Paid</span>
               <div className="w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                ৳
+                {locale === 'bn' ? '৳' : 'BDT'}
               </div>
             </div>
             <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
-              ৳{Number(summary.totalPaidAmount || 0).toLocaleString()}
+              {fmtMoney(summary.totalPaidAmount || 0)}
             </p>
           </div>
 
@@ -285,7 +294,7 @@ export default function SalesListPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 font-mono tracking-tight">
-              ৳{Number(summary.totalDueAmount || 0).toLocaleString()}
+              {fmtMoney(summary.totalDueAmount || 0)}
             </p>
           </div>
         </div>

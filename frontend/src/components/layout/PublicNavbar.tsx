@@ -9,7 +9,7 @@ import { Button } from '../ui/button';
 import { ShoppingBag, Menu, X, ArrowRight } from 'lucide-react';
 
 export function PublicNavbar() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ export function PublicNavbar() {
             </div>
             <div>
               <span className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
-                দোকান পিওএস
+                {locale === 'bn' ? 'দোকান পিওএস' : 'Dokan POS'}
               </span>
               <span className="hidden sm:block text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">
                 Fashion Retail ERP

@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { useBranchStore } from '@/lib/store/branch-store';
 import { usePermission } from '../shared/PermissionGate';
 import { ForbiddenPage } from '../feedback/ForbiddenPage';
+import { useTranslation } from '@/lib/i18n';
 import { Loader2 } from 'lucide-react';
 
 export interface ProtectedRouteProps {
@@ -16,6 +17,7 @@ export interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requiredPermission }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { locale } = useTranslation();
 
   const { isAuthenticated, isLoadingSession, setAuth, setLoadingSession, clearAuth } = useAuthStore();
   const { setBranches } = useBranchStore();
@@ -76,7 +78,7 @@ export function ProtectedRoute({ children, requiredPermission }: ProtectedRouteP
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
           <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            সেশন যাচাই করা হচ্ছে...
+            {locale === 'bn' ? 'সেশন যাচাই করা হচ্ছে...' : 'Verifying session...'}
           </p>
         </div>
       </div>

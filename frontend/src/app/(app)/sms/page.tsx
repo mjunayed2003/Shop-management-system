@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ExportButton } from '@/components/shared/ExportButton';
 import { calculateSmsSegments } from '@/lib/utils/sms-segments';
+import { useTranslation } from '@/lib/i18n';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   MessageSquare,
@@ -29,6 +30,7 @@ import {
 } from 'lucide-react';
 
 export default function SmsHubPage() {
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { currentBranchId } = useBranchStore();
@@ -40,7 +42,7 @@ export default function SmsHubPage() {
   // Tab 1: Due Reminders State
   const [minDue, setMinDue] = useState(100);
   const [olderThanDays, setOlderThanDays] = useState(0);
-  const [reminderLang, setReminderLang] = useState<'bn' | 'en'>('bn');
+  const [reminderLang, setReminderLang] = useState<'bn' | 'en'>(locale === 'bn' ? 'bn' : 'en');
   const [previewResult, setPreviewResult] = useState<{ count: number; totalDue: number; recipients: any[] } | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
@@ -243,8 +245,8 @@ export default function SmsHubPage() {
                   onChange={(e) => setReminderLang(e.target.value as any)}
                   className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs"
                 >
-                  <option value="bn">বাংলা (Bangla Unicode)</option>
                   <option value="en">English (Standard GSM)</option>
+                  <option value="bn">{locale === 'bn' ? 'বাংলা (Bangla Unicode)' : 'Bangla (Unicode)'}</option>
                 </select>
               </div>
             </div>

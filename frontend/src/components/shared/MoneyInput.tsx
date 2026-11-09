@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Decimal from 'decimal.js';
+import { useTranslation } from '@/lib/i18n';
 
 export interface MoneyInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
   value: number | string | null | undefined;
@@ -19,7 +20,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
     {
       value,
       onChange,
-      currencySymbol = '৳',
+      currencySymbol,
       isError = false,
       min = 0,
       max,
@@ -32,6 +33,8 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
     },
     ref,
   ) => {
+    const { locale } = useTranslation();
+    const activeSymbol = currencySymbol ?? (locale === 'bn' ? '৳' : 'BDT');
     // Formats value cleanly for display
     const formatValue = (val: number | string | null | undefined): string => {
       if (val === null || val === undefined || val === '') return '';
@@ -75,8 +78,8 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
 
     return (
       <div className="relative w-full">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 font-medium text-xs select-none">
-          {currencySymbol}
+        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-500 font-medium text-xs select-none">
+          {activeSymbol}
         </div>
         <input
           ref={ref}
@@ -89,7 +92,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
           disabled={disabled}
           placeholder={placeholder}
           className={`
-            w-full rounded-lg border bg-white dark:bg-slate-900 pl-8 pr-3 py-1.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500
+            w-full rounded-lg border bg-white dark:bg-slate-900 ${activeSymbol.length > 1 ? 'pl-11' : 'pl-7'} pr-3 py-1.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500
             transition-colors duration-150 font-mono text-right
             focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-950
             ${

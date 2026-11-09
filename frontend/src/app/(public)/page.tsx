@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import {
-  ShoppingBag,
   Store,
   Barcode,
   CreditCard,
@@ -16,11 +15,10 @@ import {
   CheckCircle2,
   Sparkles,
   Zap,
-  Users,
 } from 'lucide-react';
 
 export default function LandingPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <div className="space-y-24 py-10 sm:py-16">
@@ -70,20 +68,36 @@ export default function LandingPage() {
         {/* Stats strip */}
         <div className="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
-            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">১০০%</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">অফলাইন পিওএস সাপোর্ট</p>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+              {locale === 'bn' ? '১০০%' : '100%'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+              {locale === 'bn' ? 'অফলাইন পিওএস সাপোর্ট' : 'Offline POS Support'}
+            </p>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
-            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">৫x</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">দ্রুত ক্যাশিয়ার চেকআউট</p>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+              {locale === 'bn' ? '৫x' : '5x'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+              {locale === 'bn' ? 'দ্রুত ক্যাশিয়ার চেকআউট' : 'Faster Checkout'}
+            </p>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
-            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">৳ BDT</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">বিকাশ/নগদ অটো ট্র্যাকিং</p>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+              {locale === 'bn' ? '৳ BDT' : 'BDT'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+              {locale === 'bn' ? 'বিকাশ/নগদ অটো ট্র্যাকিং' : 'bKash/Nagad Auto Tracking'}
+            </p>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
-            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">৩০ দিন</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">বিনামূল্যে পূর্ণাঙ্গ ট্রায়াল</p>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+              {locale === 'bn' ? '৩০ দিন' : '30 Days'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+              {locale === 'bn' ? 'বিনামূল্যে পূর্ণাঙ্গ ট্রায়াল' : 'Full Free Trial'}
+            </p>
           </div>
         </div>
       </section>
@@ -95,7 +109,9 @@ export default function LandingPage() {
             {t('landing.featuresTitle')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            পোশাক শোরুমের ইনভেন্টরি, বারকোড এবং অ্যাকাউন্টস নিয়ন্ত্রণের আধুনিক প্রযুক্তি
+            {locale === 'bn'
+              ? 'পোশাক শোরুমের ইনভেন্টরি, বারকোড এবং অ্যাকাউন্টস নিয়ন্ত্রণের আধুনিক প্রযুক্তি'
+              : 'Modern technology to control inventory, barcodes, and accounts for retail apparel showrooms'}
           </p>
         </div>
 
@@ -195,30 +211,38 @@ export default function LandingPage() {
           {/* Starter Plan */}
           <div className="p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-6 shadow-sm">
             <div>
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">একক শোরুমের জন্য</span>
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                {locale === 'bn' ? 'একক শোরুমের জন্য' : 'For Single Showroom'}
+              </span>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">Starter Boutique</h3>
-              <p className="text-xs text-slate-500 mt-1">নতুন শুরু করা বুটিক বা একক শোরুমের জন্য পারফেক্ট</p>
+              <p className="text-xs text-slate-500 mt-1">
+                {locale === 'bn' ? 'নতুন শুরু করা বুটিক বা একক শোরুমের জন্য পারফেক্ট' : 'Perfect for newly launched boutiques or single stores'}
+              </p>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white">৳ ১,৫০০</span>
-              <span className="text-xs text-slate-500">/প্রতি মাস</span>
+              <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {locale === 'bn' ? '৳ ১,৫০০' : 'BDT 1,500'}
+              </span>
+              <span className="text-xs text-slate-500">
+                {locale === 'bn' ? '/প্রতি মাস' : '/month'}
+              </span>
             </div>
             <ul className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>১টি সক্রিয় শোরুম শাখা</span>
+                <span>{locale === 'bn' ? '১টি সক্রিয় শোরুম শাখা' : '1 Active Showroom Branch'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>সর্বোচ্চ ৩ জন স্টাফ ইউজার</span>
+                <span>{locale === 'bn' ? 'সর্বোচ্চ ৩ জন স্টাফ ইউজার' : 'Up to 3 Staff Users'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>৫০০ পোশাক পণ্য ও ১৫০০ ভ্যারিয়েন্ট</span>
+                <span>{locale === 'bn' ? '৫০০ পোশাক পণ্য ও ১৫০০ ভ্যারিয়েন্ট' : '500 Products & 1,500 Variants'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>প্রতি মাসে ১,০০০ ইনভয়েস মেমো</span>
+                <span>{locale === 'bn' ? 'প্রতি মাসে ১,০০০ ইনভয়েস মেমো' : '1,000 Invoices per Month'}</span>
               </li>
             </ul>
             <Link href="/register?plan=STARTER" className="block">
@@ -231,33 +255,41 @@ export default function LandingPage() {
           {/* Business Growth Plan */}
           <div className="p-8 rounded-2xl border-2 border-emerald-500 bg-emerald-50/20 dark:bg-slate-900 space-y-6 shadow-md relative">
             <span className="absolute -top-3 right-6 bg-emerald-600 text-white text-[11px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider">
-              জনপ্রিয় চয়েস
+              {locale === 'bn' ? 'জনপ্রিয় চয়েস' : 'Popular Choice'}
             </span>
             <div>
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">মাল্টি-ব্রাঞ্চ রিটেইল চেইন</span>
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                {locale === 'bn' ? 'মাল্টি-ব্রাঞ্চ রিটেইল চেইন' : 'Multi-Branch Retail Chain'}
+              </span>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">Business Growth</h3>
-              <p className="text-xs text-slate-500 mt-1">একাধিক শাখা ও দ্রুত বর্ধনশীল ফ্যাশন ব্র্যান্ডের জন্য</p>
+              <p className="text-xs text-slate-500 mt-1">
+                {locale === 'bn' ? 'একাধিক শাখা ও দ্রুত বর্ধনশীল ফ্যাশন ব্র্যান্ডের জন্য' : 'For multi-branch and fast-growing fashion brands'}
+              </p>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white">৳ ৩,৫০০</span>
-              <span className="text-xs text-slate-500">/প্রতি মাস</span>
+              <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
+                {locale === 'bn' ? '৳ ৩,৫০০' : 'BDT 3,500'}
+              </span>
+              <span className="text-xs text-slate-500">
+                {locale === 'bn' ? '/প্রতি মাস' : '/month'}
+              </span>
             </div>
             <ul className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>৫টি পর্যন্ত সক্রিয় শোরুম শাখা</span>
+                <span>{locale === 'bn' ? '৫টি পর্যন্ত সক্রিয় শোরুম শাখা' : 'Up to 5 Showroom Branches'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>১৫ জন পর্যন্ত স্টাফ ইউজার</span>
+                <span>{locale === 'bn' ? '১৫ জন পর্যন্ত স্টাফ ইউজার' : 'Up to 15 Staff Users'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>৫,০০০ পোশাক পণ্য ও ২৫,০০০ ভ্যারিয়েন্ট</span>
+                <span>{locale === 'bn' ? '৫,০০০ পোশাক পণ্য ও ২৫,০০০ ভ্যারিয়েন্ট' : '5,000 Products & 25,000 Variants'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>কাস্টম সেলস ও প্রফিট রিপোর্টস</span>
+                <span>{locale === 'bn' ? 'কাস্টম সেলস ও প্রফিট রিপোর্টস' : 'Custom Sales & Profit Reports'}</span>
               </li>
             </ul>
             <Link href="/register?plan=BUSINESS" className="block">
@@ -273,10 +305,12 @@ export default function LandingPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-900 text-white p-8 sm:p-14 text-center space-y-6 shadow-xl">
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-            আজই আপনার পোশাক ব্যবসাকে নিয়ে যান পরবর্তী ধাপে
+            {locale === 'bn' ? 'আজই আপনার পোশাক ব্যবসাকে নিয়ে যান পরবর্তী ধাপে' : 'Take your retail business to the next level today'}
           </h2>
           <p className="text-sm sm:text-base text-emerald-100 max-w-xl mx-auto">
-            কোন ক্রেডিট কার্ড প্রয়োজন নেই। বিনামূল্যে নিবন্ধন করুন এবং ৩০ দিন সম্পূর্ণ ফিচার ব্যবহার করুন।
+            {locale === 'bn'
+              ? 'কোন ক্রেডিট কার্ড প্রয়োজন নেই। বিনামূল্যে নিবন্ধন করুন এবং ৩০ দিন সম্পূর্ণ ফিচার ব্যবহার করুন।'
+              : 'No credit card required. Register for free and explore all features for 30 days.'}
           </p>
           <div className="pt-2">
             <Link href="/register">

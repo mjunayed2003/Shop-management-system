@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/i18n';
 import { usePlanLimitModalStore } from '@/lib/store/plan-limit-modal-store';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { AlertTriangle, ArrowRight, Zap } from 'lucide-react';
 
 export function PlanLimitReachedDialog() {
   const { isOpen, limitInfo, closePlanLimitModal } = usePlanLimitModalStore();
+  const { locale } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -20,14 +22,16 @@ export function PlanLimitReachedDialog() {
             <AlertTriangle className="w-6 h-6" />
           </div>
           <DialogTitle className="text-lg font-bold text-slate-900 dark:text-slate-100">
-            প্ল্যান সীমা সমাপ্ত (Plan Limit Reached)
+            {locale === 'bn' ? 'প্ল্যান সীমা সমাপ্ত (Plan Limit Reached)' : 'Plan Limit Reached'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
           <p className="leading-relaxed">
             {limitInfo?.message ||
-              'আপনার বর্তমান সাবস্ক্রিপশন প্ল্যানের অনুমোদিত কোটা পূর্ণ হয়েছে। নতুন এন্ট্রি যোগ করতে বা পরিষেবা সচল রাখতে আপনার প্ল্যান আপগ্রেড করুন।'}
+              (locale === 'bn'
+                ? 'আপনার বর্তমান সাবস্ক্রিপশন প্ল্যানের অনুমোদিত কোটা পূর্ণ হয়েছে। নতুন এন্ট্রি যোগ করতে বা পরিষেবা সচল রাখতে আপনার প্ল্যান আপগ্রেড করুন।'
+                : 'Your current subscription plan quota has been reached. Please upgrade your plan to add new records and keep services active.')}
           </p>
 
           {limitInfo?.limitType && (
@@ -50,17 +54,16 @@ export function PlanLimitReachedDialog() {
             onClick={closePlanLimitModal}
             className="text-xs h-9 rounded-xl"
           >
-            বাতিল (Close)
+            {locale === 'bn' ? 'বাতিল (Close)' : 'Close'}
           </Button>
 
           <Link href="/billing" onClick={closePlanLimitModal} className="w-full sm:w-auto">
             <Button
               type="button"
               size="sm"
-              className="w-full h-9 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5"
+              className="w-full h-9 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5"
             >
-              <Zap className="w-3.5 h-3.5 text-amber-300" />
-              <span>আপগ্রেড প্ল্যান দেখুন</span>
+              <span>{locale === 'bn' ? 'আপগ্রেড করুন' : 'Upgrade Plan'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </Link>

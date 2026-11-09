@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 
 export default function PrinterSettingsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const { business } = useAuthStore();
   const { currentBranch } = useBranchStore();
@@ -123,7 +123,7 @@ export default function PrinterSettingsPage() {
       {
         id: 'item-1',
         sku: 'SHIRT-OXF-BLU-L',
-        productName: 'Classic Oxford Cotton Shirt (কটন শার্ট)',
+        productName: 'Classic Oxford Cotton Shirt',
         size: 'L',
         color: 'Navy Blue',
         quantity: 1,
@@ -338,10 +338,10 @@ export default function PrinterSettingsPage() {
               <div className="flex items-center justify-between gap-4 pt-2 border-t border-border">
                 <div>
                   <label className="font-semibold text-foreground">
-                    Bangla Numbers (বাংলা সংখ্যা)
+                    {locale === 'bn' ? 'বাংলা সংখ্যা (Bangla Numbers)' : 'Bangla Numerals'}
                   </label>
                   <p className="text-[11px] text-muted-foreground">
-                    Print prices and totals using Bangla numerals (e.g. ৳১৫০০.০০).
+                    {locale === 'bn' ? 'বাংলা সংখ্যায় মূল্য ও মোট প্রিন্ট করুন (যেমন: ৳১৫০০.০০)।' : 'Print prices and totals using Bangla numerals.'}
                   </p>
                 </div>
                 <input

@@ -55,7 +55,8 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ mode, initialData }: ProductFormProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const currSym = locale === 'bn' ? '৳' : 'BDT';
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -834,9 +835,9 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                 {hasVariants && <th className="p-2.5 w-32">Color</th>}
                 <th className="p-2.5 w-36">SKU (Auto if blank)</th>
                 <th className="p-2.5 w-36">Barcode (Auto)</th>
-                <th className="p-2.5 w-28">Retail (৳)*</th>
-                <th className="p-2.5 w-28">Wholesale (৳)</th>
-                <th className="p-2.5 w-28">Cost (৳)</th>
+                <th className="p-2.5 w-28">Retail ({currSym})*</th>
+                <th className="p-2.5 w-28">Wholesale ({currSym})</th>
+                <th className="p-2.5 w-28">Cost ({currSym})</th>
                 <th className="p-2.5 w-20">Reorder</th>
                 {hasVariants && <th className="p-2.5 w-20 text-right">Actions</th>}
               </tr>
@@ -1189,7 +1190,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
                     <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                      Retail Price (৳)*
+                      Retail Price ({currSym})*
                     </label>
                     <Input
                       type="number"
@@ -1202,7 +1203,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                   </div>
                   <div>
                     <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                      Wholesale (৳)
+                      Wholesale ({currSym})
                     </label>
                     <Input
                       type="number"
@@ -1215,7 +1216,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                   </div>
                   <div>
                     <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                      Cost Price (৳)
+                      Cost Price ({currSym})
                     </label>
                     <Input
                       type="number"

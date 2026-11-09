@@ -6,6 +6,7 @@ import { api } from '@/lib/api/endpoints';
 import { CustomerSummary } from '@/lib/store/cart-store';
 import { useTranslation } from '@/lib/i18n';
 import { useToast } from '@/components/feedback/ToastContext';
+import { formatBDT } from '@/lib/utils/formatters';
 import {
   Dialog,
   DialogContent,
@@ -41,7 +42,8 @@ export function CustomerSelectModal({
   onSelectCustomer,
   currentCustomer,
 }: CustomerSelectModalProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const fmtMoney = (v: number | string | null | undefined) => formatBDT(v, locale);
   const toast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -336,7 +338,7 @@ export function CustomerSelectModal({
                       {due > 0 ? (
                         <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
                           <AlertTriangle className="w-3 h-3" />
-                          <span>Due: ৳{due.toFixed(2)}</span>
+                          <span>Due: {fmtMoney(due)}</span>
                         </div>
                       ) : (
                         <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
@@ -346,7 +348,7 @@ export function CustomerSelectModal({
 
                       {cust.credit_limit > 0 && (
                         <div className="text-[10px] text-muted-foreground">
-                          Limit: ৳{Number(cust.credit_limit).toFixed(0)}
+                          Limit: {fmtMoney(cust.credit_limit)}
                         </div>
                       )}
                     </div>

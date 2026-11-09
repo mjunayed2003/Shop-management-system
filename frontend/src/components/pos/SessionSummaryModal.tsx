@@ -34,6 +34,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { generateZReportHtml, printHtml } from '@/lib/utils/receipt-template';
+import { formatBDT } from '@/lib/utils/formatters';
 
 interface SessionSummaryModalProps {
   isOpen: boolean;
@@ -46,7 +47,8 @@ export function SessionSummaryModal({
   onClose,
   sessionId,
 }: SessionSummaryModalProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const fmtMoney = (v: any) => formatBDT(v, locale);
   const currentBranch = useBranchStore((s) => s.currentBranch);
 
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(true);
@@ -169,7 +171,7 @@ export function SessionSummaryModal({
                   {t('reconciliation.expectedBalance')}
                 </span>
                 <div className="text-2xl sm:text-3xl font-mono font-bold text-slate-900 dark:text-white mt-1">
-                  ৳{expectedBalance.toFixed(2)}
+                  {fmtMoney(expectedBalance)}
                 </div>
                 <span className="text-[11px] text-slate-500 block mt-0.5">
                   Authoritative live physical cash expected in drawer
@@ -200,43 +202,43 @@ export function SessionSummaryModal({
                       (+) {t('reconciliation.openingBalance')}
                     </span>
                     <span className="font-semibold text-slate-900 dark:text-slate-100">
-                      ৳{Number(summary.opening_balance).toFixed(2)}
+                      {fmtMoney(summary.opening_balance)}
                     </span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                     <span>(+) {t('reconciliation.cashSales')}</span>
-                    <span className="font-semibold">+৳{Number(summary.cash_sales).toFixed(2)}</span>
+                    <span className="font-semibold">+{fmtMoney(summary.cash_sales)}</span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                     <span>(+) {t('reconciliation.cashDueCollections')}</span>
-                    <span className="font-semibold">+৳{Number(summary.cash_due_collections).toFixed(2)}</span>
+                    <span className="font-semibold">+{fmtMoney(summary.cash_due_collections)}</span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                     <span>(+) {t('reconciliation.payIns')}</span>
-                    <span className="font-semibold">+৳{Number(summary.pay_ins).toFixed(2)}</span>
+                    <span className="font-semibold">+{fmtMoney(summary.pay_ins)}</span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-rose-600 dark:text-rose-400">
                     <span>(-) {t('reconciliation.payOuts')}</span>
-                    <span className="font-semibold">-৳{Number(summary.pay_outs).toFixed(2)}</span>
+                    <span className="font-semibold">-{fmtMoney(summary.pay_outs)}</span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-rose-600 dark:text-rose-400">
                     <span>(-) {t('reconciliation.cashRefunds')}</span>
-                    <span className="font-semibold">-৳{Number(summary.cash_refunds).toFixed(2)}</span>
+                    <span className="font-semibold">-{fmtMoney(summary.cash_refunds)}</span>
                   </div>
 
                   <div className="py-2 flex items-center justify-between text-rose-600 dark:text-rose-400">
                     <span>(-) {t('reconciliation.cashExpenses')}</span>
-                    <span className="font-semibold">-৳{Number(summary.cash_expenses).toFixed(2)}</span>
+                    <span className="font-semibold">-{fmtMoney(summary.cash_expenses)}</span>
                   </div>
 
                   <div className="py-2.5 flex items-center justify-between text-slate-900 dark:text-white font-bold bg-slate-50 dark:bg-slate-800/50 px-2 rounded-md">
                     <span>(=) {t('reconciliation.expectedBalance')}</span>
-                    <span className="text-sm">৳{expectedBalance.toFixed(2)}</span>
+                    <span className="text-sm">{fmtMoney(expectedBalance)}</span>
                   </div>
                 </div>
               )}
@@ -257,7 +259,7 @@ export function SessionSummaryModal({
                       {method}
                     </span>
                     <span className="font-semibold text-slate-800 dark:text-slate-200">
-                      ৳{Number(amt as string).toFixed(2)}
+                      {fmtMoney(amt as string)}
                     </span>
                   </div>
                 ))}

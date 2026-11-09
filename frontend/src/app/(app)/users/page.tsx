@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export default function UsersPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const currentUser = useAuthStore((s) => s.user);
@@ -114,7 +114,7 @@ export default function UsersPage() {
       if (err.name === 'PlanLimitReachedError') {
         setPlanLimitReachedError(err.message);
       } else {
-        setFormError(err.message || 'কর্মী যোগ করা সম্ভব হয়নি');
+        setFormError(err.message || (locale === 'bn' ? 'কর্মী যোগ করা সম্ভব হয়নি' : 'Failed to add user'));
       }
     },
   });
@@ -127,7 +127,7 @@ export default function UsersPage() {
       handleCloseForm();
     },
     onError: (err: any) => {
-      setFormError(err.message || 'কর্মী তথ্য আপডেট করা যায়নি');
+      setFormError(err.message || (locale === 'bn' ? 'কর্মী তথ্য আপডেট করা যায়নি' : 'Failed to update user'));
     },
   });
 
@@ -148,7 +148,7 @@ export default function UsersPage() {
       setStatusDialogUser(null);
     },
     onError: (err: any) => {
-      toast.error(err.message || 'অবস্থা পরিবর্তন করা সম্ভব হয়নি');
+      toast.error(err.message || (locale === 'bn' ? 'অবস্থা পরিবর্তন করা সম্ভব হয়নি' : 'Failed to change status'));
     },
   });
 
@@ -156,12 +156,12 @@ export default function UsersPage() {
     mutationFn: ({ id, pwd }: { id: string; pwd: string }) =>
       api.users.resetPassword(id, pwd),
     onSuccess: () => {
-      toast.success('পাসওয়ার্ড রিসেট সফল হয়েছে। কর্মী নতুন পাসওয়ার্ডে লগইন করবেন।');
+      toast.success(locale === 'bn' ? 'পাসওয়ার্ড রিসেট সফল হয়েছে। কর্মী নতুন পাসওয়ার্ডে লগইন করবেন।' : 'Password reset successful. The user can now log in with the new password.');
       setResetPwdUser(null);
       setNewPassword('');
     },
     onError: (err: any) => {
-      toast.error(err.message || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে');
+      toast.error(err.message || (locale === 'bn' ? 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে' : 'Failed to reset password'));
     },
   });
 
@@ -254,7 +254,7 @@ export default function UsersPage() {
     }
 
     if (!isValidBDPhone(phone)) {
-      setFormError('সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)');
+      setFormError(locale === 'bn' ? 'সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)' : 'Enter a valid 11-digit phone number (e.g. 017XXXXXXXX)');
       return;
     }
 
@@ -284,7 +284,7 @@ export default function UsersPage() {
       );
     } else {
       if (!password || password.length < 6) {
-        setFormError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+        setFormError(locale === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters');
         return;
       }
 
@@ -319,7 +319,7 @@ export default function UsersPage() {
                 <span>{user.fullName}</span>
                 {user.isOwner && (
                   <Badge variant="warning" size="sm">
-                    মালিক (Owner)
+                    {locale === 'bn' ? 'মালিক (Owner)' : 'Store Owner'}
                   </Badge>
                 )}
               </p>
@@ -356,7 +356,7 @@ export default function UsersPage() {
                     ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 font-semibold'
                     : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200'
                 }`}
-                title={b.isDefault ? 'ডিফল্ট শাখা' : undefined}
+                title={b.isDefault ? (locale === 'bn' ? 'ডিফল্ট শাখা' : 'Default Branch') : undefined}
               >
                 {b.name} {b.isDefault && '★'}
               </span>
@@ -464,7 +464,7 @@ export default function UsersPage() {
               setSearch(val);
               setPage(1);
             }}
-            placeholder="নাম, ফোন বা ইমেইল খুঁজুন..."
+            placeholder={locale === 'bn' ? 'নাম, ফোন বা ইমেইল খুঁজুন...' : 'Search by name, phone or email...'}
           />
         </div>
 
@@ -549,7 +549,9 @@ export default function UsersPage() {
                   {editingUser ? t('users.editUser') : t('users.createUser')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  {editingUser ? `${editingUser.fullName} এর তথ্য আপডেট` : 'নতুন স্টাফ সদস্যের তথ্য ও শাখা অনুমোদন দিন'}
+                  {editingUser
+                    ? (locale === 'bn' ? `${editingUser.fullName} এর তথ্য আপডেট` : `Update ${editingUser.fullName}'s information`)
+                    : (locale === 'bn' ? 'নতুন স্টাফ সদস্যের তথ্য ও শাখা অনুমোদন দিন' : 'Enter staff member details and branch access')}
                 </p>
               </div>
               <button
@@ -619,7 +621,7 @@ export default function UsersPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড"
+                    placeholder={locale === 'bn' ? 'কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড' : 'At least 6 characters'}
                     required
                   />
                 </FormFieldWrapper>
@@ -648,7 +650,9 @@ export default function UsersPage() {
                     {t('users.branches')} <span className="text-rose-500">*</span>
                   </h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    কমপক্ষে একটি শাখা নির্বাচন আবশ্যক। নির্বাচিত শাখার মধ্য থেকে ডিফল্ট শোরুম নির্ধারণ করুন।
+                    {locale === 'bn'
+                      ? 'কমপক্ষে একটি শাখা নির্বাচন আবশ্যক। নির্বাচিত শাখার মধ্য থেকে ডিফল্ট শোরুম নির্ধারণ করুন।'
+                      : 'At least one branch is required. Choose default showroom among selected branches.'}
                   </p>
                 </div>
 
@@ -690,9 +694,9 @@ export default function UsersPage() {
                                 ? 'bg-emerald-600 text-white border-emerald-600'
                                 : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-300 hover:text-emerald-600'
                             }`}
-                            title="ডিফল্ট শাখা হিসেবে সেট করুন"
+                            title={locale === 'bn' ? 'ডিফল্ট শাখা হিসেবে সেট করুন' : 'Set as default branch'}
                           >
-                            {isDefault ? '★ ডিফল্ট' : 'ডিফল্ট করুন'}
+                            {isDefault ? (locale === 'bn' ? '★ ডিফল্ট' : '★ Default') : (locale === 'bn' ? 'ডিফল্ট করুন' : 'Set Default')}
                           </button>
                         )}
                       </div>
@@ -739,13 +743,13 @@ export default function UsersPage() {
         }}
         title={
           statusDialogUser?.isActive
-            ? `${statusDialogUser.fullName} কে নিষ্ক্রিয় করবেন?`
-            : `${statusDialogUser?.fullName} কে সক্রিয় করবেন?`
+            ? (locale === 'bn' ? `${statusDialogUser.fullName} কে নিষ্ক্রিয় করবেন?` : `Deactivate ${statusDialogUser.fullName}?`)
+            : (locale === 'bn' ? `${statusDialogUser?.fullName} কে সক্রিয় করবেন?` : `Activate ${statusDialogUser?.fullName}?`)
         }
         description={
           statusDialogUser?.isActive
             ? t('users.deactivateConfirmDesc')
-            : 'সক্রিয় করার পর ব্যবহারকারী পুনরায় সফটওয়্যারে লগইন করতে পারবেন।'
+            : (locale === 'bn' ? 'সক্রিয় করার পর ব্যবহারকারী পুনরায় সফটওয়্যারে লগইন করতে পারবেন।' : 'After reactivation, the user will be able to log in to the system.')
         }
         confirmText={statusDialogUser?.isActive ? t('users.deactivate') : t('users.reactivate')}
         variant={statusDialogUser?.isActive ? 'danger' : 'default'}
@@ -775,11 +779,12 @@ export default function UsersPage() {
             </div>
 
             <p className="text-xs text-slate-500">
-              {resetPwdUser.fullName} ({resetPwdUser.email}) এর জন্য নতুন পাসওয়ার্ড সেট করুন।
-              আগের সব সেশন স্বয়ংক্রিয়ভাবে বাতিল হয়ে যাবে।
+              {locale === 'bn'
+                ? `${resetPwdUser.fullName} (${resetPwdUser.email}) এর জন্য নতুন পাসওয়ার্ড সেট করুন। আগের সব সেশন স্বয়ংক্রিয়ভাবে বাতিল হয়ে যাবে।`
+                : `Set a new password for ${resetPwdUser.fullName} (${resetPwdUser.email}). All previous active sessions will be terminated.`}
             </p>
 
-            <FormFieldWrapper label="নতুন পাসওয়ার্ড" required>
+            <FormFieldWrapper label={locale === 'bn' ? 'নতুন পাসওয়ার্ড' : 'New Password'} required>
               <Input
                 type="password"
                 value={newPassword}
@@ -805,7 +810,7 @@ export default function UsersPage() {
                       pwd: newPassword,
                     });
                   } else {
-                    toast.error('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+                    toast.error(locale === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'Password must be at least 6 characters');
                   }
                 }}
                 isLoading={resetPasswordMutation.isPending}

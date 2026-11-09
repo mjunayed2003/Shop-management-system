@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { useBranchStore } from '@/lib/store/branch-store';
 import { useOfflineStore } from '@/lib/store/offline-store';
 import { usePermission } from '@/components/shared/PermissionGate';
+import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -38,6 +39,8 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { t, locale } = useTranslation();
+  const currSym = locale === 'bn' ? '৳' : 'BDT';
   const { user, business } = useAuthStore();
   const isOwner = Boolean(user?.isOwner);
   const { currentBranch, currentBranchId } = useBranchStore();
@@ -80,9 +83,9 @@ export default function DashboardPage() {
   const salesTrend = businessData?.salesTrend || [];
   const maxTrendTotal = Math.max(...salesTrend.map((t) => Number(t?.total) || 0), 1);
 
-  // Currency Formatter (BDT / ৳)
+  // Currency Formatter (BDT)
   const fmtCurrency = (num: number = 0) =>
-    `৳ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    `${currSym} ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   // =========================================================================
   // MULTI-LINE SPLINE SVG MATH (Performance Overview Chart) - 100% LIVE DATA
@@ -205,10 +208,10 @@ export default function DashboardPage() {
           val: fmtCurrency(Number(p.amount) || 0),
         }))
       : [
-          { label: 'CASH', height: 12, val: '৳ 0' },
-          { label: 'BKASH', height: 12, val: '৳ 0' },
-          { label: 'NAGAD', height: 12, val: '৳ 0' },
-          { label: 'BANK', height: 12, val: '৳ 0' },
+          { label: 'CASH', height: 12, val: `${currSym} 0` },
+          { label: 'BKASH', height: 12, val: `${currSym} 0` },
+          { label: 'NAGAD', height: 12, val: `${currSym} 0` },
+          { label: 'BANK', height: 12, val: `${currSym} 0` },
         ];
 
   // Top products list directly from live sale records
@@ -495,7 +498,7 @@ export default function DashboardPage() {
                         textAnchor="end"
                         className="text-[10px] fill-slate-300 dark:fill-slate-600 font-mono font-medium"
                       >
-                        ৳ {Math.round(stepVal / 1000)}K
+                        {currSym} {Math.round(stepVal / 1000)}K
                       </text>
                       <line
                         x1={padX}
@@ -592,7 +595,7 @@ export default function DashboardPage() {
                   }}
                 >
                   <div className="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-lg">
-                    {months[activeChartPoint]}: ৳ {(activeSalesPt.val).toLocaleString()}
+                    {months[activeChartPoint]}: {currSym} {(activeSalesPt.val).toLocaleString()}
                   </div>
                   <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1"></div>
                 </div>

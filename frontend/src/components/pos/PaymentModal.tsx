@@ -76,9 +76,15 @@ export function PaymentModal({
   onClose,
   registerSessionId,
 }: PaymentModalProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const { business } = useAuthStore();
+
+  const fmtMoney = (val: number | string | Decimal, decimals = 2) => {
+    const num = Number(val || 0);
+    const formatted = num.toFixed(decimals);
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
   const {
     items,
     customer,
@@ -415,7 +421,7 @@ export function PaymentModal({
               {(completedSale.isOffline || completedSale.isProvisional) && (
                 <div className="pt-1">
                   <Badge className="bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300 text-[11px] font-bold">
-                    OFFLINE / PROVISIONAL INVOICE (অফলাইন খসড়া)
+                    {locale === 'bn' ? 'OFFLINE / PROVISIONAL INVOICE (অফলাইন খসড়া)' : 'OFFLINE / PROVISIONAL INVOICE'}
                   </Badge>
                 </div>
               )}
@@ -426,27 +432,27 @@ export function PaymentModal({
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t('pos.total')}:</span>
                 <span className="font-bold text-foreground">
-                  ৳{Number(completedSale.totalAmount).toFixed(2)}
+                  {fmtMoney(completedSale.totalAmount)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t('pos.paidAmount')}:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                  ৳{Number(completedSale.paidAmount).toFixed(2)}
+                  {fmtMoney(completedSale.paidAmount)}
                 </span>
               </div>
 
               {Number(completedSale.changeAmount) > 0 && (
                 <div className="flex justify-between border-t border-border pt-2 text-emerald-700 dark:text-emerald-300 font-bold">
                   <span>{t('pos.changeAmount')}:</span>
-                  <span>৳{Number(completedSale.changeAmount).toFixed(2)}</span>
+                  <span>{fmtMoney(completedSale.changeAmount)}</span>
                 </div>
               )}
 
               {Number(completedSale.dueAmount) > 0 && (
                 <div className="flex justify-between border-t border-border pt-2 text-rose-600 dark:text-rose-400 font-bold">
                   <span>{t('pos.dueAmount')}:</span>
-                  <span>৳{Number(completedSale.dueAmount).toFixed(2)}</span>
+                  <span>{fmtMoney(completedSale.dueAmount)}</span>
                 </div>
               )}
 
@@ -516,7 +522,7 @@ export function PaymentModal({
                     {t('pos.total')}
                   </span>
                   <p className="text-xl font-extrabold text-foreground font-mono">
-                    ৳{totalPayable.toFixed(2)}
+                    {fmtMoney(totalPayable)}
                   </p>
                 </div>
               </div>
@@ -539,7 +545,7 @@ export function PaymentModal({
                     onClick={handleExactCash}
                     className="h-8 text-xs font-semibold"
                   >
-                    {t('pos.exactCash')} (৳{totalPayable.toFixed(0)})
+                    {t('pos.exactCash')} ({fmtMoney(totalPayable, 0)})
                   </Button>
                   <Button
                     type="button"
@@ -559,7 +565,7 @@ export function PaymentModal({
                       onClick={() => handleQuickNote(note)}
                       className="h-8 text-xs font-mono"
                     >
-                      ৳{note}
+                      {locale === 'bn' ? `৳${note}` : `BDT ${note}`}
                     </Button>
                   ))}
                 </div>
@@ -673,7 +679,7 @@ export function PaymentModal({
                   <div>
                     <p className="font-bold">{t('pos.creditLimitExceeded')}</p>
                     <p className="text-[11px] mt-0.5">
-                      Current Due: ৳{customer?.currentDue.toFixed(2)} | Limit: ৳{customer?.creditLimit.toFixed(2)}
+                      Current Due: {fmtMoney(customer?.currentDue || 0)} | Limit: {fmtMoney(customer?.creditLimit || 0)}
                     </p>
                   </div>
                 </div>
@@ -696,21 +702,21 @@ export function PaymentModal({
                 <div className="flex justify-between text-muted-foreground">
                   <span>{t('pos.paidAmount')}:</span>
                   <span className="font-semibold text-foreground font-mono">
-                    ৳{totalPaidPreview.toFixed(2)}
+                    {fmtMoney(totalPaidPreview)}
                   </span>
                 </div>
 
                 {changePreview.greaterThan(0) && (
                   <div className="flex justify-between text-emerald-700 dark:text-emerald-300 font-bold">
                     <span>{t('pos.changeAmount')}:</span>
-                    <span className="font-mono">৳{changePreview.toFixed(2)}</span>
+                    <span className="font-mono">{fmtMoney(changePreview)}</span>
                   </div>
                 )}
 
                 {duePreview > 0 && (
                   <div className="flex justify-between text-rose-600 dark:text-rose-400 font-bold">
                     <span>{t('pos.dueAmount')}:</span>
-                    <span className="font-mono">৳{duePreview.toFixed(2)}</span>
+                    <span className="font-mono">{fmtMoney(duePreview)}</span>
                   </div>
                 )}
               </div>
@@ -758,7 +764,7 @@ export function PaymentModal({
                 ) : (
                   <>
                     <Banknote className="w-4 h-4" />
-                    <span>{t('pos.payBtn')} (৳{totalPayable.toFixed(2)})</span>
+                    <span>{t('pos.payBtn')} ({fmtMoney(totalPayable)})</span>
                   </>
                 )}
               </Button>

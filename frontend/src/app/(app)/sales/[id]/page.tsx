@@ -41,10 +41,19 @@ export default function SaleDetailPage() {
   const params = useParams();
   const router = useRouter();
   const saleId = String(params.id);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const { user, business, hasPermission } = useAuthStore();
+
+  const fmtMoney = (val: number | string) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   const canVoid =
     hasPermission('sale.void') ||
@@ -281,7 +290,7 @@ export default function SaleDetailPage() {
                 <div className="pt-2 border-t border-border flex justify-between items-center">
                   <span className="text-muted-foreground">Customer Due:</span>
                   <span className="font-bold text-rose-600 font-mono">
-                    ৳{Number(sale.customer.currentDue || 0).toFixed(2)}
+                    {fmtMoney(sale.customer.currentDue || 0)}
                   </span>
                 </div>
                 <div className="pt-1">
@@ -337,12 +346,12 @@ export default function SaleDetailPage() {
           <CardContent className="p-3.5 text-xs space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal:</span>
-              <span className="font-mono">৳{Number(sale.subtotal).toFixed(2)}</span>
+              <span className="font-mono">{fmtMoney(sale.subtotal)}</span>
             </div>
             {Number(sale.discountAmount) > 0 && (
               <div className="flex justify-between text-rose-600">
                 <span>Discount:</span>
-                <span className="font-mono">-৳{Number(sale.discountAmount).toFixed(2)}</span>
+                <span className="font-mono">-{fmtMoney(sale.discountAmount)}</span>
               </div>
             )}
             {sale.coupon && (
@@ -354,21 +363,21 @@ export default function SaleDetailPage() {
             {Number(sale.roundOff) !== 0 && (
               <div className="flex justify-between text-muted-foreground text-[11px]">
                 <span>Round-off:</span>
-                <span className="font-mono">{Number(sale.roundOff) > 0 ? '+' : ''}৳{Number(sale.roundOff).toFixed(2)}</span>
+                <span className="font-mono">{Number(sale.roundOff) > 0 ? '+' : ''}{fmtMoney(sale.roundOff)}</span>
               </div>
             )}
             <div className="pt-1.5 border-t border-border flex justify-between font-extrabold text-sm text-foreground">
               <span>Total Payable:</span>
-              <span className="font-mono">৳{Number(sale.totalAmount).toFixed(2)}</span>
+              <span className="font-mono">{fmtMoney(sale.totalAmount)}</span>
             </div>
             <div className="flex justify-between text-emerald-600 font-bold">
               <span>Paid:</span>
-              <span className="font-mono">৳{Number(sale.paidAmount).toFixed(2)}</span>
+              <span className="font-mono">{fmtMoney(sale.paidAmount)}</span>
             </div>
             {Number(sale.dueAmount) > 0 && (
               <div className="flex justify-between text-rose-600 font-bold">
                 <span>Due Balance:</span>
-                <span className="font-mono">৳{Number(sale.dueAmount).toFixed(2)}</span>
+                <span className="font-mono">{fmtMoney(sale.dueAmount)}</span>
               </div>
             )}
           </CardContent>
@@ -422,22 +431,22 @@ export default function SaleDetailPage() {
                         </Badge>
                       )}
                     </td>
-                    <td className="p-3 text-right font-mono">৳{Number(item.unitPrice).toFixed(2)}</td>
+                    <td className="p-3 text-right font-mono">{fmtMoney(item.unitPrice)}</td>
                     {canViewCost && (
                       <td className="p-3 text-right font-mono text-muted-foreground">
-                        ৳{Number(item.unitCost || 0).toFixed(2)}
+                        {fmtMoney(item.unitCost || 0)}
                       </td>
                     )}
                     <td className="p-3 text-center font-mono font-bold">{item.quantity}</td>
                     <td className="p-3 text-right font-mono text-muted-foreground">
-                      {Number(item.discountAmount) > 0 ? `৳${Number(item.discountAmount).toFixed(2)}` : '—'}
+                      {Number(item.discountAmount) > 0 ? fmtMoney(item.discountAmount) : '—'}
                     </td>
                     <td className="p-3 text-right font-mono font-bold text-foreground">
-                      ৳{lineTotal.toFixed(2)}
+                      {fmtMoney(lineTotal)}
                     </td>
                     {canViewCost && (
                       <td className={`p-3 text-right font-mono font-bold ${profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        ৳{profit.toFixed(2)}
+                        {fmtMoney(profit)}
                       </td>
                     )}
                   </tr>
@@ -479,7 +488,7 @@ export default function SaleDetailPage() {
                     })}
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-foreground">
-                    ৳{Number(pay.amount).toFixed(2)}
+                    {fmtMoney(pay.amount)}
                   </td>
                 </tr>
               ))}

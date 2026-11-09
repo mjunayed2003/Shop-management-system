@@ -7,13 +7,15 @@ import { useBranchStore } from '@/lib/store/branch-store';
 import { useTranslation } from '@/lib/i18n';
 import { Loader2, Tag, Shirt, Layers } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { formatBDT } from '@/lib/utils/formatters';
 
 interface ProductQuickPickProps {
   onSelectVariant: (variant: any) => void;
 }
 
 export function ProductQuickPick({ onSelectVariant }: ProductQuickPickProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const fmtMoney = (v: number | string | null | undefined) => formatBDT(v, locale);
   const { currentBranchId } = useBranchStore();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('ALL');
 
@@ -104,7 +106,7 @@ export function ProductQuickPick({ onSelectVariant }: ProductQuickPickProps) {
 
                   <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between">
                     <span className="font-bold text-xs text-primary font-mono">
-                      ৳{Number(price).toFixed(0)}
+                      {fmtMoney(price)}
                     </span>
 
                     {variants.length > 1 ? (

@@ -78,10 +78,10 @@ export default function ProfilePage() {
         phone: res.user.phone,
       });
       toast.success(t('profile.updateSuccess'));
-      setProfileMsg('প্রোফাইল তথ্য সফলভাবে সংরক্ষিত হয়েছে।');
+      setProfileMsg(locale === 'bn' ? 'প্রোফাইল তথ্য সফলভাবে সংরক্ষিত হয়েছে।' : 'Profile information updated successfully.');
     },
     onError: (err: any) => {
-      setProfileMsg(err.message || 'প্রোফাইল আপডেট করা যায়নি');
+      setProfileMsg(err.message || (locale === 'bn' ? 'প্রোফাইল আপডেট করা যায়নি' : 'Failed to update profile'));
     },
   });
 
@@ -94,10 +94,10 @@ export default function ProfilePage() {
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setPwdMsg('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।');
+      setPwdMsg(locale === 'bn' ? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।' : 'Password changed successfully.');
     },
     onError: (err: any) => {
-      setPwdMsg(err.message || 'পাসওয়ার্ড পরিবর্তন করা যায়নি');
+      setPwdMsg(err.message || (locale === 'bn' ? 'পাসওয়ার্ড পরিবর্তন করা যায়নি' : 'Failed to change password'));
     },
   });
 
@@ -106,10 +106,10 @@ export default function ProfilePage() {
     mutationFn: (id: string) => api.auth.revokeSession(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      toast.success('সেশন সফলভাবে বাতিল করা হয়েছে');
+      toast.success(locale === 'bn' ? 'সেশন সফলভাবে বাতিল করা হয়েছে' : 'Session revoked successfully');
     },
     onError: (err: any) => {
-      toast.error(err.message || 'সেশন বাতিল করা সম্ভব হয়নি');
+      toast.error(err.message || (locale === 'bn' ? 'সেশন বাতিল করা সম্ভব হয়নি' : 'Failed to revoke session'));
     },
   });
 
@@ -122,7 +122,7 @@ export default function ProfilePage() {
       setIsLogoutAllOpen(false);
     },
     onError: (err: any) => {
-      toast.error(err.message || 'অনুরোধ ব্যর্থ হয়েছে');
+      toast.error(err.message || (locale === 'bn' ? 'অনুরোধ ব্যর্থ হয়েছে' : 'Request failed'));
     },
   });
 
@@ -131,7 +131,7 @@ export default function ProfilePage() {
     setProfileMsg(null);
 
     if (!isValidBDPhone(phone)) {
-      setProfileMsg('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন');
+      setProfileMsg(locale === 'bn' ? 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন' : 'Enter a valid 11-digit phone number');
       return;
     }
 
@@ -148,12 +148,12 @@ export default function ProfilePage() {
     setPwdMsg(null);
 
     if (newPassword.length < 6) {
-      setPwdMsg('নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+      setPwdMsg(locale === 'bn' ? 'নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' : 'New password must be at least 6 characters');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPwdMsg('নতুন পাসওয়ার্ড নিশ্চিতকরণ মিলছে না');
+      setPwdMsg(locale === 'bn' ? 'নতুন পাসওয়ার্ড নিশ্চিতকরণ মিলছে না' : 'Password confirmation does not match');
       return;
     }
 
@@ -269,7 +269,7 @@ export default function ProfilePage() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="কমপক্ষে ৬ অক্ষরের নতুন পাসওয়ার্ড"
+                placeholder={locale === 'bn' ? 'কমপক্ষে ৬ অক্ষরের নতুন পাসওয়ার্ড' : 'At least 6 characters'}
                 required
               />
             </FormFieldWrapper>
@@ -279,7 +279,7 @@ export default function ProfilePage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="নতুন পাসওয়ার্ড নিশ্চিত করুন"
+                placeholder={locale === 'bn' ? 'নতুন পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm new password'}
                 required
               />
             </FormFieldWrapper>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
 
           <div className="flex items-center gap-2">
             <Badge variant={user?.isOwner ? 'warning' : 'info'}>
-              {user?.isOwner ? 'মালিক (Owner)' : user?.role?.name}
+              {user?.isOwner ? (locale === 'bn' ? 'মালিক (Owner)' : 'Store Owner') : user?.role?.name}
             </Badge>
           </div>
         </div>
@@ -319,13 +319,19 @@ export default function ProfilePage() {
           <div className="p-4 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 border border-sky-200 dark:border-sky-800 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-sky-600 shrink-0" />
             <p className="text-xs sm:text-sm text-sky-900 dark:text-sky-100 font-medium leading-relaxed">
-              আপনি এই প্রতিষ্ঠানের প্রধান মালিক (Owner)। আপনার অ্যাকাউন্টে সমস্ত মডিউল, শাখা, সেটিংস এবং আর্থিক প্রতিবেদনের ওপর পূর্ণাঙ্গ সুপার-অ্যাডমিন অনুমোদন (*) সক্রিয় রয়েছে।
+              {locale === 'bn'
+                ? 'আপনি এই প্রতিষ্ঠানের প্রধান মালিক (Owner)। আপনার অ্যাকাউন্টে সমস্ত মডিউল, শাখা, সেটিংস এবং আর্থিক প্রতিবেদনের ওপর পূর্ণাঙ্গ সুপার-অ্যাডমিন অনুমোদন (*) সক্রিয় রয়েছে।'
+                : 'You are the primary Owner of this store. Full super-admin privileges (*) across all modules, branches, settings, and financial reports are active on your account.'}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-xs text-slate-500">
-              আপনার রোলে ({user?.role?.name}) মোট <strong>{permissions.length}</strong> টি অনুমতি বরাদ্দ রয়েছে:
+              {locale === 'bn' ? (
+                <>আপনার রোলে ({user?.role?.name}) মোট <strong>{permissions.length}</strong> টি অনুমতি বরাদ্দ রয়েছে:</>
+              ) : (
+                <>Your role ({user?.role?.name}) has <strong>{permissions.length}</strong> permissions assigned:</>
+              )}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -367,7 +373,9 @@ export default function ProfilePage() {
         {isLoadingSessions ? (
           <TableSkeleton rows={3} cols={4} />
         ) : sessions.length === 0 ? (
-          <p className="text-xs text-slate-400 py-4 text-center">কোন সক্রিয় সেশন পাওয়া যায়নি</p>
+          <p className="text-xs text-slate-400 py-4 text-center">
+            {locale === 'bn' ? 'কোন সক্রিয় সেশন পাওয়া যায়নি' : 'No active sessions found'}
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -424,8 +432,14 @@ export default function ProfilePage() {
         isOpen={isLogoutAllOpen}
         onClose={() => setIsLogoutAllOpen(false)}
         onConfirm={() => logoutAllMutation.mutate()}
-        title="সব ডিভাইস থেকে লগআউট নিশ্চিতকরণ"
-        description="আপনি কি নিশ্চিত যে আপনার সমস্ত সক্রিয় ব্রাউজার ও ডিভাইসের সেশন বাতিল করতে চান? এরপর সব ডিভাইসে পুনরায় পাসওয়ার্ড দিয়ে লগইন করতে হবে।"
+        title={locale === 'bn' ? 'সব ডিভাইস থেকে লগআউট নিশ্চিতকরণ' : 'Confirm Logout From All Devices'}
+        description={locale === 'bn'
+          ? 'আপনি কি নিশ্চিত যে আপনার সমস্ত সক্রিয় ব্রাউজার ও ডিভাইসের সেশন বাতিল করতে চান? এরপর সব ডিভাইসে পুনরায় পাসওয়ার্ড দিয়ে লগইন করতে হবে।'
+          : 'Are you sure you want to terminate all active sessions across all devices? You will need to log in again on each device.'}
+        confirmText={t('profile.logoutAllDevices')}
+        variant="danger"
+        isLoading={logoutAllMutation.isPending}
+      />
         confirmText={t('profile.logoutAllDevices')}
         variant="danger"
         isLoading={logoutAllMutation.isPending}

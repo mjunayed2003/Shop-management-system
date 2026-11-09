@@ -2,6 +2,7 @@
 
 import React, { useId } from 'react';
 import { normalizeBDPhone, isValidBDPhone, formatBDPhoneDisplay } from '@/lib/utils/phone';
+import { useTranslation } from '@/lib/i18n';
 import { Phone, CheckCircle2 } from 'lucide-react';
 
 export interface PhoneInputProps
@@ -25,6 +26,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     },
     ref,
   ) => {
+    const { locale } = useTranslation();
     const hintId = useId();
     const normalized = normalizeBDPhone(value);
     const isValid = isValidBDPhone(value);
@@ -70,12 +72,16 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
         {showNormalizedHint && value && (
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
             <span>
-              স্ট্যান্ডার্ড ফরম্যাট: <strong className="font-mono text-slate-700 dark:text-slate-200">{normalized || '-'}</strong>
+              {locale === 'bn' ? 'স্ট্যান্ডার্ড ফরম্যাট:' : 'Standard format:'} <strong className="font-mono text-slate-700 dark:text-slate-200">{normalized || '-'}</strong>
             </span>
             {isValid ? (
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">বৈধ নম্বর</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                {locale === 'bn' ? 'বৈধ নম্বর' : 'Valid number'}
+              </span>
             ) : (
-              <span className="text-amber-600 dark:text-amber-400">১১ ডিজিট আবশ্যক</span>
+              <span className="text-amber-600 dark:text-amber-400">
+                {locale === 'bn' ? '১১ ডিজিট আবশ্যক' : '11 digits required'}
+              </span>
             )}
           </div>
         )}

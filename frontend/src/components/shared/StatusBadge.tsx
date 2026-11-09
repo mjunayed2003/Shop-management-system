@@ -11,7 +11,7 @@ export interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, className = '' }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   if (typeof status === 'boolean') {
     return status ? (
@@ -33,7 +33,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, classNa
     return (
       <Badge variant="success" className={className}>
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        {label || (s === 'TRIAL' ? 'ট্রায়াল (Trial)' : t('active'))}
+        {label || (s === 'TRIAL' ? (locale === 'bn' ? 'ট্রায়াল (Trial)' : 'Trial') : t('active'))}
       </Badge>
     );
   }
@@ -42,7 +42,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, classNa
     return (
       <Badge variant="danger" className={className}>
         <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-        {label || (s === 'SUSPENDED' ? 'স্থগিত (Suspended)' : s)}
+        {label || (s === 'SUSPENDED' ? (locale === 'bn' ? 'স্থগিত (Suspended)' : 'Suspended') : s)}
       </Badge>
     );
   }

@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 
 export function UserMenu() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { user, business, clearAuth } = useAuthStore();
   const { currentBranchId, clearBranchState } = useBranchStore();
   const { pendingCount, conflictCount } = useOfflineStore();
@@ -99,7 +99,7 @@ export function UserMenu() {
             {user.fullName}
           </p>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">
-            {user.isOwner ? 'দোকান মালিক (Owner)' : user.role?.name}
+            {user.isOwner ? (locale === 'bn' ? 'দোকান মালিক (Owner)' : 'Store Owner') : user.role?.name}
           </p>
         </div>
         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />

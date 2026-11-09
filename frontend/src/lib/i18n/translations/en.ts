@@ -418,7 +418,7 @@ export const en = {
     bulkModifier: 'Bulk Modify Prices',
     applyModifier: 'Apply Adjustment',
     percentageAdj: 'Percentage (+/- %)',
-    fixedAdj: 'Fixed Amount (+/- ৳)',
+    fixedAdj: 'Fixed Amount (+/- BDT)',
   },
 
   // Purchasing & Suppliers

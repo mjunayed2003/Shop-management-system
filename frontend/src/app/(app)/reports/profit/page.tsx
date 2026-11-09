@@ -32,13 +32,22 @@ import {
 type PeriodType = 'today' | 'yesterday' | 'this_week' | 'this_month' | 'custom';
 
 export default function ProfitReportPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const currentBranch = useBranchStore((s) => s.currentBranch);
   const user = useAuthStore((s) => s.user);
   const { hasPermission: canViewProfitPerm } = usePermission('report.view_profit');
   const canViewProfit = canViewProfitPerm || Boolean(user?.isOwner);
   const isOwner = user?.isOwner;
+
+  const fmtMoney = (val: number | string) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   // Period State (Asia/Dhaka helper)
   const [period, setPeriod] = useState<PeriodType>('today');
@@ -291,7 +300,7 @@ export default function ProfitReportPage() {
               {t('reports.grossSales')}
             </span>
             <div className="mt-1.5 text-xl font-bold font-mono text-slate-900 dark:text-white">
-              ৳{Number(combined.grossSales).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+              {fmtMoney(combined.grossSales)}
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">Subtotal of all sales</span>
           </div>
@@ -301,7 +310,7 @@ export default function ProfitReportPage() {
               {t('reports.salesReturns')}
             </span>
             <div className="mt-1.5 text-xl font-bold font-mono text-rose-600">
-              ৳{Number(combined.salesReturns).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+              {fmtMoney(combined.salesReturns)}
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">Refunded amounts</span>
           </div>
@@ -311,7 +320,7 @@ export default function ProfitReportPage() {
               {t('reports.netSales')}
             </span>
             <div className="mt-1.5 text-xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
-              ৳{Number(combined.netSales).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+              {fmtMoney(combined.netSales)}
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">Gross - Disc - Returns</span>
           </div>
@@ -321,7 +330,7 @@ export default function ProfitReportPage() {
               {t('reports.expenses')}
             </span>
             <div className="mt-1.5 text-xl font-bold font-mono text-slate-800 dark:text-slate-200">
-              ৳{Number(combined.expenses).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+              {fmtMoney(combined.expenses)}
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">Showroom vouchers</span>
           </div>
@@ -333,7 +342,7 @@ export default function ProfitReportPage() {
                   {t('reports.grossProfit')}
                 </span>
                 <div className="mt-1.5 text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-                  ৳{Number(combined.grossProfit).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                  {fmtMoney(combined.grossProfit)}
                 </div>
                 <span className="text-[10px] text-slate-400 mt-0.5 block">Net Sales - COGS</span>
               </div>
@@ -343,7 +352,7 @@ export default function ProfitReportPage() {
                   {t('reports.netProfit')}
                 </span>
                 <div className="mt-1.5 text-xl font-bold font-mono text-emerald-700 dark:text-emerald-300">
-                  ৳{Number(combined.netProfit).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+                  {fmtMoney(combined.netProfit)}
                 </div>
                 <span className="text-[10px] text-emerald-600/80 mt-0.5 block">
                   Gross Profit - Expenses
@@ -421,33 +430,33 @@ export default function ProfitReportPage() {
                       {b.branchName} ({b.branchCode})
                     </td>
                     <td className="py-3 px-4 text-right text-slate-800 dark:text-slate-200">
-                      ৳{Number(b.grossSales).toFixed(2)}
+                      {fmtMoney(b.grossSales)}
                     </td>
                     <td className="py-3 px-4 text-right text-slate-500">
-                      ৳{Number(b.discounts).toFixed(2)}
+                      {fmtMoney(b.discounts)}
                     </td>
                     <td className="py-3 px-4 text-right text-rose-600">
-                      ৳{Number(b.salesReturns).toFixed(2)}
+                      {fmtMoney(b.salesReturns)}
                     </td>
                     <td className="py-3 px-4 text-right font-bold text-indigo-600 dark:text-indigo-400">
-                      ৳{Number(b.netSales).toFixed(2)}
+                      {fmtMoney(b.netSales)}
                     </td>
                     <td className="py-3 px-4 text-right text-slate-700 dark:text-slate-300">
-                      ৳{Number(b.expenses).toFixed(2)}
+                      {fmtMoney(b.expenses)}
                     </td>
                     <td className="py-3 px-4 text-right text-amber-600">
-                      ৳{Number(b.damageLoss).toFixed(2)}
+                      {fmtMoney(b.damageLoss)}
                     </td>
                     {canViewProfit && (
                       <>
                         <td className="py-3 px-4 text-right text-slate-600 dark:text-slate-400">
-                          ৳{Number(b.costOfGoodsSold).toFixed(2)}
+                          {fmtMoney(b.costOfGoodsSold)}
                         </td>
                         <td className="py-3 px-4 text-right font-semibold text-slate-900 dark:text-white">
-                          ৳{Number(b.grossProfit).toFixed(2)}
+                          {fmtMoney(b.grossProfit)}
                         </td>
                         <td className="py-3 px-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                          ৳{Number(b.netProfit).toFixed(2)}
+                          {fmtMoney(b.netProfit)}
                         </td>
                       </>
                     )}
@@ -464,28 +473,28 @@ export default function ProfitReportPage() {
                     <Building2 className="w-4 h-4 text-indigo-600" />
                     <span>Combined Total</span>
                   </td>
-                  <td className="py-3 px-4 text-right">৳{Number(combined.grossSales).toFixed(2)}</td>
-                  <td className="py-3 px-4 text-right">৳{Number(combined.discounts).toFixed(2)}</td>
+                  <td className="py-3 px-4 text-right">{fmtMoney(combined.grossSales)}</td>
+                  <td className="py-3 px-4 text-right">{fmtMoney(combined.discounts)}</td>
                   <td className="py-3 px-4 text-right text-rose-600">
-                    ৳{Number(combined.salesReturns).toFixed(2)}
+                    {fmtMoney(combined.salesReturns)}
                   </td>
                   <td className="py-3 px-4 text-right text-indigo-600 dark:text-indigo-400">
-                    ৳{Number(combined.netSales).toFixed(2)}
+                    {fmtMoney(combined.netSales)}
                   </td>
-                  <td className="py-3 px-4 text-right">৳{Number(combined.expenses).toFixed(2)}</td>
+                  <td className="py-3 px-4 text-right">{fmtMoney(combined.expenses)}</td>
                   <td className="py-3 px-4 text-right text-amber-600">
-                    ৳{Number(combined.damageLoss).toFixed(2)}
+                    {fmtMoney(combined.damageLoss)}
                   </td>
                   {canViewProfit && (
                     <>
                       <td className="py-3 px-4 text-right">
-                        ৳{Number(combined.costOfGoodsSold).toFixed(2)}
+                        {fmtMoney(combined.costOfGoodsSold)}
                       </td>
                       <td className="py-3 px-4 text-right">
-                        ৳{Number(combined.grossProfit).toFixed(2)}
+                        {fmtMoney(combined.grossProfit)}
                       </td>
                       <td className="py-3 px-4 text-right text-emerald-600 dark:text-emerald-400 text-sm">
-                        ৳{Number(combined.netProfit).toFixed(2)}
+                        {fmtMoney(combined.netProfit)}
                       </td>
                     </>
                   )}

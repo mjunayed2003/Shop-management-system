@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 export default function RolesPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -71,7 +71,7 @@ export default function RolesPage() {
       handleCloseModal();
     },
     onError: (err: any) => {
-      toast.error(err.message || 'রোল তৈরি করা যায়নি');
+      toast.error(err.message || (locale === 'bn' ? 'রোল তৈরি করা যায়নি' : 'Failed to create role'));
     },
   });
 
@@ -84,7 +84,7 @@ export default function RolesPage() {
       handleCloseModal();
     },
     onError: (err: any) => {
-      toast.error(err.message || 'রোল আপডেট করা যায়নি');
+      toast.error(err.message || (locale === 'bn' ? 'রোল আপডেট করা যায়নি' : 'Failed to update role'));
     },
   });
 
@@ -96,7 +96,7 @@ export default function RolesPage() {
       setDeleteConfirmRole(null);
     },
     onError: (err: any) => {
-      toast.error(err.message || 'রোল মুছে ফেলা যায়নি');
+      toast.error(err.message || (locale === 'bn' ? 'রোল মুছে ফেলা যায়নি' : 'Failed to delete role'));
     },
   });
 
@@ -178,12 +178,12 @@ export default function RolesPage() {
   const handleSubmitRole = (e: React.FormEvent) => {
     e.preventDefault();
     if (!roleName.trim()) {
-      toast.error('রোলের নাম আবশ্যক');
+      toast.error(locale === 'bn' ? 'রোলের নাম আবশ্যক' : 'Role name is required');
       return;
     }
 
     if (selectedPermissions.size === 0) {
-      toast.error('কমপক্ষে একটি অনুমতি নির্বাচন করতে হবে');
+      toast.error(locale === 'bn' ? 'কমপক্ষে একটি অনুমতি নির্বাচন করতে হবে' : 'At least one permission must be selected');
       return;
     }
 
@@ -247,7 +247,7 @@ export default function RolesPage() {
                       <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <span>{role.name}</span>
                         {isOwner && (
-                          <span title="সিস্টেম মালিক রোল">
+                          <span title={locale === 'bn' ? 'সিস্টেম মালিক রোল' : 'System Owner Role'}>
                             <Lock className="w-3.5 h-3.5 text-amber-500" />
                           </span>
                         )}
@@ -269,11 +269,11 @@ export default function RolesPage() {
                   <div className="pt-2 flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-slate-400" />
-                      <strong>{role.usersCount}</strong> জন কর্মী
+                      <strong>{role.usersCount}</strong> {locale === 'bn' ? 'জন কর্মী' : 'staff'}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
-                      <strong>{isOwner ? 'সকল' : role.permissionsCount}</strong> টি অনুমতি
+                      <strong>{isOwner ? (locale === 'bn' ? 'সকল' : 'All') : role.permissionsCount}</strong> {locale === 'bn' ? 'টি অনুমতি' : 'permissions'}
                     </span>
                   </div>
                 </div>
@@ -300,7 +300,7 @@ export default function RolesPage() {
                       role.isSystem
                         ? t('roles.cannotDeleteSystem')
                         : role.usersCount > 0
-                        ? `এই রোলে ${role.usersCount} জন কর্মী যুক্ত আছেন, মুছে ফেলা সম্ভব নয়`
+                        ? (locale === 'bn' ? `এই রোলে ${role.usersCount} জন কর্মী যুক্ত আছেন, মুছে ফেলা সম্ভব নয়` : `Cannot delete: ${role.usersCount} users assigned to this role`)
                         : undefined
                     }
                   >
@@ -328,7 +328,9 @@ export default function RolesPage() {
                   {editingRole ? t('roles.editRole') : t('roles.createRole')}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  {editingRole ? `রোল সম্পাদনা: ${editingRole.name}` : 'নতুন কাস্টম পদবী ও পারমিশন ম্যাট্রিক্স তৈরি করুন'}
+                  {editingRole
+                    ? (locale === 'bn' ? `রোল সম্পাদনা: ${editingRole.name}` : `Edit Role: ${editingRole.name}`)
+                    : (locale === 'bn' ? 'নতুন কাস্টম পদবী ও পারমিশন ম্যাট্রিক্স তৈরি করুন' : 'Create new custom role and permissions matrix')}
                 </p>
               </div>
               <button
@@ -364,7 +366,7 @@ export default function RolesPage() {
                   />
                 </FormFieldWrapper>
 
-                <FormFieldWrapper label={t('roles.roleCode')} hint="যেমন: INVENTORY_CLERK">
+                <FormFieldWrapper label={t('roles.roleCode')} hint={locale === 'bn' ? 'যেমন: INVENTORY_CLERK' : 'e.g. INVENTORY_CLERK'}>
                   <Input
                     value={roleCode}
                     onChange={(e) => setRoleCode(e.target.value)}
@@ -424,7 +426,7 @@ export default function RolesPage() {
                           {/* Module Header with Select All Button */}
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                              {group.module} মডিউল ({group.permissions.length})
+                              {group.module} {locale === 'bn' ? 'মডিউল' : 'Module'} ({group.permissions.length})
                             </span>
                             <button
                               type="button"
@@ -434,7 +436,7 @@ export default function RolesPage() {
                               {allModuleSelected ? (
                                 <>
                                   <CheckSquare className="w-3.5 h-3.5" />
-                                  <span>সব বাতিল</span>
+                                  <span>{locale === 'bn' ? 'সব বাতিল' : 'Deselect All'}</span>
                                 </>
                               ) : (
                                 <>
@@ -510,8 +512,12 @@ export default function RolesPage() {
             deleteMutation.mutate(deleteConfirmRole.id);
           }
         }}
-        title="রোল মুছে ফেলার নিশ্চয়তা"
-        description={`আপনি কি নিশ্চিতভাবে "${deleteConfirmRole?.name}" রোলটি মুছে ফেলতে চান? এটি আর পুনরুদ্ধার করা যাবে না।`}
+        title={locale === 'bn' ? 'রোল মুছে ফেলার নিশ্চয়তা' : 'Confirm Role Deletion'}
+        description={
+          locale === 'bn'
+            ? `আপনি কি নিশ্চিতভাবে "${deleteConfirmRole?.name}" রোলটি মুছে ফেলতে চান? এটি আর পুনরুদ্ধার করা যাবে না।`
+            : `Are you sure you want to delete "${deleteConfirmRole?.name}"? This action cannot be undone.`
+        }
         confirmText={t('delete')}
         variant="danger"
         isLoading={deleteMutation.isPending}

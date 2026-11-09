@@ -48,10 +48,16 @@ import {
 } from 'lucide-react';
 
 export default function PosPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const { user, hasPermission } = useAuthStore();
   const { currentBranchId, currentBranch } = useBranchStore();
+
+  const fmtMoney = (val: number | string, decimals = 2) => {
+    const num = Number(val || 0);
+    const formatted = num.toFixed(decimals);
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   const {
     items,
@@ -433,7 +439,7 @@ export default function PosPage() {
                             </p>
                           </div>
                           <span className="text-xs font-bold text-primary font-mono">
-                            ৳{Number(product.retail_price || 0).toFixed(0)}
+                            {fmtMoney(product.retail_price || 0, 0)}
                           </span>
                         </div>
 
@@ -481,7 +487,7 @@ export default function PosPage() {
               >
                 <ShoppingCart className="w-4 h-4" />
                 <span>
-                  View Cart ({items.length} items) • ৳{displayTotal.toFixed(2)}
+                  View Cart ({items.length} items) • {fmtMoney(displayTotal)}
                 </span>
               </Button>
             </div>
@@ -523,7 +529,7 @@ export default function PosPage() {
                     className="text-[10px] font-mono cursor-pointer"
                     onClick={() => setIsCustomerModalOpen(true)}
                   >
-                    Due: ৳{customer.currentDue.toFixed(0)}
+                    Due: {fmtMoney(customer.currentDue, 0)}
                   </Badge>
                 )}
               </div>
@@ -680,7 +686,7 @@ export default function PosPage() {
                         {/* Right: Line Total and Remove */}
                         <div className="text-right space-y-0.5">
                           <p className="font-extrabold text-xs text-foreground font-mono">
-                            ৳{lineTotal.toFixed(2)}
+                            {fmtMoney(lineTotal)}
                           </p>
                           <Button
                             type="button"
@@ -739,7 +745,7 @@ export default function PosPage() {
                             } ${!canDiscount ? 'cursor-default' : 'hover:ring-1 hover:ring-primary'}`}
                             title={canDiscount ? 'Click to override unit price' : undefined}
                           >
-                            <span>@ ৳{line.unitPrice.toFixed(2)}</span>
+                            <span>@ {fmtMoney(line.unitPrice)}</span>
                             {canDiscount && <Edit2 className="w-2.5 h-2.5 opacity-60" />}
                           </button>
 
@@ -760,7 +766,7 @@ export default function PosPage() {
                               title="Line Discount"
                             >
                               <Percent className="w-2.5 h-2.5" />
-                              <span>{line.discountAmount > 0 ? `-৳${line.discountAmount}` : 'Disc'}</span>
+                              <span>{line.discountAmount > 0 ? `-${fmtMoney(line.discountAmount)}` : 'Disc'}</span>
                             </button>
                           )}
                         </div>
@@ -815,27 +821,27 @@ export default function PosPage() {
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between text-muted-foreground">
                   <span>{t('pos.subtotal')}:</span>
-                  <span className="font-mono">৳{displaySubtotal.toFixed(2)}</span>
+                  <span className="font-mono">{fmtMoney(displaySubtotal)}</span>
                 </div>
 
                 {displayDiscount > 0 && (
                   <div className="flex justify-between text-rose-600 dark:text-rose-400">
                     <span>{t('pos.discount')}:</span>
-                    <span className="font-mono">-৳{displayDiscount.toFixed(2)}</span>
+                    <span className="font-mono">-{fmtMoney(displayDiscount)}</span>
                   </div>
                 )}
 
                 {serverTotals && serverTotals.couponDiscount > 0 && (
                   <div className="flex justify-between text-rose-600 dark:text-rose-400 font-semibold">
                     <span>{t('pos.couponDiscount')} ({serverTotals.couponCode}):</span>
-                    <span className="font-mono">-৳{serverTotals.couponDiscount.toFixed(2)}</span>
+                    <span className="font-mono">-{fmtMoney(serverTotals.couponDiscount)}</span>
                   </div>
                 )}
 
                 {serverTotals && serverTotals.taxAmount > 0 && (
                   <div className="flex justify-between text-muted-foreground">
                     <span>{t('pos.tax')}:</span>
-                    <span className="font-mono">৳{serverTotals.taxAmount.toFixed(2)}</span>
+                    <span className="font-mono">{fmtMoney(serverTotals.taxAmount)}</span>
                   </div>
                 )}
 
@@ -843,7 +849,7 @@ export default function PosPage() {
                   <div className="flex justify-between text-muted-foreground text-[11px]">
                     <span>{t('pos.roundOff')}:</span>
                     <span className="font-mono">
-                      {serverTotals.roundOff > 0 ? '+' : ''}৳{serverTotals.roundOff.toFixed(2)}
+                      {serverTotals.roundOff > 0 ? '+' : ''}{fmtMoney(serverTotals.roundOff)}
                     </span>
                   </div>
                 )}
@@ -861,7 +867,7 @@ export default function PosPage() {
                     )}
                   </div>
                   <span className="text-2xl font-black text-foreground font-mono">
-                    ৳{displayTotal.toFixed(2)}
+                    {fmtMoney(displayTotal)}
                   </span>
                 </div>
               </div>
@@ -874,7 +880,7 @@ export default function PosPage() {
                 className="w-full h-12 text-sm font-extrabold gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-lg shadow-sky-600/25 transition-transform active:scale-[0.99]"
               >
                 <CreditCard className="w-5 h-5" />
-                <span>{t('pos.payBtn')} • ৳{displayTotal.toFixed(2)}</span>
+                <span>{t('pos.payBtn')} • {fmtMoney(displayTotal)}</span>
               </Button>
             </div>
           </div>

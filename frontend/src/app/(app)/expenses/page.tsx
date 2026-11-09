@@ -36,12 +36,21 @@ import {
 } from 'lucide-react';
 
 export default function ExpensesPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
   const currentBranch = useBranchStore((s) => s.currentBranch);
   const user = useAuthStore((s) => s.user);
   const isOwner = user?.isOwner;
+
+  const fmtMoney = (val: number | string) => {
+    const num = Number(val || 0);
+    const formatted = num.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return locale === 'bn' ? `৳${formatted}` : `BDT ${formatted}`;
+  };
 
   // Filter States
   const [page, setPage] = useState(1);
@@ -255,7 +264,7 @@ export default function ExpensesPage() {
       align: 'right',
       accessor: (r) => (
         <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
-          ৳{Number(r.amount).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+          {fmtMoney(r.amount)}
         </span>
       ),
     },
@@ -264,9 +273,7 @@ export default function ExpensesPage() {
       align: 'right',
       accessor: (r) => (
         <span className="text-sm font-mono text-slate-500 dark:text-slate-400">
-          {Number(r.tax_amount) > 0
-            ? `৳${Number(r.tax_amount).toLocaleString('en-BD', { minimumFractionDigits: 2 })}`
-            : '-'}
+          {Number(r.tax_amount) > 0 ? fmtMoney(r.tax_amount) : '-'}
         </span>
       ),
     },
@@ -275,7 +282,7 @@ export default function ExpensesPage() {
       align: 'right',
       accessor: (r) => (
         <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
-          ৳{Number(r.total_amount).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+          {fmtMoney(r.total_amount)}
         </span>
       ),
     },
@@ -395,11 +402,10 @@ export default function ExpensesPage() {
             {t('expenses.totalExpenses')}
           </span>
           <div className="mt-2 text-2xl font-bold font-mono text-slate-900 dark:text-white">
-            ৳{Number(totals.total).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+            {fmtMoney(totals.total)}
           </div>
           <span className="text-xs text-slate-500 mt-1 block">
-            Base: ৳{Number(totals.amount).toLocaleString('en-BD', { minimumFractionDigits: 2 })} + Tax: ৳
-            {Number(totals.tax).toLocaleString('en-BD', { minimumFractionDigits: 2 })}
+            Base: {fmtMoney(totals.amount)} + Tax: {fmtMoney(totals.tax)}
           </span>
         </div>
 
@@ -544,10 +550,10 @@ export default function ExpensesPage() {
               Showing {items.length} vouchers on this page (Total {expenseData?.total || 0} recorded)
             </span>
             <div className="flex items-center gap-6 font-mono">
-              <span>Page Subtotal: ৳{totals.amount}</span>
-              <span>Page Tax: ৳{totals.tax}</span>
+              <span>Page Subtotal: {fmtMoney(totals.amount)}</span>
+              <span>Page Tax: {fmtMoney(totals.tax)}</span>
               <span className="text-indigo-600 dark:text-indigo-400 text-sm font-bold">
-                Page Total: ৳{totals.total}
+                Page Total: {fmtMoney(totals.total)}
               </span>
             </div>
           </div>

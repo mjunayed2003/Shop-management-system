@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { useTranslation } from '@/lib/i18n';
 
 export function usePermission(requiredPermission?: string | string[], requireAll = false) {
   const user = useAuthStore((s) => s.user);
@@ -76,6 +77,7 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   disableOnly = false,
   children,
 }) => {
+  const { locale } = useTranslation();
   const req = permission || permissions;
   const { hasPermission } = usePermission(req, requireAll);
 
@@ -86,7 +88,7 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   if (disableOnly && React.isValidElement(children)) {
     return React.cloneElement(children as React.ReactElement<any>, {
       disabled: true,
-      title: 'এই সুবিধাটি ব্যবহারের অনুমতি আপনার অ্যাকাউন্টে নেই।',
+      title: locale === 'bn' ? 'এই সুবিধাটি ব্যবহারের অনুমতি আপনার অ্যাকাউন্টে নেই।' : 'You do not have permission to use this feature.',
       className: `${(children as any).props.className || ''} opacity-40 cursor-not-allowed pointer-events-none`,
     });
   }
