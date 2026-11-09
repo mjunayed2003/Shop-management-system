@@ -17,7 +17,7 @@ export function PlatformLayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <PlatformProtectedRoute>
-      <div className="h-screen flex bg-[#f8f9fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans overflow-hidden">
+      <div className="h-screen flex bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans overflow-hidden">
         {/* Desktop Platform Sidebar */}
         <div className="hidden lg:block shrink-0 h-full">
           <PlatformSidebar />
@@ -37,7 +37,7 @@ export function PlatformLayoutClient({ children }: { children: React.ReactNode }
         )}
 
         {/* Platform Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-[#f8f9fa] dark:bg-slate-950">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-white dark:bg-slate-950">
           <PlatformTopBar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
           <main className="flex-1 p-4 sm:p-6 lg:p-7 max-w-[1600px] w-full mx-auto space-y-6">
             {children}

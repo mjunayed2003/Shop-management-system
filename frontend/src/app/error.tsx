@@ -19,7 +19,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center p-6 text-center bg-white dark:bg-slate-950">
       <div className="max-w-md w-full space-y-6">
         <div className="w-20 h-20 rounded-3xl bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 mx-auto flex items-center justify-center shadow-md">
           <AlertOctagon className="w-10 h-10" />

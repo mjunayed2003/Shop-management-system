@@ -11,7 +11,7 @@ export default function PublicPricingPage() {
   const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('YEARLY');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-16 px-4 sm:px-6 lg:px-8 space-y-16 animate-fadeIn">
+    <div className="min-h-screen bg-white dark:bg-slate-950 py-16 px-4 sm:px-6 lg:px-8 space-y-16 animate-fadeIn">
       {/* Hero Strip */}
       <div className="max-w-4xl mx-auto text-center space-y-4">
         <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold px-3 py-1 text-xs rounded-full">

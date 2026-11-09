@@ -20,7 +20,7 @@ export function AppShell({
 
   return (
     <ProtectedRoute requiredPermission={requiredPermission}>
-      <div className="h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+      <div className="h-screen flex bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block shrink-0 h-full">
           <AppSidebar />
