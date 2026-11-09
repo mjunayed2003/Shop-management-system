@@ -193,13 +193,13 @@ export default function ProfitReportPage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link href="/reports/collections">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Receipt className="w-4 h-4 text-emerald-600" />
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-xl">
+              <Receipt className="w-4 h-4 text-sky-600" />
               <span>{t('reports.collectionsTitle')}</span>
             </Button>
           </Link>
 
-          <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={handlePrint}>
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-xl" onClick={handlePrint}>
             <Printer className="w-4 h-4 text-slate-600" />
             <span>{t('reports.printReport')}</span>
           </Button>
@@ -207,11 +207,11 @@ export default function ProfitReportPage() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs rounded-xl"
             onClick={handleExportCsv}
             disabled={!branchList || branchList.length === 0}
           >
-            <Download className="w-4 h-4 text-emerald-600" />
+            <Download className="w-4 h-4 text-sky-600" />
             <span>{t('reports.exportCsv')}</span>
           </Button>
         </div>

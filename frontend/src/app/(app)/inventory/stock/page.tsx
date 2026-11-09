@@ -518,7 +518,7 @@ export default function StockOverviewPage() {
                     setLowStockOnly(e.target.checked);
                     setPage(1);
                   }}
-                  className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <span className="font-medium text-amber-700 dark:text-amber-400">
                   Low Stock Items Only
@@ -533,7 +533,7 @@ export default function StockOverviewPage() {
                     setZeroStockOnly(e.target.checked);
                     setPage(1);
                   }}
-                  className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <span className="font-medium text-rose-700 dark:text-rose-400">
                   Zero Stock Only

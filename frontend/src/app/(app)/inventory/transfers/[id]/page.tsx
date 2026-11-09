@@ -286,7 +286,7 @@ export default function StockTransferDetailPage() {
               <Button
                 size="sm"
                 onClick={openReceiveModal}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-xs"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Receive Goods
@@ -612,7 +612,7 @@ export default function StockTransferDetailPage() {
               <Button
                 onClick={handleReceive}
                 disabled={isActionLoading}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-xs"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 {isActionLoading ? 'Receiving...' : 'Confirm Receipt'}

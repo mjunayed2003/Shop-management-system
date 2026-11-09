@@ -234,12 +234,12 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
               <Button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-semibold"
+                className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] text-white gap-2 font-semibold rounded-xl shadow-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>{t('due.printReceipt')}</span>
               </Button>
-              <Button asChild variant="outline" className="flex-1">
+              <Button asChild variant="outline" className="flex-1 rounded-xl">
                 <Link href="/customers/due">Back to Collections</Link>
               </Button>
             </div>
@@ -260,7 +260,7 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
         </Button>
         <div>
           <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-emerald-600" />
+            <Wallet className="w-5 h-5 text-sky-600" />
             <span>{t('due.title')}</span>
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t('due.subtitle')}</p>
@@ -268,7 +268,7 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
       </div>
 
       {/* Customer Info Card */}
-      <Card className="border-slate-200 dark:border-slate-800">
+      <Card className="border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
         <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -300,14 +300,14 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
             <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
             <span>{t('due.requiresOpenSession')}</span>
           </div>
-          <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+          <Button asChild size="sm" variant="outline" className="h-7 text-xs rounded-xl">
             <Link href="/pos">Open Register Shift</Link>
           </Button>
         </div>
       )}
 
       {/* Collection Form */}
-      <Card className="border-slate-200 dark:border-slate-800">
+      <Card className="border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-bold">Debt Settlement Voucher</CardTitle>
           <CardDescription className="text-xs">
@@ -328,7 +328,7 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
                   size="sm"
                   onClick={handleSetHalfDue}
                   disabled={currentDue <= 0}
-                  className="h-6 px-2 text-[10px] font-semibold"
+                  className="h-6 px-2 text-[10px] font-semibold rounded-lg"
                 >
                   {t('due.quickHalf')}
                 </Button>
@@ -338,7 +338,7 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
                   size="sm"
                   onClick={handleSetFullDue}
                   disabled={currentDue <= 0}
-                  className="h-6 px-2 text-[10px] font-semibold text-emerald-600"
+                  className="h-6 px-2 text-[10px] font-semibold text-sky-600 rounded-lg"
                 >
                   {t('due.quickFull')}
                 </Button>
@@ -367,9 +367,9 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
                   key={method}
                   type="button"
                   onClick={() => setPaymentMethod(method)}
-                  className={`py-2 px-3 rounded-lg border text-xs font-semibold transition-all ${
+                  className={`py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                     paymentMethod === method
-                      ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/20'
+                      ? 'border-[#0284c7] bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 ring-2 ring-sky-500/20'
                       : 'border-slate-200 dark:border-slate-800 text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900'
                   }`}
                 >
@@ -409,7 +409,7 @@ export default function CustomerCollectDuePage({ params }: { params: Promise<{ i
             type="button"
             disabled={!canSubmit || collectMutation.isPending || currentDue <= 0}
             onClick={() => collectMutation.mutate()}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2"
+            className="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold gap-2 rounded-xl shadow-xs"
           >
             {collectMutation.isPending ? (
               <>

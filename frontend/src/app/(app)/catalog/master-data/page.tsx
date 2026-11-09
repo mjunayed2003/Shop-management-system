@@ -918,7 +918,7 @@ export default function MasterDataPage() {
                   <select
                     value={parentId}
                     onChange={(e) => setParentId(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                   >
                     <option value="">{t('catalog.noParent')}</option>
                     {categories
@@ -977,7 +977,7 @@ export default function MasterDataPage() {
                     type="checkbox"
                     checked={allowDecimal}
                     onChange={(e) => setAllowDecimal(e.target.checked)}
-                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                    className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
                   />
                 </div>
               )}

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Noto_Sans_Bengali, Inter } from 'next/font/google';
 import './globals.css';
 import { AppProviders } from '@/components/providers/AppProviders';
@@ -21,12 +21,15 @@ export const metadata: Metadata = {
   description: 'মাল্টি-টেন্যান্ট, মাল্টি-ব্রাঞ্চ আধুনিক পোশাক খুচরা বিক্রয় ও ইনভেন্টরি সিস্টেম (বাংলাদেশ বাজার)',
   keywords: ['POS', 'Retail POS', 'Clothing POS', 'Bangladesh POS', 'দোকান ম্যানেজমেন্ট', 'ইনভেন্টরি'],
   manifest: '/manifest.json',
-  themeColor: '#10b981',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Shop POS',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0284c7',
 };
 
 export default function RootLayout({

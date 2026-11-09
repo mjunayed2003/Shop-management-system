@@ -306,7 +306,7 @@ export default function SalesReturnPage({ params }: { params: Promise<{ id: stri
               <Button
                 type="button"
                 onClick={handlePrintSlip}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                className="flex-1 bg-[#0284c7] hover:bg-[#0369a1] text-white gap-2 rounded-xl shadow-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>{t('returns.printReturnSlip')}</span>
@@ -624,7 +624,7 @@ export default function SalesReturnPage({ params }: { params: Promise<{ id: stri
               type="button"
               disabled={!canSubmit || returnMutation.isPending}
               onClick={() => returnMutation.mutate()}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2"
+              className="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold gap-2 rounded-xl shadow-xs"
             >
               {returnMutation.isPending ? (
                 <>

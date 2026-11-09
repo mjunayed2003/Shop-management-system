@@ -132,7 +132,7 @@ export default function NotificationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <Bell className="w-6 h-6 text-emerald-600" />
+            <Bell className="w-6 h-6 text-sky-600" />
             <span>Notifications &amp; Activity Center</span>
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -152,7 +152,7 @@ export default function NotificationsPage() {
           >
             {soundEnabled ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+                <Volume2 className="w-3.5 h-3.5 mr-1.5 text-sky-600" />
                 Sound On
               </>
             ) : (
@@ -170,7 +170,7 @@ export default function NotificationsPage() {
               variant="outline"
               size="sm"
               onClick={requestBrowserPermission}
-              className="text-xs h-9 rounded-xl border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+              className="text-xs h-9 rounded-xl border-sky-500/30 text-sky-600 dark:text-sky-400"
             >
               <Bell className="w-3.5 h-3.5 mr-1.5" />
               Enable Push
@@ -183,7 +183,7 @@ export default function NotificationsPage() {
             size="sm"
             onClick={() => markAllMutation.mutate()}
             disabled={markAllMutation.isPending}
-            className="text-xs h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
+            className="text-xs h-9 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold shadow-xs"
           >
             <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
             Mark all read
@@ -244,7 +244,7 @@ export default function NotificationsPage() {
               type="checkbox"
               checked={unreadOnly}
               onChange={(e) => { setUnreadOnly(e.target.checked); setPage(1); }}
-              className="w-3.5 h-3.5 rounded text-emerald-600"
+              className="w-3.5 h-3.5 rounded text-sky-600"
             />
             <span>Unread only</span>
           </label>
@@ -265,7 +265,7 @@ export default function NotificationsPage() {
             <div
               key={n.id}
               className={`p-4 transition-colors flex items-start gap-3.5 ${
-                !n.is_read ? 'bg-emerald-50/30 dark:bg-emerald-950/20' : 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30'
+                !n.is_read ? 'bg-sky-50/40 dark:bg-sky-950/20' : 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30'
               }`}
             >
               <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0">
@@ -279,7 +279,7 @@ export default function NotificationsPage() {
                       {n.title}
                     </h3>
                     {!n.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="w-2 h-2 rounded-full bg-sky-500" />
                     )}
                   </div>
                   <span className="text-[11px] text-slate-400">
@@ -297,7 +297,7 @@ export default function NotificationsPage() {
                     <Link
                       href={getDeepLink(n)}
                       onClick={() => !n.is_read && markReadMutation.mutate(n.id)}
-                      className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+                      className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
                     >
                       <span>Take Action</span>
                       <ExternalLink className="w-3 h-3" />

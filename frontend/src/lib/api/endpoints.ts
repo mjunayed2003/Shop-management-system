@@ -1361,6 +1361,37 @@ export const api = {
         }>;
         salesTrend: Array<{ date: string; total: number }>;
         branchComparison: Array<{ branchId: string; branchName: string; monthRevenue: number }>;
+        totalProducts?: number;
+        totalCustomers?: number;
+        totalOrders?: number;
+        stockOverview?: {
+          total: number;
+          inStock: number;
+          lowStock: number;
+          outOfStock: number;
+        };
+        ordersOverview?: {
+          total: number;
+          completed: number;
+          refunded: number;
+        };
+        paymentChannels?: Array<{
+          name: string;
+          value: number;
+          pct: number;
+        }>;
+        monthlyPerformance?: Array<{
+          month: string;
+          sales: number;
+          revenue: number;
+          profit: number;
+          orders: number;
+        }>;
+        categoryDistribution?: Array<{
+          category: string;
+          sales: number;
+          revenue: number;
+        }>;
         profit?: {
           today: { gross: number; net: number };
           thisWeek: { gross: number; net: number };

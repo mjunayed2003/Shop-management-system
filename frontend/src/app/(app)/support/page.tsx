@@ -163,7 +163,7 @@ export default function TenantSupportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-            <LifeBuoy className="w-8 h-8 text-emerald-600" />
+            <LifeBuoy className="w-8 h-8 text-sky-600" />
             <span>সাপোর্ট ও হেল্পডেস্ক</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -185,7 +185,7 @@ export default function TenantSupportPage() {
       <Card className="rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <CardHeader className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-emerald-600" />
+            <MessageSquare className="w-4 h-4 text-sky-600" />
             <span>আপনার টিকিটের তালিকা</span>
           </CardTitle>
 
@@ -410,7 +410,7 @@ export default function TenantSupportPage() {
           <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 max-h-[50vh] text-xs">
             {isThreadLoading ? (
               <div className="p-8 text-center text-slate-400">
-                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600" />
+                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-600" />
                 মেসেজ লোড হচ্ছে...
               </div>
             ) : !activeTicket?.messages || activeTicket.messages.length === 0 ? (
@@ -424,7 +424,7 @@ export default function TenantSupportPage() {
                     key={m.id}
                     className={`p-4 rounded-2xl border transition-all ${
                       isPlatformAdmin
-                        ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 ml-4 sm:ml-8'
+                        ? 'bg-sky-50/80 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800 ml-4 sm:ml-8'
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 mr-4 sm:mr-8'
                     }`}
                   >
@@ -432,8 +432,8 @@ export default function TenantSupportPage() {
                       <div className="flex items-center gap-1.5 font-semibold">
                         {isPlatformAdmin ? (
                           <>
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-emerald-700 dark:text-emerald-400">
+                            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+                            <span className="text-sky-700 dark:text-sky-400">
                               সাপোর্ট টিম (Platform Admin)
                             </span>
                           </>
@@ -473,7 +473,7 @@ export default function TenantSupportPage() {
                 onChange={(e) => setReplyMessage(e.target.value)}
                 placeholder="এখানে আপনার উত্তর বা প্রতিক্রিয়া লিখুন..."
                 rows={3}
-                className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
               />
 
               <div className="flex justify-end">

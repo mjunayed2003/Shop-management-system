@@ -122,7 +122,7 @@ export default function NegativeStockPage() {
                       <td className="py-3 px-4 text-right">
                         <Link
                           href={`/inventory/adjustments?sku=${encodeURIComponent(b.variant?.sku || '')}`}
-                          className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+                          className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
                         >
                           <span>Adjust Balance</span>
                           <ArrowRight className="w-3 h-3" />

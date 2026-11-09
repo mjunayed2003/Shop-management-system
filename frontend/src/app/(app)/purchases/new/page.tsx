@@ -419,7 +419,7 @@ export default function NewPurchasePage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6 py-6 animate-in fade-in duration-300">
         <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-9 h-9" />
           </div>
 
@@ -591,7 +591,7 @@ export default function NewPurchasePage() {
                   value={supplierId}
                   onChange={(e) => setSupplierId(e.target.value)}
                   required
-                  className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   <option value="">Select vendor...</option>
                   {suppliersData?.data?.map((s: any) => (
@@ -853,7 +853,7 @@ export default function NewPurchasePage() {
                   type="checkbox"
                   checked={landedCost}
                   onChange={(e) => setLandedCost(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <div>
                   <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 block">
@@ -875,7 +875,7 @@ export default function NewPurchasePage() {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="e.g. Received via Sundarban Courier, 2 cartons verified intact"
-                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
           </div>

@@ -167,7 +167,7 @@ export default function CollectionsReportPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-              <Receipt className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+              <Receipt className="w-7 h-7 text-sky-600 dark:text-sky-400" />
               {t('reports.collectionsTitle')}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -178,13 +178,13 @@ export default function CollectionsReportPage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link href="/reports/profit">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <TrendingUp className="w-4 h-4 text-indigo-600" />
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-xl">
+              <TrendingUp className="w-4 h-4 text-sky-600" />
               <span>{t('reports.profitTitle')}</span>
             </Button>
           </Link>
 
-          <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => window.print()}>
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs rounded-xl" onClick={() => window.print()}>
             <Printer className="w-4 h-4 text-slate-600" />
             <span>{t('reports.printReport')}</span>
           </Button>
@@ -192,11 +192,11 @@ export default function CollectionsReportPage() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs rounded-xl"
             onClick={handleExportCsv}
             disabled={branchCollections.length === 0}
           >
-            <Download className="w-4 h-4 text-emerald-600" />
+            <Download className="w-4 h-4 text-sky-600" />
             <span>{t('reports.exportCsv')}</span>
           </Button>
         </div>

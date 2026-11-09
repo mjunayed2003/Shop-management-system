@@ -174,7 +174,7 @@ export default function SyncHubPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <RefreshCw className={`w-6 h-6 text-emerald-600 ${isSyncingNow ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-6 h-6 text-sky-600 ${isSyncingNow ? 'animate-spin' : ''}`} />
             <span>Offline Sync Hub &amp; Outbox</span>
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -231,7 +231,7 @@ export default function SyncHubPage() {
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-400 uppercase">Network Mode</span>
             {isOnline && !isManualOffline && !isSimulatingOffline ? (
-              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300">
+              <Badge className="bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950 dark:text-sky-300">
                 Online
               </Badge>
             ) : (
@@ -241,7 +241,7 @@ export default function SyncHubPage() {
             )}
           </div>
           <div className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            {isOnline ? <Wifi className="w-4 h-4 text-emerald-600" /> : <WifiOff className="w-4 h-4 text-amber-600" />}
+            {isOnline ? <Wifi className="w-4 h-4 text-sky-600" /> : <WifiOff className="w-4 h-4 text-amber-600" />}
             <span>{isManualOffline ? 'Manual Offline Mode' : isOnline ? 'Connected to Cloud' : 'Network Disconnected'}</span>
           </div>
           <div className="pt-1 flex items-center justify-between text-xs">
@@ -250,7 +250,7 @@ export default function SyncHubPage() {
               type="checkbox"
               checked={isManualOffline}
               onChange={(e) => setManualOffline(e.target.checked)}
-              className="w-4 h-4 text-emerald-600 rounded"
+              className="w-4 h-4 text-sky-600 rounded"
             />
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function SyncHubPage() {
             <button
               type="button"
               onClick={handleReserveNumbers}
-              className="text-[10px] text-emerald-600 font-bold hover:underline"
+              className="text-[10px] text-sky-600 font-bold hover:underline"
               title="Reserve +50 more numbers"
             >
               +50 More
@@ -362,7 +362,7 @@ export default function SyncHubPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Layers className="w-4 h-4 text-emerald-600" />
+            <Layers className="w-4 h-4 text-sky-600" />
             <span>Local Outbox Queue ({outboxItems.length})</span>
           </h2>
           <span className="text-xs text-slate-400 font-mono">

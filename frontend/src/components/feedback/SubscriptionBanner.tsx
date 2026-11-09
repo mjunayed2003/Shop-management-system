@@ -64,9 +64,9 @@ export function SubscriptionBanner() {
 
     // Only show if 15 days or fewer left in trial, or always for visibility
     return (
-      <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white px-4 py-2 text-xs font-medium shadow-sm flex items-center justify-between z-40">
+      <div className="bg-gradient-to-r from-sky-600 via-[#0284c7] to-blue-600 text-white px-4 py-2 text-xs font-medium shadow-xs flex items-center justify-between z-40">
         <div className="flex items-center gap-2 overflow-hidden">
-          <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+          <Sparkles className="w-4 h-4 text-amber-200 shrink-0" />
           <span className="truncate">
             ফ্রি ট্রায়াল চলছে: আপনার ট্রায়াল শেষ হতে <strong>{daysLeft} দিন</strong> বাকি।
           </span>
@@ -77,7 +77,7 @@ export function SubscriptionBanner() {
             <Button
               size="sm"
               variant="outline"
-              className="bg-white/95 hover:bg-white text-indigo-900 font-bold border-none text-[11px] h-6 px-2.5 rounded-lg"
+              className="bg-white/95 hover:bg-white text-sky-900 font-bold border-none text-[11px] h-6 px-2.5 rounded-lg shadow-xs"
             >
               <span>প্ল্যান আপগ্রেড করুন</span>
             </Button>

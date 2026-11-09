@@ -571,7 +571,7 @@ export default function GuidedExchangePage() {
           <Card className="border-slate-200 dark:border-slate-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold flex items-center gap-2">
-                <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                <ShoppingBag className="w-4 h-4 text-sky-600" />
                 <span>Step 3: Pick New Items</span>
               </CardTitle>
               <CardDescription className="text-xs">
@@ -822,7 +822,7 @@ export default function GuidedExchangePage() {
                   newItems.length === 0
                 }
                 onClick={() => exchangeMutation.mutate()}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-2"
+                className="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold gap-2 rounded-xl shadow-xs"
               >
                 {exchangeMutation.isPending ? (
                   <>

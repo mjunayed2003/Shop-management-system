@@ -131,8 +131,8 @@ function LoginForm() {
 
       toast.success(t('auth.loginSuccess'));
 
-      // Redirect back to requested target
-      router.push(redirectTarget);
+      // Clean browser navigation to target to ensure fresh session cookies & avoid cross-layout RSC chunk collisions
+      window.location.href = redirectTarget;
     } catch (err: any) {
       setServerError(err?.message || 'সার্ভারে সংযোগ করা সম্ভব হচ্ছে না');
     } finally {
@@ -145,7 +145,7 @@ function LoginForm() {
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none animate-fadeIn">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white mx-auto flex items-center justify-center shadow-md shadow-sky-500/25">
             <ShoppingBag className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -165,23 +165,23 @@ function LoginForm() {
         )}
 
         {/* Demo Credentials Quick-Fill */}
-        <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-200">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+        <div className="p-3 bg-sky-50/70 dark:bg-sky-950/30 rounded-xl border border-sky-200/80 dark:border-sky-800/50 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-900 dark:text-sky-200">
+            <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             <span>ক্লিক করে ডেমো অ্যাকাউন্ট ফিল করুন:</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={() => fillStoreDemo('owner@shop.com', 'ShopOwner123!', 'demo-fashion')}
-              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-emerald-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-sky-200 dark:border-slate-700 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
               Store Owner (মালিক)
             </button>
             <button
               type="button"
               onClick={() => fillStoreDemo('cashier@shop.com', 'Cashier123!', 'demo-fashion')}
-              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-emerald-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="text-[11px] px-2.5 py-1 rounded-lg border font-medium bg-white dark:bg-slate-800 border-sky-200 dark:border-slate-700 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
               Cashier (ক্যাশিয়ার)
             </button>
@@ -239,7 +239,7 @@ function LoginForm() {
             <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600 dark:text-slate-300">
               <input
                 type="checkbox"
-                className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                className="rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4"
                 {...register('rememberMe')}
               />
               <span>{t('auth.rememberMe')}</span>
@@ -247,7 +247,7 @@ function LoginForm() {
 
             <Link
               href="/forgot-password"
-              className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="font-medium text-sky-600 dark:text-sky-400 hover:underline"
             >
               {t('auth.forgotPassword')}
             </Link>
@@ -257,7 +257,7 @@ function LoginForm() {
           <div className="pt-2">
             <Button
               type="submit"
-              className="w-full h-11 text-sm font-semibold shadow-md"
+              className="w-full h-11 text-sm font-semibold rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xs"
               isLoading={isSubmitting}
               loadingText={t('auth.signingIn')}
               disabled={isSubmitting}
@@ -273,7 +273,7 @@ function LoginForm() {
             <span>{t('auth.noAccount')} </span>
             <Link
               href="/register"
-              className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="font-semibold text-sky-600 dark:text-sky-400 hover:underline"
             >
               {t('auth.registerLink')}
             </Link>
@@ -281,7 +281,7 @@ function LoginForm() {
           <div>
             <Link
               href="/platform/login"
-              className="text-[11px] text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline inline-flex items-center gap-1"
+              className="text-[11px] text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:underline inline-flex items-center gap-1"
             >
               <Shield className="w-3 h-3" />
               <span>প্ল্যাটফর্ম সুপার অ্যাডমিন লগইন (Platform Console)</span>
@@ -299,7 +299,7 @@ export default function LoginPage() {
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
           <div className="flex flex-col items-center gap-3">
-            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="p-3 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
               <Loader2 className="w-8 h-8 animate-spin" />
             </div>
             <p className="text-sm font-medium text-slate-500">লোড হচ্ছে...</p>

@@ -55,7 +55,7 @@ function PlatformLoginForm() {
         admin: res.admin,
       });
 
-      router.replace('/platform/dashboard');
+      window.location.href = '/platform/dashboard';
     } catch (err: any) {
       setError(
         err?.message ||

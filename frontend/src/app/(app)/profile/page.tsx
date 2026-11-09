@@ -168,7 +168,7 @@ export default function ProfilePage() {
       {/* Page Title */}
       <div className="pb-2 border-b border-slate-200 dark:border-slate-800">
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
-          <User className="w-6 h-6 text-emerald-600" />
+          <User className="w-6 h-6 text-sky-600" />
           <span>{t('profile.title')}</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -180,14 +180,14 @@ export default function ProfilePage() {
         {/* Card 1: Personal Information Form */}
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
           <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-            <User className="w-4 h-4 text-emerald-600" />
+            <User className="w-4 h-4 text-sky-600" />
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               {t('profile.personalInfo')}
             </h2>
           </div>
 
           {profileMsg && (
-            <p className="text-xs font-medium p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+            <p className="text-xs font-medium p-3 rounded-lg bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800">
               {profileMsg}
             </p>
           )}
@@ -241,7 +241,7 @@ export default function ProfilePage() {
         {/* Card 2: Change Password Form */}
         <div id="password" className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
           <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
-            <KeyRound className="w-4 h-4 text-emerald-600" />
+            <KeyRound className="w-4 h-4 text-sky-600" />
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               {t('profile.changePassword')}
             </h2>
@@ -302,7 +302,7 @@ export default function ProfilePage() {
       <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <ShieldCheck className="w-5 h-5 text-sky-600" />
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               {t('profile.myPermissions')}
             </h2>
@@ -316,9 +316,9 @@ export default function ProfilePage() {
         </div>
 
         {user?.isOwner ? (
-          <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
-            <p className="text-xs sm:text-sm text-emerald-900 dark:text-emerald-100 font-medium leading-relaxed">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 border border-sky-200 dark:border-sky-800 flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-sky-600 shrink-0" />
+            <p className="text-xs sm:text-sm text-sky-900 dark:text-sky-100 font-medium leading-relaxed">
               আপনি এই প্রতিষ্ঠানের প্রধান মালিক (Owner)। আপনার অ্যাকাউন্টে সমস্ত মডিউল, শাখা, সেটিংস এবং আর্থিক প্রতিবেদনের ওপর পূর্ণাঙ্গ সুপার-অ্যাডমিন অনুমোদন (*) সক্রিয় রয়েছে।
             </p>
           </div>
@@ -334,7 +334,7 @@ export default function ProfilePage() {
                   key={permCode}
                   className="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/60 text-xs font-medium text-slate-700 dark:text-slate-300"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
                   <span className="font-mono text-[11px] truncate">{permCode}</span>
                 </div>
               ))}
@@ -348,7 +348,7 @@ export default function ProfilePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Laptop className="w-4 h-4 text-emerald-600" />
+              <Laptop className="w-4 h-4 text-sky-600" />
               <span>{t('profile.activeSessions')}</span>
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">{t('profile.sessionsDesc')}</p>

@@ -78,14 +78,14 @@ export default function DashboardPage() {
   const cogsMetric = businessData?.cogs?.[period];
 
   const salesTrend = businessData?.salesTrend || [];
-  const maxTrendTotal = Math.max(...salesTrend.map((t) => t.total), 1);
+  const maxTrendTotal = Math.max(...salesTrend.map((t) => Number(t?.total) || 0), 1);
 
   // Currency Formatter (BDT / ৳)
   const fmtCurrency = (num: number = 0) =>
     `৳ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   // =========================================================================
-  // MULTI-LINE SPLINE SVG MATH (Performance Overview Chart)
+  // MULTI-LINE SPLINE SVG MATH (Performance Overview Chart) - 100% LIVE DATA
   // =========================================================================
   const svgW = 860;
   const svgH = 260;
@@ -96,26 +96,30 @@ export default function DashboardPage() {
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 
-  // 12-month data points dynamically calibrated to actual business revenue
-  const baseRevenue = Math.max(salesMetric.revenue, 50000);
-  const salesWave = [0.42, 0.58, 0.65, 0.48, 0.35, 0.56, 0.62, 0.44, 0.51, 0.72, 0.48, 0.38];
-  const profitWave = [0.22, 0.35, 0.45, 0.32, 0.20, 0.18, 0.24, 0.32, 0.38, 0.35, 0.28, 0.21];
-  const trafficWave = [0.35, 0.52, 0.58, 0.41, 0.48, 0.59, 0.64, 0.55, 0.47, 0.39, 0.33, 0.28];
+  // 12-month data points dynamically sourced from live backend sales records
+  const monthlyData: Array<{ month: string; sales: number; revenue: number; profit: number; orders: number }> =
+    businessData?.monthlyPerformance && businessData.monthlyPerformance.length === 12
+      ? businessData.monthlyPerformance
+      : months.map((m) => ({ month: m, sales: 0, revenue: 0, profit: 0, orders: 0 }));
 
-  const chartMax = Math.max(baseRevenue * 1.5, 60000);
+  const chartMax = Math.max(
+    ...monthlyData.map((m) => Math.max(Number(m.sales) || 0, Number(m.revenue) || 0, Number(m.profit) || 0)),
+    Math.max(Number(salesMetric.revenue) || 0, 10000),
+  );
 
-  const getPoints = (wave: number[]) => {
-    return wave.map((ratio, i) => {
+  const getPoints = (key: 'sales' | 'profit' | 'revenue') => {
+    return monthlyData.map((item, i) => {
+      const val = Number(item[key]) || 0;
+      const ratio = chartMax > 0 ? Math.min(val / chartMax, 1) : 0;
       const x = padX + (i / (months.length - 1)) * usableW;
       const y = svgH - padY - ratio * usableH;
-      const val = Math.round(ratio * chartMax);
       return { x, y, val };
     });
   };
 
-  const salesPoints = getPoints(salesWave);
-  const profitPoints = getPoints(profitWave);
-  const trafficPoints = getPoints(trafficWave);
+  const salesPoints = getPoints('sales');
+  const profitPoints = getPoints('profit');
+  const revenuePoints = getPoints('revenue');
 
   // Smooth spline generator function
   const createSplineD = (points: { x: number; y: number }[]) => {
@@ -133,33 +137,36 @@ export default function DashboardPage() {
 
   const salesPathD = createSplineD(salesPoints);
   const profitPathD = createSplineD(profitPoints);
-  const trafficPathD = createSplineD(trafficPoints);
+  const revenuePathD = createSplineD(revenuePoints);
 
-  const activeSalesPt = salesPoints[activeChartPoint] || salesPoints[3];
-  const activeProfitPt = profitPoints[activeChartPoint] || profitPoints[3];
-  const activeTrafficPt = trafficPoints[activeChartPoint] || trafficPoints[3];
-
-  // =========================================================================
-  // CATEGORY SALES DISTRIBUTION DATA
-  // =========================================================================
-  const categoryData = [
-    { name: 'Clothing', sales: 78, revenue: 65 },
-    { name: 'Panjabi', sales: 88, revenue: 72 },
-    { name: 'Shirts', sales: 94, revenue: 80 },
-    { name: 'Trousers', sales: 82, revenue: 68 },
-    { name: 'Fabrics', sales: 75, revenue: 58 },
-  ];
+  const activeSalesPt = salesPoints[activeChartPoint] || salesPoints[3] || { x: 0, y: 0, val: 0 };
+  const activeProfitPt = profitPoints[activeChartPoint] || profitPoints[3] || { x: 0, y: 0, val: 0 };
+  const activeRevenuePt = revenuePoints[activeChartPoint] || revenuePoints[3] || { x: 0, y: 0, val: 0 };
 
   // =========================================================================
-  // DONUT CHART 1: PRODUCTS OVERVIEW CALCULATIONS
+  // CATEGORY SALES DISTRIBUTION DATA - 100% LIVE FROM DB
   // =========================================================================
-  const totalStockCount = Math.max(
-    (businessData?.topProducts?.length || 0) * 15 + 85,
-    100,
-  );
-  const inStockPct = 65;
-  const lowStockPct = 20;
-  const outOfStockPct = 15;
+  const rawCategories = businessData?.categoryDistribution || [];
+  const maxCatVal = Math.max(...rawCategories.map((c: any) => Math.max(Number(c.sales) || 0, Number(c.revenue) || 0)), 1);
+  const categoryData = rawCategories.map((c: any) => ({
+    name: c.name || 'Category',
+    sales: Math.min(Math.round(((Number(c.sales) || 0) / maxCatVal) * 100), 100),
+    revenue: Math.min(Math.round(((Number(c.revenue) || 0) / maxCatVal) * 100), 100),
+    salesVal: Number(c.sales) || 0,
+    revenueVal: Number(c.revenue) || 0,
+  }));
+
+  // =========================================================================
+  // DONUT CHART 1: PRODUCTS OVERVIEW CALCULATIONS - 100% LIVE FROM DB
+  // =========================================================================
+  const totalStockCount = Number(businessData?.totalProducts ?? businessData?.stockOverview?.total ?? 0);
+  const inStockCount = Number(businessData?.stockOverview?.inStock ?? 0);
+  const lowStockCount = Number(businessData?.stockOverview?.lowStock ?? businessData?.lowStockCount ?? 0);
+  const outOfStockCount = Number(businessData?.stockOverview?.outOfStock ?? 0);
+
+  const inStockPct = totalStockCount > 0 ? Math.round((inStockCount / totalStockCount) * 100) : 0;
+  const lowStockPct = totalStockCount > 0 ? Math.round((lowStockCount / totalStockCount) * 100) : 0;
+  const outOfStockPct = totalStockCount > 0 ? Math.max(0, 100 - inStockPct - lowStockPct) : 0;
 
   const donutR = 56;
   const donutCirc = 2 * Math.PI * donutR; // ~351.85
@@ -168,44 +175,46 @@ export default function DashboardPage() {
   const outOfStockStroke = (outOfStockPct / 100) * donutCirc;
 
   // =========================================================================
-  // DONUT CHART 2: ORDERS OVERVIEW CALCULATIONS
+  // DONUT CHART 2: ORDERS OVERVIEW CALCULATIONS - 100% LIVE FROM DB
   // =========================================================================
-  const totalOrdersCount = Math.max(salesMetric.count, 28);
-  const ordCompletedPct = 50;
-  const ordShippedPct = 20;
-  const ordInProgressPct = 20;
-  const ordCancelledPct = 10;
+  const totalOrdersCount = Number(businessData?.totalOrders ?? salesMetric.count ?? 0);
+  const ordCompletedCount = Number(businessData?.ordersOverview?.completed ?? totalOrdersCount);
+  const ordRefundedCount = Number(businessData?.ordersOverview?.refunded ?? 0);
+
+  const ordCompletedPct = totalOrdersCount > 0 ? Math.round((ordCompletedCount / totalOrdersCount) * 100) : 0;
+  const ordRefundedPct = totalOrdersCount > 0 ? Math.round((ordRefundedCount / totalOrdersCount) * 100) : 0;
+  const ordInProgressPct = Math.max(0, 100 - ordCompletedPct - ordRefundedPct);
 
   const ordCompletedStroke = (ordCompletedPct / 100) * donutCirc;
-  const ordShippedStroke = (ordShippedPct / 100) * donutCirc;
+  const ordRefundedStroke = (ordRefundedPct / 100) * donutCirc;
   const ordInProgressStroke = (ordInProgressPct / 100) * donutCirc;
-  const ordCancelledStroke = (ordCancelledPct / 100) * donutCirc;
 
   // =========================================================================
-  // TRAFFIC / PAYMENT SOURCES DATA
+  // TRAFFIC / PAYMENT SOURCES DATA - 100% LIVE FROM DB
   // =========================================================================
-  const paymentSources = [
-    { label: 'Cash', height: 75, val: '৳ 38.5K' },
-    { label: 'bKash', height: 95, val: '৳ 48.2K' },
-    { label: 'Nagad', height: 60, val: '৳ 29.8K' },
-    { label: 'Card POS', height: 55, val: '৳ 28.0K' },
-    { label: 'Cust. Due', height: 80, val: '৳ 39.4K' },
-  ];
-
-  // Top products list or realistic retail placeholders
-  const topProductsList =
-    (businessData?.topProducts || []).length > 0
-      ? businessData!.topProducts.map((p, idx) => ({
-          name: p.productName || `Product ${String.fromCharCode(65 + idx)}`,
-          category: 'Clothing Retail',
-          sold: p.quantitySold || 100,
-          status: idx === 0 ? 'In Stock' : idx === 1 ? 'Low Stock' : 'In Stock',
+  const rawPayments = businessData?.paymentChannels || [];
+  const maxPaymentVal = Math.max(...rawPayments.map((p: any) => Number(p.amount) || 0), 1);
+  const paymentSources =
+    rawPayments.length > 0
+      ? rawPayments.map((p: any) => ({
+          label: p.label || 'Tender',
+          height: Math.max(Math.round(((Number(p.amount) || 0) / maxPaymentVal) * 100), 12),
+          val: fmtCurrency(Number(p.amount) || 0),
         }))
       : [
-          { name: 'Premium Cotton Panjabi', category: 'Panjabi', sold: 1000, status: 'In Stock' },
-          { name: 'Slim Fit Oxford Shirt', category: 'Shirts', sold: 800, status: 'Low Stock' },
-          { name: 'Classic Chino Pants', category: 'Trousers', sold: 500, status: 'Out of Stock' },
+          { label: 'CASH', height: 12, val: '৳ 0' },
+          { label: 'BKASH', height: 12, val: '৳ 0' },
+          { label: 'NAGAD', height: 12, val: '৳ 0' },
+          { label: 'BANK', height: 12, val: '৳ 0' },
         ];
+
+  // Top products list directly from live sale records
+  const topProductsList = (businessData?.topProducts || []).map((p: any) => ({
+    name: p.productName || 'Product',
+    category: p.category || 'Clothing Retail',
+    sold: Number(p.quantitySold) || 0,
+    status: p.status || (p.currentStock > 5 ? 'In Stock' : p.currentStock > 0 ? 'Low Stock' : 'Out of Stock'),
+  }));
 
   return (
     <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-12">
@@ -398,13 +407,13 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Card 5: New Customers / Receivables */}
+            {/* Card 5: Customers & Receivables */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Customer Dues</span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Customers</span>
                   <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
-                    {fmtCurrency(businessData?.receivables || 0)}
+                    {(businessData?.totalCustomers || 0).toLocaleString()}
                   </div>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
@@ -412,7 +421,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Active customer credit ledger &amp; receivables
+                Registered clients ({fmtCurrency(businessData?.receivables || 0)} outstanding dues)
               </p>
             </div>
 
@@ -605,14 +614,12 @@ export default function DashboardPage() {
                     <ChevronDown className="w-3 h-3 text-slate-400" />
                   </div>
 
-                  <Link href="/products">
-                    <button
-                      type="button"
-                      className="h-8 px-3.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>View All Products</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                  <Link
+                    href="/products"
+                    className="h-8 px-3.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>View All Products</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
@@ -969,7 +976,7 @@ export default function DashboardPage() {
                     <span>OPEN ({cashierData.activeSession.registerName})</span>
                   </div>
                   <p className="text-xs text-slate-500">
-                    Opened at: <strong>{new Date(cashierData.activeSession.openedAt).toLocaleTimeString()}</strong>
+                    Opened at: <strong>{cashierData.activeSession.openedAt ? new Date(cashierData.activeSession.openedAt).toLocaleTimeString() : 'N/A'}</strong>
                   </p>
                   <p className="text-xs text-slate-500">
                     Opening float:{' '}
@@ -979,11 +986,9 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-3 pt-1">
                   <div className="text-sm font-bold text-amber-600">No Open Shift Active</div>
-                  <Link href="/pos">
-                    <Button size="sm" className="text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold shadow-xs">
-                      Open Shift in POS Counter
-                    </Button>
-                  </Link>
+                  <Button asChild size="sm" className="text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold shadow-xs">
+                    <Link href="/pos">Open Shift in POS Counter</Link>
+                  </Button>
                 </div>
               )}
             </div>
@@ -1009,22 +1014,22 @@ export default function DashboardPage() {
 
           {/* Quick Action Links for Cashier */}
           <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-3">
-            <Link href="/pos">
-              <Button size="sm" className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs h-10 px-4 rounded-xl font-bold shadow-sm cursor-pointer">
+            <Button asChild size="sm" className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs h-10 px-4 rounded-xl font-bold shadow-sm cursor-pointer">
+              <Link href="/pos">
                 <ShoppingCart className="w-4 h-4 mr-1.5" />
-                Go to POS Terminal
-              </Button>
-            </Link>
-            <Link href="/pos/register/close">
-              <Button variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
-                Close Register Shift (Z-Report)
-              </Button>
-            </Link>
-            <Link href="/sync">
-              <Button variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
-                View Offline Queue ({pendingCount})
-              </Button>
-            </Link>
+                <span>Go to POS Terminal</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
+              <Link href="/pos/register/close">
+                <span>Close Register Shift (Z-Report)</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
+              <Link href="/sync">
+                <span>View Offline Queue ({pendingCount})</span>
+              </Link>
+            </Button>
           </div>
         </div>
       )}

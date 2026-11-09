@@ -205,7 +205,7 @@ export default function RegisterPage() {
       <div className="bg-white dark:bg-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-8 animate-fadeIn">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white mx-auto flex items-center justify-center shadow-md shadow-sky-500/25">
             <Sparkles className="w-6 h-6" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -228,7 +228,7 @@ export default function RegisterPage() {
           {/* Section 1: Business Details */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-              <Store className="w-4 h-4 text-emerald-600" />
+              <Store className="w-4 h-4 text-sky-600" />
               <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                 {t('register.businessSection')}
               </h2>
@@ -269,7 +269,7 @@ export default function RegisterPage() {
           {/* Section 2: Owner Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-              <User className="w-4 h-4 text-emerald-600" />
+              <User className="w-4 h-4 text-sky-600" />
               <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                 {t('register.ownerSection')}
               </h2>
@@ -389,7 +389,7 @@ export default function RegisterPage() {
           {/* Section 3: First Branch */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-              <MapPin className="w-4 h-4 text-emerald-600" />
+              <MapPin className="w-4 h-4 text-sky-600" />
               <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                 {t('register.branchSection')}
               </h2>
@@ -431,7 +431,7 @@ export default function RegisterPage() {
             <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
               <input
                 type="checkbox"
-                className="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                className="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4"
                 {...register('terms')}
               />
               <span>{t('register.termsLabel')}</span>
@@ -446,7 +446,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               size="lg"
-              className="w-full h-12 text-base font-bold shadow-lg shadow-emerald-500/25"
+              className="w-full h-12 text-base font-bold bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-xs"
               isLoading={isSubmitting}
               loadingText={t('register.submitting')}
               disabled={isSubmitting}
@@ -460,7 +460,7 @@ export default function RegisterPage() {
           <span>ইতিমধ্যে অ্যাকাউন্ট রয়েছে? </span>
           <Link
             href="/login"
-            className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="font-semibold text-sky-600 dark:text-sky-400 hover:underline"
           >
             {t('nav.login')}
           </Link>

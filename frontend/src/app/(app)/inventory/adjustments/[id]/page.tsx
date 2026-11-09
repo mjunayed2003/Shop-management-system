@@ -172,7 +172,7 @@ export default function StockAdjustmentDetailPage() {
             <Button
               size="sm"
               onClick={() => setIsApproveOpen(true)}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="gap-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl shadow-xs"
             >
               <CheckCircle2 className="w-4 h-4" />
               Approve Adjustment

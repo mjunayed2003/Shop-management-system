@@ -715,7 +715,7 @@ export default function TenantBillingPage() {
       <Dialog open={isPayHelpOpen} onOpenChange={setIsPayHelpOpen}>
         <DialogContent className="max-w-md p-6 space-y-4 rounded-3xl">
           <DialogHeader>
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mb-1">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-600 flex items-center justify-center mb-1">
               <CreditCard className="w-5 h-5" />
             </div>
             <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
@@ -730,11 +730,11 @@ export default function TenantBillingPage() {
           <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
             <div className="flex justify-between">
               <span className="text-slate-500">bKash Merchant:</span>
-              <strong className="font-mono text-emerald-600">+৮৮০ ১৭০০০০০০০০</strong>
+              <strong className="font-mono text-sky-600">+৮৮০ ১৭০০০০০০০০</strong>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Nagad Merchant:</span>
-              <strong className="font-mono text-emerald-600">+৮৮০ ১৬০০০০০০০০</strong>
+              <strong className="font-mono text-sky-600">+৮৮০ ১৬০০০০০০০০</strong>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">City Bank A/C:</span>
