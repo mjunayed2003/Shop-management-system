@@ -138,6 +138,7 @@ export default function DashboardPage() {
   const salesPathD = createSplineD(salesPoints);
   const profitPathD = createSplineD(profitPoints);
   const revenuePathD = createSplineD(revenuePoints);
+  const trafficPathD = profitPathD;
 
   const activeSalesPt = salesPoints[activeChartPoint] || salesPoints[3] || { x: 0, y: 0, val: 0 };
   const activeProfitPt = profitPoints[activeChartPoint] || profitPoints[3] || { x: 0, y: 0, val: 0 };
@@ -188,6 +189,8 @@ export default function DashboardPage() {
   const ordCompletedStroke = (ordCompletedPct / 100) * donutCirc;
   const ordRefundedStroke = (ordRefundedPct / 100) * donutCirc;
   const ordInProgressStroke = (ordInProgressPct / 100) * donutCirc;
+  const ordShippedStroke = 0;
+  const ordCancelledStroke = ordRefundedStroke;
 
   // =========================================================================
   // TRAFFIC / PAYMENT SOURCES DATA - 100% LIVE FROM DB
@@ -538,11 +541,11 @@ export default function DashboardPage() {
                   />
                 )}
 
-                {/* Curve 1: Slate Traffic Wave */}
+                {/* Curve 1: Slate Traffic / Profit Wave */}
                 <path d={trafficPathD} fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
 
                 {/* Curve 2: Rose Revenue Wave */}
-                <path d={profitPathD} fill="none" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" />
+                <path d={revenuePathD} fill="none" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" />
 
                 {/* Curve 3: Ocean Blue Sales Wave */}
                 <path d={salesPathD} fill="none" stroke="#0284c7" strokeWidth="3.5" strokeLinecap="round" />
@@ -905,19 +908,19 @@ export default function DashboardPage() {
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 pt-1">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
-                  <span>Completed - 50%</span>
+                  <span>Completed - {ordCompletedPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#0284c7]"></span>
-                  <span>In-Store - 20%</span>
+                  <span>In-Store - {ordInProgressPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
-                  <span>In Progress - 20%</span>
+                  <span>Active - {ordInProgressPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#f43f5e]"></span>
-                  <span>Cancelled - 10%</span>
+                  <span>Refunded - {ordRefundedPct}%</span>
                 </span>
               </div>
             </div>
