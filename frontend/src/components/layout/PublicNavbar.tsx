@@ -68,11 +68,20 @@ export function PublicNavbar() {
 
     const q = searchQuery.toLowerCase().trim();
     if (q.includes('price') || q.includes('প্ল্যান') || q.includes('মূল্য')) {
-      router.push('/#pricing');
+      router.push('/pricing');
     } else if (q.includes('contact') || q.includes('যোগাযোগ') || q.includes('help')) {
-      router.push('/#contact');
+      router.push('/contact');
     } else {
-      router.push('/#features');
+      if (pathname === '/') {
+        const el = document.getElementById('features');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          router.push('/#features');
+        }
+      } else {
+        router.push('/#features');
+      }
     }
   };
 
@@ -96,10 +105,10 @@ export function PublicNavbar() {
       isActive: pathname === '/pricing',
     },
     {
-      href: '/#contact',
+      href: '/contact',
       label: t('nav.contact') || 'CONTACT',
       icon: Send,
-      isActive: false,
+      isActive: pathname === '/contact',
     },
   ];
 
@@ -129,27 +138,31 @@ export function PublicNavbar() {
             </Link>
 
             {/* Center: Desktop Navigation Links with Icons */}
-            <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+            <nav className="hidden lg:flex items-center gap-1.5 sm:gap-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`group relative flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase transition-colors py-2 ${
+                    prefetch={false}
+                    onClick={(e) => {
+                      if (item.href === '/#features' && pathname === '/') {
+                        e.preventDefault();
+                        const el = document.getElementById('features');
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase px-3.5 py-1.5 rounded-md transition-all ${
                       item.isActive
-                        ? 'text-[#3b7987] dark:text-[#52a7b7]'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-[#3b7987] dark:hover:text-[#52a7b7]'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <Icon className="w-3.5 h-3.5 shrink-0 opacity-80" />
                     <span>{item.label}</span>
-                    {/* Bottom accent indicator */}
-                    <span
-                      className={`absolute bottom-0 left-0 h-[2px] bg-[#3b7987] dark:bg-[#52a7b7] transition-all duration-200 ${
-                        item.isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`}
-                    />
                   </Link>
                 );
               })}
@@ -249,10 +262,24 @@ export function PublicNavbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-md text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#3b7987]"
+                    prefetch={false}
+                    onClick={(e) => {
+                      setMobileMenuOpen(false);
+                      if (item.href === '/#features' && pathname === '/') {
+                        e.preventDefault();
+                        const el = document.getElementById('features');
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }
+                    }}
+                    className={`flex items-center gap-2.5 p-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+                      item.isActive
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 shadow-xs'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
                   >
-                    <Icon className="w-4 h-4 text-[#3b7987]" />
+                    <Icon className={`w-4 h-4 ${item.isActive ? 'text-slate-900 dark:text-slate-50' : 'text-[#3b7987]'}`} />
                     <span>{item.label}</span>
                   </Link>
                 );

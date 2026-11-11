@@ -38,22 +38,37 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                <Link href="/" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                   {t('nav.home')}
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                <Link href="/#features" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('nav.features')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('nav.pricing')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('nav.contact')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/register" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                   {t('nav.register')}
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                <Link href="/login" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                   {t('nav.login')}
                 </Link>
               </li>
               <li>
-                <Link href="/dev/components" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                <Link href="/dev/components" prefetch={false} className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                   {t('nav.componentDocs')}
                 </Link>
               </li>
@@ -81,16 +96,30 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-xs">
               <li className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{t('footer.phone')}</span>
+                <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <a href="tel:+8801700000000" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('footer.phone')}
+                </a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{t('footer.email')}</span>
+                <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <a href="mailto:support@shop-pos.com" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('footer.email')}
+                </a>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{t('footer.dhaka')}</span>
+                <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <Link href="/contact" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
+                  {t('footer.dhaka')}
+                </Link>
+              </li>
+              <li className="pt-1">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline"
+                >
+                  <span>{locale === 'bn' ? 'সরাসরি বার্তা পাঠান →' : 'Send us a message →'}</span>
+                </Link>
               </li>
             </ul>
           </div>
