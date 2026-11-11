@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { AppSidebar } from './AppSidebar';
 import { AppTopBar } from './AppTopBar';
 import { SuspendedNotice } from '../feedback/SuspendedNotice';
@@ -8,6 +9,11 @@ import { SubscriptionBanner } from '../feedback/SubscriptionBanner';
 import { PlanLimitReachedDialog } from '../feedback/PlanLimitReachedDialog';
 import { ProtectedRoute } from '../auth/ProtectedRoute';
 import { PwaUpdatePrompt } from '../pwa/PwaUpdatePrompt';
+
+const AbstractWaveBackground = dynamic(
+  () => import('@/components/ui/AbstractWaveBackground').then((mod) => mod.AbstractWaveBackground),
+  { ssr: false }
+);
 
 export function AppShell({
   children,
@@ -20,7 +26,9 @@ export function AppShell({
 
   return (
     <ProtectedRoute requiredPermission={requiredPermission}>
-      <div className="h-screen flex bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+      <div className="relative h-screen flex bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+        {/* Subtle Ambient 3D Wave Background for authenticated app */}
+        <AbstractWaveBackground variant="subtle" />
         {/* Desktop Sidebar */}
         <div className="hidden lg:block shrink-0 h-full">
           <AppSidebar />

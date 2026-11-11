@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import { Noto_Sans_Bengali, Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { AppProviders } from '@/components/providers/AppProviders';
+
+const abuSayed = localFont({
+  src: '../../public/fonts/Abu-Sayed.ttf',
+  variable: '--font-abu-sayed',
+  weight: '100 900',
+  display: 'swap',
+});
 
 const notoSansBengali = Noto_Sans_Bengali({
   subsets: ['bengali'],
@@ -38,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${notoSansBengali.variable} ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${abuSayed.variable} ${notoSansBengali.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
         <AppProviders>{children}</AppProviders>
       </body>

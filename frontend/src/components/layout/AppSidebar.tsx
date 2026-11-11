@@ -28,7 +28,7 @@ export function AppSidebar({ onCloseMobile }: AppSidebarProps) {
             {locale === 'bn' ? 'দোকান পিওএস' : 'Shop POS'}
           </h1>
           <p className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider">
-            Fashion Retail
+            {locale === 'bn' ? 'স্মার্ট বিজনেস পিওএস' : 'Smart Business POS'}
           </p>
         </div>
       </div>

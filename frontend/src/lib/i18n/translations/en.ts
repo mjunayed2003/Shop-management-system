@@ -88,17 +88,17 @@ export const en = {
 
   // Public Landing
   landing: {
-    heroBadge: '🇧🇩 Built specifically for Bangladesh Apparel Retail',
-    heroTitle: 'Smart Cloud POS & Multi-Branch Inventory for Fashion Stores',
-    heroSubtitle: 'Central stock control, garment master data, Code 128 barcode printing, bKash/Nagad payments, and offline resilience.',
+    heroBadge: 'Built for All Types of Retail & Wholesale Businesses in Bangladesh',
+    heroTitle: 'Smart Cloud POS & Multi-Branch Inventory for Any Business',
+    heroSubtitle: 'Retail shops, superstores, wholesale or showrooms—central inventory control, smart barcode generation, fast billing, and offline resilience.',
     ctaRegister: 'Start 30-Day Free Trial',
     ctaLogin: 'Access Shop Terminal',
     ctaDocs: 'Explore Components',
-    featuresTitle: 'Everything you need to scale your clothing boutique brand',
+    featuresTitle: 'Everything you need to manage and scale your business',
     feature1Title: 'Multi-Branch Central Control',
-    feature1Desc: 'Monitor real-time showroom sales, stock levels, and cash registers across all outlets seamlessly.',
-    feature2Title: 'Garment Master Data & Barcodes',
-    feature2Desc: 'Organize by size, color, fit, fabric, and batch. Print and scan Code 128 price barcode tags.',
+    feature1Desc: 'Monitor real-time sales, inventory levels, and cash registers across all outlets and stores seamlessly.',
+    feature2Title: 'Universal Product Catalog & Barcodes',
+    feature2Desc: 'Manage products with variants (size, color, weight, batch). Generate and print standard barcode price tags.',
     feature3Title: 'Bangladeshi Payments & VAT',
     feature3Desc: 'Support Cash, bKash, Nagad, and Cards. Generate NBR compliant invoices instantly.',
     feature4Title: 'Granular Role-Based Access',
@@ -108,7 +108,7 @@ export const en = {
     feature6Title: 'Enterprise Cloud Security',
     feature6Desc: 'Isolated multi-tenant architecture with encrypted sessions and automated daily backups.',
     pricingPlaceholderTitle: 'Transparent, Scalable Pricing',
-    pricingPlaceholderDesc: 'Tailored for single retail boutiques to multi-branch nationwide chains.',
+    pricingPlaceholderDesc: 'Tailored for single stores to multi-branch nationwide business chains.',
   },
 
   // Auth & Login
@@ -291,7 +291,7 @@ export const en = {
   // Footer
   footer: {
     about: 'About',
-    aboutText: 'Specialized Cloud POS & Retail ERP designed for Bangladesh apparel boutiques and multi-branch garment retail.',
+    aboutText: 'Modern Cloud POS & Inventory ERP designed for retail shops, wholesale, and multi-branch businesses in Bangladesh.',
     quickLinks: 'Quick Links',
     contactUs: 'Contact Us',
     phone: 'Helpline: +880 1700000000',

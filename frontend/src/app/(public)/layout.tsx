@@ -1,6 +1,7 @@
 import React from 'react';
 import { PublicNavbar } from '@/components/layout/PublicNavbar';
 import { Footer } from '@/components/layout/Footer';
+import { AbstractWaveBackground } from '@/components/ui/AbstractWaveBackground';
 
 export default function PublicLayout({
   children,
@@ -8,9 +9,12 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div className="relative min-h-screen flex flex-col bg-transparent text-slate-900 dark:text-slate-100 overflow-x-hidden">
+      {/* Universal Abstract Wave Background for all public pages */}
+      <AbstractWaveBackground variant="hero" />
+
       <PublicNavbar />
-      <main className="flex-1">{children}</main>
+      <main className="relative z-10 flex-1">{children}</main>
       <Footer />
     </div>
   );

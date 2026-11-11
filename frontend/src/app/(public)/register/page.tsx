@@ -232,23 +232,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full flex items-center justify-center p-4 sm:p-6 sm:py-12 overflow-hidden bg-gradient-to-tr from-[#22d3ee] via-[#6366f1] to-[#ec4899] dark:from-[#083344] dark:via-[#1e1b4b] dark:to-[#4a044e]">
-      {/* Background Soft Facets & Polygons */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-35">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-cyan-300/40 rounded-full blur-3xl transform rotate-45" />
-        <div
-          className="absolute top-1/4 -left-16 w-80 h-80 bg-cyan-400/25 transform rotate-12"
-          style={{ clipPath: 'polygon(0 0, 100% 0, 70% 100%, 0% 100%)' }}
-        />
-        <div className="absolute -bottom-28 -right-28 w-96 h-96 bg-fuchsia-400/40 rounded-full blur-3xl" />
-        <div
-          className="absolute top-1/3 -right-20 w-96 h-96 bg-purple-500/20 transform -rotate-12"
-          style={{ clipPath: 'polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)' }}
-        />
-      </div>
-
+    <div className="relative min-h-[calc(100vh-64px)] w-full flex items-center justify-center p-4 sm:p-6 sm:py-12">
       {/* Main Centered Register Card */}
-      <div className="relative z-10 w-full max-w-[640px] bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] p-6 sm:p-12 transition-all">
+      <div className="relative z-10 w-full max-w-[640px] bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] p-6 sm:p-12 transition-all border border-slate-200/50 dark:border-slate-800">
         {/* Header with Icon */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#22d3ee] to-[#ec4899] text-white mx-auto flex items-center justify-center shadow-md shadow-purple-500/25 mb-3">

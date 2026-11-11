@@ -1,11 +1,31 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Abu Sayed';
+  src: url('/fonts/Abu-Sayed.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #0284c7;
   --color-primary-hover: #0369a1;
   --color-primary-foreground: #ffffff;
   --color-brand: #0284c7;
   --color-brand-hover: #0369a1;
+  --font-sans: var(--font-noto-bengali), var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-body: var(--font-noto-bengali), var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-bangla: var(--font-noto-bengali), sans-serif;
+  --font-display: var(--font-abu-sayed), 'Abu Sayed', var(--font-noto-bengali), sans-serif;
+  --font-sayed: var(--font-abu-sayed), 'Abu Sayed', sans-serif;
+  --font-heading: var(--font-abu-sayed), 'Abu Sayed', var(--font-noto-bengali), sans-serif;
+  --tracking-tighter: 0em;
+  --tracking-tight: 0.015em;
+  --tracking-normal: 0.025em;
+  --tracking-wide: 0.045em;
+  --tracking-wider: 0.07em;
+  --tracking-widest: 0.12em;
 }
 
 :root {
@@ -22,8 +42,22 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-noto-bengali), var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-weight: 400;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Main Display & Hero Headings: Use Abu Sayed */
+h1, .font-display, .font-sayed {
+  font-family: var(--font-abu-sayed), 'Abu Sayed', var(--font-noto-bengali), sans-serif;
+  letter-spacing: 0.045em;
+  font-weight: normal;
+}
+
+/* Small text, body, paragraphs, labels: Ensure light, non-bold, readable font */
+p, span, small, label, input, select, textarea, li {
+  font-family: var(--font-noto-bengali), var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
 /* Custom Scrollbar */
