@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RoleService } from './role.service.js';
-import { ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConflictException, BadRequestException } from '@nestjs/common';
 
 describe('RoleService', () => {
   let service: RoleService;

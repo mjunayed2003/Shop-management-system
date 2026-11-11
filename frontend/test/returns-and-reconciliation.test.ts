@@ -158,7 +158,7 @@ describe('Phase F5: Returns, Exchange, Due Collection, Expenses, Cash, Register 
     });
 
     it('preserves exchange form state upon backend failure for cashier correction', () => {
-      let formState = {
+      const formState = {
         returnedItems: [{ saleItemId: 'item-1', quantity: 2 }],
         newItems: [{ variantId: 'var-10', quantity: 1, unitPrice: 850 }],
       };

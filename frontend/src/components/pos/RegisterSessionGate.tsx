@@ -104,21 +104,18 @@ export function RegisterSessionGate({
   const cashRegisters: Array<{ id: string; name: string; code: string }> =
     (branchDetails as any)?.cash_registers || [];
 
-  // Automatically pick the first register if none selected
-  React.useEffect(() => {
-    if (cashRegisters.length > 0 && !selectedRegisterId) {
-      setSelectedRegisterId(cashRegisters[0].id);
-    }
-  }, [cashRegisters, selectedRegisterId]);
+  const activeRegisterId = cashRegisters.some((reg) => reg.id === selectedRegisterId)
+    ? selectedRegisterId
+    : cashRegisters[0]?.id || '';
 
   // 3. Mutation to open a new register session
   const openSessionMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedRegisterId) {
+      if (!activeRegisterId) {
         throw new Error('Please select a cash register');
       }
       return api.sales.registerSessions.open({
-        cashRegisterId: selectedRegisterId,
+        cashRegisterId: activeRegisterId,
         openingBalance,
       });
     },
@@ -195,7 +192,7 @@ export function RegisterSessionGate({
               </label>
               {cashRegisters.length > 0 ? (
                 <select
-                  value={selectedRegisterId}
+                  value={activeRegisterId}
                   onChange={(e) => setSelectedRegisterId(e.target.value)}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
                 >
@@ -240,7 +237,7 @@ export function RegisterSessionGate({
               onClick={() => openSessionMutation.mutate()}
               disabled={
                 openSessionMutation.isPending ||
-                !selectedRegisterId ||
+                !activeRegisterId ||
                 cashRegisters.length === 0
               }
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2 shadow-sm text-sm"

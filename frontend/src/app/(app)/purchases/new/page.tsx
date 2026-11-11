@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -65,7 +65,9 @@ export default function NewPurchasePage() {
   const supplierIdParam = searchParams.get('supplierId') || '';
 
   // Stable idempotency key per form open
-  const idempotencyKeyRef = useRef<string>(generateIdempotencyKey('purchase'));
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() =>
+    generateIdempotencyKey('purchase'),
+  );
 
   // Form states
   const [supplierId, setSupplierId] = useState(supplierIdParam);
@@ -387,7 +389,7 @@ export default function NewPurchasePage() {
           })),
         },
         {
-          idempotencyKey: idempotencyKeyRef.current,
+          idempotencyKey,
         },
       );
 
@@ -519,7 +521,7 @@ export default function NewPurchasePage() {
                 setShippingCost(0);
                 setPaidAmount(0);
                 setSupplierInvoiceNo('');
-                idempotencyKeyRef.current = generateIdempotencyKey('purchase');
+                setIdempotencyKey(generateIdempotencyKey('purchase'));
               }}
               className="bg-[#0284c7] hover:bg-[#0369a1] text-white gap-1.5 text-xs w-full sm:w-auto font-semibold rounded-xl shadow-xs"
             >
@@ -547,7 +549,7 @@ export default function NewPurchasePage() {
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <span>Receive Goods (Purchase Inward)</span>
             <Badge variant="outline" className="text-xs font-mono">
-              Idemp: {idempotencyKeyRef.current.slice(0, 8)}...
+              Idemp: {idempotencyKey.slice(0, 8)}...
             </Badge>
           </h1>
         </div>

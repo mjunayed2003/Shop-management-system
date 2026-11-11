@@ -468,7 +468,7 @@ export default function PlatformSettingsPage() {
                   className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 mt-1 font-mono text-xs rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Will be encrypted with the server's master key before storage.
+                  Will be encrypted with the server&apos;s master key before storage.
                 </p>
               </div>
 

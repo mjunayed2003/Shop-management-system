@@ -3,7 +3,6 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { CustomerService } from './services/customer.service.js';

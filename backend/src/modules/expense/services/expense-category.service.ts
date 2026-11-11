@@ -67,9 +67,7 @@ export class ExpenseCategoryService {
 
     return this.prisma.expenseCategory.update({
       where: { id },
-      data: {
-        ...(dto.name ? { name: dto.name.trim() } : {}),
-      },
+      data: dto.name ? { name: dto.name.trim() } : {},
     });
   }
 

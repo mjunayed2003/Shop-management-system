@@ -70,8 +70,8 @@ test.describe('POS Smoke E2E Flow', () => {
     page,
   }) => {
     let hasOpenSession = false;
-    let heldSalesList: any[] = [];
-    let saleInvoices: any[] = [];
+    const heldSalesList: any[] = [];
+    const saleInvoices: any[] = [];
 
     // Mock Branch Details with active cash register
     await page.route('**/api/v1/branches/**', async (route) => {

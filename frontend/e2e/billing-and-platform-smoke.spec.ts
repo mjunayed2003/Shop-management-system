@@ -11,7 +11,7 @@ test.describe('Phase F7: Billing, Support & Platform Admin E2E Smoke Spec', () =
     const tenantPage = await tenantContext.newPage();
 
     let tenantSubStatus = 'TRIAL';
-    let tenantSupportTickets: any[] = [];
+    const tenantSupportTickets: any[] = [];
     let invoiceStatus = 'ISSUED';
     let invoicePaid = 0;
 

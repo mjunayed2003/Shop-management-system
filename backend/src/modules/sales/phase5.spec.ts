@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   BadRequestException,
   ForbiddenException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { SalesReturnService } from './services/sales-return.service.js';
@@ -10,14 +9,10 @@ import { ExchangeService } from './services/exchange.service.js';
 import { DueCollectionService } from './services/due-collection.service.js';
 import { RegisterSessionService } from './services/register-session.service.js';
 import { SaleService } from './services/sale.service.js';
-import { CustomerService } from './services/customer.service.js';
-import { PhoneNormalizerService } from './services/phone-normalizer.service.js';
-import { PricingService } from './services/pricing.service.js';
 import { SmsStubService } from './services/sms-stub.service.js';
 import { ReportService } from './services/report.service.js';
 import { SequenceService } from '../inventory/services/sequence.service.js';
 import { ExpenseService } from '../expense/services/expense.service.js';
-import { LocalDiskFileStorageService } from '../expense/services/file-storage.service.js';
 
 describe('Phase 5: Returns, Exchange, Due Collection, Expenses, Cash, Register Close', () => {
   let mockPrisma: any;
@@ -26,8 +21,6 @@ describe('Phase 5: Returns, Exchange, Due Collection, Expenses, Cash, Register C
   let dueCollectionService: DueCollectionService;
   let registerSessionService: RegisterSessionService;
   let saleService: SaleService;
-  let customerService: CustomerService;
-  let phoneNormalizer: PhoneNormalizerService;
   let reportService: ReportService;
   let expenseService: ExpenseService;
   let sequenceService: SequenceService;
@@ -39,7 +32,6 @@ describe('Phase 5: Returns, Exchange, Due Collection, Expenses, Cash, Register C
   const branch1Id = 'branch-gulshan';
   const branch2Id = 'branch-dhanmondi';
   const cashierId = 'user-cashier-1';
-  const managerId = 'user-mgr-1';
   const customer1Id = 'cust-001';
   const variant1Id = 'var-polo-m';
   const sale1Id = 'sale-001';
@@ -184,8 +176,6 @@ describe('Phase 5: Returns, Exchange, Due Collection, Expenses, Cash, Register C
     };
 
     sequenceService = new SequenceService();
-    phoneNormalizer = new PhoneNormalizerService();
-    customerService = new CustomerService(mockPrisma, phoneNormalizer);
     registerSessionService = new RegisterSessionService(mockPrisma);
     smsStubService = new SmsStubService();
     mockFileStorage = { saveFile: vi.fn().mockResolvedValue({ filePath: 'uploads/f.jpg', fileName: 'f.jpg', fileSize: 100, mimeType: 'image/jpeg' }) };
@@ -607,7 +597,7 @@ describe('Phase 5: Returns, Exchange, Due Collection, Expenses, Cash, Register C
         adjustment_status: 'CUSTOMER_PAID',
       });
 
-      const exchangeResult = await exchangeService.createExchange(businessId, branch1Id, cashierId, {
+      await exchangeService.createExchange(businessId, branch1Id, cashierId, {
         originalSaleId: sale1Id,
         returnedItems: [{ saleItemId: saleItemId1, quantity: 1 }],
         newItems: [{ variantId: 'var-polo-l', quantity: 1 }],

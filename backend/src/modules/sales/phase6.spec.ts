@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  BadRequestException,
   ForbiddenException,
-  ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -15,7 +13,6 @@ import {
   SmsStatus,
   SyncStatus,
   NotificationType,
-  TicketStatus,
   TicketPriority,
   TicketSenderType,
   SuperAdminRole,
@@ -90,7 +87,7 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
       },
       sale: {
         count: vi.fn().mockResolvedValue(5),
-        aggregate: vi.fn(),
+        aggregate: vi.fn().mockResolvedValue({ _sum: { total_amount: 0, total_cost: 0 }, _count: { id: 0 } }),
         findMany: vi.fn().mockResolvedValue([]),
       },
       saleItem: {
@@ -103,7 +100,14 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
       },
       salesReturn: {
         count: vi.fn().mockResolvedValue(1),
+        aggregate: vi.fn().mockResolvedValue({ _sum: { total_refund_amount: 0 }, _count: { id: 0 } }),
         findMany: vi.fn().mockResolvedValue([]),
+      },
+      salesReturnItem: {
+        groupBy: vi.fn().mockResolvedValue([]),
+      },
+      purchaseReturn: {
+        aggregate: vi.fn().mockResolvedValue({ _sum: { total_amount: 0 }, _count: { id: 0 } }),
       },
       expense: {
         aggregate: vi.fn(),

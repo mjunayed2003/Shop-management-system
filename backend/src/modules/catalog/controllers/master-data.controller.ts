@@ -11,7 +11,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { MasterDataService } from '../services/master-data.service.js';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto.js';
 import { CreateBrandDto, UpdateBrandDto } from '../dto/brand.dto.js';

@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   BadRequestException,
   ForbiddenException,
-  ConflictException,
-  NotFoundException,
 } from '@nestjs/common';
 import { BranchService } from './branch.service.js';
 import type { PrismaService } from '../../prisma/prisma.service.js';

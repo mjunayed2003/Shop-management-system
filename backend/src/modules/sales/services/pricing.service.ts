@@ -77,7 +77,7 @@ export class PricingService {
     const taxRate = new Prisma.Decimal(0); // 0% default per requirements
 
     for (const itemDto of dto.items) {
-      const { item, resolvedVariant, unit } = await this.resolveItem(
+      const { resolvedVariant, unit } = await this.resolveItem(
         client,
         businessId,
         itemDto,

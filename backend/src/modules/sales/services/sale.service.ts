@@ -493,11 +493,34 @@ export class SaleService {
         // Check tracked units
         let unitIdToLink: string | null = null;
         if (cItem.trackIndividually) {
-          let barcode = cItem.productUnitBarcode;
+          const explicitBarcode = cItem.productUnitBarcode;
+          let targetUnit: any = null;
 
-          // If no specific unit barcode was scanned, check for an available IN_STOCK unit in this branch (FIFO)
-          if (!barcode) {
-            const availableUnit = await tx.productUnit.findFirst({
+          if (explicitBarcode) {
+            const unit = await tx.productUnit.findFirst({
+              where: {
+                business_id: businessId,
+                barcode_value: explicitBarcode,
+              },
+            });
+
+            if (!unit) {
+              throw new NotFoundException(`Product unit barcode "${explicitBarcode}" not found.`);
+            }
+            if (unit.branch_id !== currentBranchId) {
+              throw new BadRequestException(
+                `Product unit "${explicitBarcode}" belongs to another branch and cannot be sold directly.`,
+              );
+            }
+            if (unit.status !== 'IN_STOCK') {
+              throw new BadRequestException(
+                `Product unit "${explicitBarcode}" is already ${unit.status} and cannot be sold.`,
+              );
+            }
+            targetUnit = unit;
+          } else {
+            // If no specific unit barcode was scanned, check for an available IN_STOCK unit in this branch (FIFO)
+            targetUnit = await tx.productUnit.findFirst({
               where: {
                 business_id: businessId,
                 branch_id: currentBranchId,
@@ -506,31 +529,18 @@ export class SaleService {
               },
               orderBy: { created_at: 'asc' },
             });
-            if (availableUnit) {
-              barcode = availableUnit.barcode_value;
-            }
           }
 
-          if (barcode) {
-            const unit = await tx.productUnit.findFirst({
-              where: {
-                business_id: businessId,
-                barcode_value: barcode,
+          if (targetUnit) {
+            await tx.productUnit.update({
+              where: { id: targetUnit.id },
+              data: {
+                status: 'SOLD',
+                sold_sale_id: sale.id,
+                sold_at: new Date(),
               },
             });
-
-            if (unit && unit.branch_id === currentBranchId && unit.status === 'IN_STOCK') {
-              // Mark unit SOLD
-              await tx.productUnit.update({
-                where: { id: unit.id },
-                data: {
-                  status: 'SOLD',
-                  sold_sale_id: sale.id,
-                  sold_at: new Date(),
-                },
-              });
-              unitIdToLink = unit.id;
-            }
+            unitIdToLink = targetUnit.id;
           }
         }
 

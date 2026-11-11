@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ConflictException, BadRequestException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { OnboardingService } from './onboarding.service.js';
 import type { PrismaService } from '../../prisma/prisma.service.js';
 import type { JwtService } from '@nestjs/jwt';

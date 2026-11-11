@@ -118,17 +118,18 @@ export default function ExpensesPage() {
   };
 
   // Filter items by client-side vendor search if provided
+  const rawExpenseItems = expenseData?.items;
   const items = React.useMemo(() => {
-    if (!expenseData?.items) return [];
-    if (!searchVendor.trim()) return expenseData.items;
+    if (!rawExpenseItems) return [];
+    if (!searchVendor.trim()) return rawExpenseItems;
     const term = searchVendor.toLowerCase();
-    return expenseData.items.filter(
+    return rawExpenseItems.filter(
       (item) =>
         item.vendor_name?.toLowerCase().includes(term) ||
         item.expense_no?.toLowerCase().includes(term) ||
         item.receipt_no?.toLowerCase().includes(term),
     );
-  }, [expenseData?.items, searchVendor]);
+  }, [rawExpenseItems, searchVendor]);
 
   // Compute server totals for display row
   const totals = React.useMemo(() => {

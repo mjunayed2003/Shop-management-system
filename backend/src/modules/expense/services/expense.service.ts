@@ -81,7 +81,6 @@ export class ExpenseService {
       ? Number(approvalSetting.value)
       : null;
 
-    let isApproved = true;
     if (approvalThreshold !== null && totalAmount.greaterThan(approvalThreshold)) {
       const hasApprovePerm =
         userRole?.permissions.includes('*') ||

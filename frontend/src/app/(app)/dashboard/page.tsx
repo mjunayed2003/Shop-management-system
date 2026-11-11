@@ -62,8 +62,13 @@ export default function DashboardPage() {
   // =========================================================================
   // REAL API FILTER STATES
   // =========================================================================
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const sevenDaysAgoStr = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const [{ todayStr, sevenDaysAgoStr }] = useState(() => {
+    const now = Date.now();
+    return {
+      todayStr: new Date(now).toISOString().slice(0, 10),
+      sevenDaysAgoStr: new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    };
+  });
 
   const [period, setPeriod] = useState<string>('thisMonth');
   const [customStartDate, setCustomStartDate] = useState<string>(sevenDaysAgoStr);

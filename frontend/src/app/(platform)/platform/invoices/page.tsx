@@ -669,7 +669,7 @@ export default function PlatformInvoicesPage() {
               <span className="font-mono">{selectedInvoice?.invoice_number}</span>?
             </p>
             <p className="mt-2 text-xs text-slate-400">
-              The server will verify remaining due and automatically update the tenant's subscription status
+              The server will verify remaining due and automatically update the tenant&apos;s subscription status
               to <strong>ACTIVE</strong> if the invoice becomes fully settled.
             </p>
           </div>

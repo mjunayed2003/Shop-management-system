@@ -9,7 +9,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiHeader } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { VariantService } from '../services/variant.service.js';
 import { CreateVariantDto, UpdateVariantDto, BulkGenerateVariantsDto } from '../dto/variant.dto.js';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';

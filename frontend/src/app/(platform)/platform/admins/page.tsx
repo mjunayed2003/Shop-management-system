@@ -514,7 +514,7 @@ export default function PlatformAdminsPage() {
                 Security Policy Notice:
               </span>
               <p className="text-[11px] leading-relaxed text-orange-900/80 dark:text-orange-300">
-                Role changes take effect upon the operator's next authenticated session. Revoking Super Admin role requires at least one active Super Admin to remain on the platform.
+                Role changes take effect upon the operator&apos;s next authenticated session. Revoking Super Admin role requires at least one active Super Admin to remain on the platform.
               </p>
             </div>
 

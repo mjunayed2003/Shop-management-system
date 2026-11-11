@@ -1375,6 +1375,41 @@ export const api = {
           thisYear?: number;
           custom?: number;
         };
+        returns?: {
+          today: { revenue: number; count: number };
+          thisWeek: { revenue: number; count: number };
+          thisMonth: { revenue: number; count: number };
+          last30Days?: { revenue: number; count: number };
+          thisYear?: { revenue: number; count: number };
+          allTime?: { revenue: number; count: number };
+          custom?: { revenue: number; count: number };
+        };
+        returnsOverview?: {
+          totalReturnsCount: number;
+          resellableItemsCount: number;
+          damagedItemsCount: number;
+          purchaseReturnsCount: number;
+          purchaseReturnsAmount: number;
+          recentReturns: Array<{
+            id: string;
+            returnNo: string;
+            invoiceNo: string;
+            customerName: string;
+            customerPhone: string | null;
+            refundAmount: number;
+            refundMethod: string;
+            status: string;
+            reason: string;
+            itemCount: number;
+            items: Array<{
+              productName: string;
+              sku?: string;
+              quantity: number;
+              condition: string;
+            }>;
+            createdAt: string;
+          }>;
+        };
         receivables: number;
         payables: number;
         stockValue: number;
@@ -1448,7 +1483,12 @@ export const api = {
           openedAt: string;
           openingBalance: number | string;
         } | null;
-        today: { salesCount: number; salesAmount: number };
+        today: {
+          salesCount: number;
+          salesAmount: number;
+          returnsCount?: number;
+          refundAmount?: number;
+        };
       }>('/api/v1/dashboards/cashier'),
   },
 

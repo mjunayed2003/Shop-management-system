@@ -47,7 +47,7 @@ export function OnlineIndicator() {
     window.addEventListener('offline', handleOffline);
 
     // Health ping timer: every 30 seconds while active, or 10s if offline
-    let backoffInterval = isOnline ? 30000 : 10000;
+    const backoffInterval = isOnline ? 30000 : 10000;
     const interval = setInterval(() => {
       checkHealth();
       refreshQueueCounts(business?.id, currentBranchId, user?.id);

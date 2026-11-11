@@ -143,9 +143,7 @@ export class VariantService {
             avg_cost_price: dto.costPrice ?? 0,
             total_cost_value: (Number(dto.stock) || 0) * (dto.costPrice ?? 0),
           },
-          update: {
-            ...(dto.stock !== undefined ? { quantity: Number(dto.stock) || 0 } : {}),
-          },
+          update: dto.stock !== undefined ? { quantity: Number(dto.stock) || 0 } : {},
         });
       }
 

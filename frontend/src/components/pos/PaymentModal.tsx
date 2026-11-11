@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Decimal from 'decimal.js';
 import { api } from '@/lib/api/endpoints';
 import { useCartStore } from '@/lib/store/cart-store';
@@ -103,6 +103,12 @@ export function PaymentModal({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [completedSale, setCompletedSale] = useState<any | null>(null);
   const [isSmsSent, setIsSmsSent] = useState(false);
+  const paymentSeqRef = useRef(1);
+
+  const handleFinishAndNewSale = useCallback(() => {
+    resetAfterSaleSuccess();
+    onClose();
+  }, [resetAfterSaleSuccess, onClose]);
 
   // Initialize payment rows when modal opens
   useEffect(() => {
@@ -134,7 +140,7 @@ export function PaymentModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, completedSale]);
+  }, [isOpen, completedSale, handleFinishAndNewSale]);
 
   // Calculate live preview totals with decimal.js
   let totalPaidPreview = new Decimal(0);
@@ -197,7 +203,7 @@ export function PaymentModal({
     setPayments([
       ...payments,
       {
-        id: `pay-${Date.now()}`,
+        id: `pay-${paymentSeqRef.current++}`,
         method: 'BKASH',
         amount: defaultAmount,
       },
@@ -394,11 +400,6 @@ export function PaymentModal({
     }
     setIsSmsSent(true);
     toast.success(t('pos.smsSent'));
-  };
-
-  const handleFinishAndNewSale = () => {
-    resetAfterSaleSuccess();
-    onClose();
   };
 
   return (

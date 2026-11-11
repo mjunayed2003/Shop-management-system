@@ -87,7 +87,7 @@ export class PlatformPlansService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      const updatedPlan = await tx.plan.update({
+      await tx.plan.update({
         where: { id: planId },
         data: {
           name: dto.name ?? plan.name,

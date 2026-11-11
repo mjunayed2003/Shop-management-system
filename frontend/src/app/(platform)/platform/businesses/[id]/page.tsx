@@ -578,7 +578,7 @@ export default function BusinessDetailPage() {
                     )}
                     <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
                       <span className="text-slate-500 dark:text-slate-400">Override Reason</span>
-                      <span className="text-slate-700 dark:text-slate-300 italic">"{activeOverride.reason}"</span>
+                      <span className="text-slate-700 dark:text-slate-300 italic">&ldquo;{activeOverride.reason}&rdquo;</span>
                     </div>
                     <div className="flex justify-between py-1">
                       <span className="text-slate-500 dark:text-slate-400">Valid Until</span>

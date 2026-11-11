@@ -20,7 +20,7 @@ describe('Phase F3 - Purchasing & Stock Logic Test Suite', () => {
         unitCost: number;
       }
 
-      let items: ItemRow[] = [];
+      const items: ItemRow[] = [];
 
       const addOrIncrement = (variant: { id: string; sku: string; cost: number }, qty = 1) => {
         const idx = items.findIndex((i) => i.variantId === variant.id);

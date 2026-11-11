@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserService } from './user.service.js';
-import { ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
+import { ForbiddenException, BadRequestException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService;

@@ -24,7 +24,7 @@ export function BarcodeInput({
 }: BarcodeInputProps) {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastKeyTimeRef = useRef<number>(Date.now());
+  const lastKeyTimeRef = useRef<number>(0);
   const fastKeystrokeCountRef = useRef<number>(0);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function BarcodeInput({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const now = Date.now();
-    const diff = now - lastKeyTimeRef.current;
+    const diff = lastKeyTimeRef.current === 0 ? Infinity : now - lastKeyTimeRef.current;
     lastKeyTimeRef.current = now;
 
     // Detect fast scanner keystrokes (< 45ms between strokes)

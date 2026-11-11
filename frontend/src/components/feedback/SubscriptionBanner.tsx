@@ -11,6 +11,7 @@ export function SubscriptionBanner() {
   const { business } = useAuthStore();
   const { t, locale } = useTranslation();
   const [isDismissed, setIsDismissed] = useState(false);
+  const [nowTs] = useState<number>(() => Date.now());
 
   const sub = business?.subscription;
   if (!sub || isDismissed) return null;
@@ -21,7 +22,7 @@ export function SubscriptionBanner() {
   if (status === 'PAYMENT_DUE' || status === 'GRACE') {
     let daysLeft = 0;
     if (sub.graceEndsAt) {
-      const diff = new Date(sub.graceEndsAt).getTime() - Date.now();
+      const diff = new Date(sub.graceEndsAt).getTime() - nowTs;
       daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     }
 
@@ -71,7 +72,7 @@ export function SubscriptionBanner() {
 
   // 2. TRIAL BANNER
   if (status === 'TRIAL' && sub.trialEndsAt) {
-    const diff = new Date(sub.trialEndsAt).getTime() - Date.now();
+    const diff = new Date(sub.trialEndsAt).getTime() - nowTs;
     const daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 
     // Only show if 15 days or fewer left in trial, or always for visibility

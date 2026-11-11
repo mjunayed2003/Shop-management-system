@@ -269,21 +269,21 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
   };
 
   // Check for duplicate Size + Color combinations within the form
-  const duplicateMatrixError = useMemo(() => {
-    if (!hasVariants) return null;
+  let duplicateMatrixError: string | null = null;
+  if (hasVariants) {
     const seen = new Set<string>();
     for (let i = 0; i < variants.length; i++) {
       const row = variants[i];
       if (row.sizeId && row.colorId) {
         const key = `${row.sizeId}:${row.colorId}`;
         if (seen.has(key)) {
-          return t('catalog.duplicateVariantError');
+          duplicateMatrixError = t('catalog.duplicateVariantError');
+          break;
         }
         seen.add(key);
       }
     }
-    return null;
-  }, [variants, hasVariants, t]);
+  }
 
   // Bulk Generator Handler
   const handleGenerateBulkCombinations = () => {

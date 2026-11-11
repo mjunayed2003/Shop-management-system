@@ -132,7 +132,7 @@ function LoginForm() {
       toast.success(t('auth.loginSuccess'));
 
       // Direct fresh browser redirect to avoid RSC chunk hydration mismatch
-      window.location.href = redirectTarget;
+      window.location.assign(redirectTarget);
     } catch (err: any) {
       setServerError(
         err?.message ||

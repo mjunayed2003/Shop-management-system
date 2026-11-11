@@ -2,12 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   BadRequestException,
   ForbiddenException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { StockService } from './services/stock.service.js';
 import { SequenceService } from './services/sequence.service.js';
-import { SupplierService } from './services/supplier.service.js';
 import { PurchaseService } from './services/purchase.service.js';
 import { SupplierPaymentService } from './services/supplier-payment.service.js';
 import { StockTransferService } from './services/stock-transfer.service.js';
@@ -21,7 +19,6 @@ describe('Phase 3: Purchasing & Inventory Unit Tests', () => {
   let mockProductBranchService: any;
   let sequenceService: SequenceService;
   let stockService: StockService;
-  let supplierService: SupplierService;
   let purchaseService: PurchaseService;
   let paymentService: SupplierPaymentService;
   let transferService: StockTransferService;
@@ -31,7 +28,6 @@ describe('Phase 3: Purchasing & Inventory Unit Tests', () => {
   const branch1Id = 'branch-gulshan';
   const branch2Id = 'branch-dhanmondi';
   const userId = 'user-staff-1';
-  const ownerId = 'user-owner-1';
   const variant1Id = 'variant-panjabi-m';
   const product1Id = 'product-panjabi';
   const supplier1Id = 'supplier-apex';
@@ -149,7 +145,6 @@ describe('Phase 3: Purchasing & Inventory Unit Tests', () => {
       mockPrisma as unknown as PrismaService,
       mockProductBranchService as unknown as ProductBranchService,
     );
-    supplierService = new SupplierService(mockPrisma as unknown as PrismaService);
     purchaseService = new PurchaseService(
       mockPrisma as unknown as PrismaService,
       stockService,

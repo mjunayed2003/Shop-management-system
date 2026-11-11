@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import {
@@ -226,7 +225,7 @@ export class SubscriptionService {
     });
   }
 
-  async cancelSubscription(businessId: string, reason?: string) {
+  async cancelSubscription(businessId: string, _reason?: string) {
     const sub = await this.prisma.subscription.findUnique({
       where: { business_id: businessId },
     });
