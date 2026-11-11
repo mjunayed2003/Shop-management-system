@@ -36,7 +36,7 @@ export function BranchSwitcher() {
   if (branches.length === 1) {
     return (
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-        <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+        <Store className="w-3.5 h-3.5 text-[#3b7987] dark:text-[#52a7b7]" />
         <span className="truncate max-w-[140px]">{branches[0].name}</span>
       </div>
     );
@@ -83,11 +83,11 @@ export function BranchSwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b7987]"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+        <Store className="w-4 h-4 text-[#3b7987] dark:text-[#52a7b7]" />
         <span className="truncate max-w-[150px] font-semibold">
           {currentBranch?.name || t('branch.switchBranch')}
         </span>
@@ -109,7 +109,7 @@ export function BranchSwitcher() {
                   onClick={() => handleSelect(b.id)}
                   className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs transition-colors text-left ${
                     isSelected
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-semibold'
+                      ? 'bg-[#c2d4d4]/40 dark:bg-[#2c4246] text-slate-900 dark:text-slate-100 font-semibold'
                       : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                   }`}
                 >
@@ -117,7 +117,7 @@ export function BranchSwitcher() {
                     <p className="truncate">{b.name}</p>
                     <span className="text-[10px] text-slate-400 font-mono">{b.code}</span>
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                  {isSelected && <Check className="w-4 h-4 text-[#3b7987] dark:text-[#52a7b7] shrink-0" />}
                 </button>
               );
             })}

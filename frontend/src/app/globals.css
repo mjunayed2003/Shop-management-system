@@ -49,11 +49,9 @@ body {
 }
 
 /* Main Display & Hero Headings: Use Abu Sayed */
-h1, h2, .font-display, .font-sayed,
-h1 *, h2 *, .font-display *, .font-sayed * {
+h1, h2, .font-display, .font-sayed {
   font-family: var(--font-abu-sayed), 'Abu Sayed', var(--font-noto-bengali), sans-serif;
   letter-spacing: 0.045em;
-  font-weight: normal;
 }
 
 /* Small text, body, paragraphs, labels: Ensure light, non-bold, readable font */

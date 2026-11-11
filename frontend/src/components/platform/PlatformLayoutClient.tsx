@@ -28,9 +28,7 @@ export function PlatformLayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <PlatformProtectedRoute>
-      <div className="relative h-screen flex bg-slate-50/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans overflow-hidden">
-        <AbstractWaveBackground variant="subtle" />
-
+      <div className="relative h-screen flex bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans overflow-hidden">
         {/* Desktop Platform Sidebar */}
         <div className="hidden lg:block shrink-0 h-full">
           <PlatformSidebar />

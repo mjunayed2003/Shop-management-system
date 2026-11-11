@@ -20,6 +20,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module.js';
 import { ExportModule } from './modules/export/export.module.js';
 import { RoleModule } from './modules/role/role.module.js';
 import { UserModule } from './modules/user/user.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { BranchContextGuard } from './common/guards/branch-context.guard.js';
@@ -46,6 +47,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter.js';
     ExportModule,
     RoleModule,
     UserModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [

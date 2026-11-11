@@ -103,6 +103,11 @@ export class CreateProductDto {
   @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({ example: '/uploads/products/image.webp', description: 'Product primary image URL' })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+
   @ApiPropertyOptional({ default: true, description: 'Has variant matrix (size/color)' })
   @IsBoolean()
   @IsOptional()

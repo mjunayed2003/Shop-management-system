@@ -1,19 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import morgan from 'morgan';
+import * as path from 'path';
+import * as fs from 'fs';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Disable HTTP 304 ETag Caching so API routes always return fresh 200 OK
   const expressApp = app.getHttpAdapter().getInstance();
   if (expressApp && typeof expressApp.set === 'function') {
     expressApp.set('etag', false);
   }
+
+  // Ensure uploads directory exists and serve statically
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  app.useStaticAssets(uploadsDir, { prefix: '/uploads/' });
 
   // Prevent browser 304 caching on dynamic API routes
   app.use((_req: any, res: any, next: any) => {

@@ -24,6 +24,11 @@ export class PrismaService extends BasePrismaClient implements OnModuleInit, OnM
   async onModuleInit() {
     await this.$connect();
     console.log('✅ Prisma Connected Successfully');
+    try {
+      await this.$executeRawUnsafe(`ALTER TABLE "products" ADD COLUMN IF NOT EXISTS "image_url" TEXT;`);
+    } catch (e) {
+      console.warn('Note on image_url column migration:', e);
+    }
   }
 
   async onModuleDestroy() {

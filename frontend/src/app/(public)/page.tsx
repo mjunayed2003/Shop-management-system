@@ -20,14 +20,29 @@ export default function LandingPage() {
   const { t, locale } = useTranslation();
 
   return (
-    <div className="space-y-24 py-10 sm:py-16">
+    <div className="relative space-y-24 py-10 sm:py-16">
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
 
-        {/* Main Title */}
-        <div className="w-full space-y-5">
-          <h1 suppressHydrationWarning className="text-3xl sm:text-5xl lg:text-6xl font-normal font-sayed text-slate-950 dark:text-white tracking-wide leading-[1.25] w-full">
-            {t('landing.heroTitle')}
+        {/* Main Title with Stylish Gradient Text */}
+        <div className="w-full space-y-4">
+          <h1
+            suppressHydrationWarning
+            className="text-3xl sm:text-5xl lg:text-6xl font-bold font-sayed text-slate-950 dark:text-white tracking-wide leading-[1.3] w-full"
+          >
+            {locale === 'bn' ? (
+              <>
+                খুচরা ও পাইকারি ব্যবসায়ের সম্পূর্ণ স্মার্ট ক্লাউড
+                <br />
+                সমাধান
+              </>
+            ) : (
+              <>
+                Complete Retail & Wholesale Smart Cloud POS
+                <br />
+                Solution
+              </>
+            )}
           </h1>
           <p suppressHydrationWarning className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-5xl mx-auto leading-relaxed font-normal">
             {t('landing.heroSubtitle')}

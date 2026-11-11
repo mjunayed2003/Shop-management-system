@@ -35,13 +35,21 @@ export class DashboardService {
     branchId?: string,
     isAllBranchAdmin = false,
     canViewProfit = false,
+    startDate?: string,
+    endDate?: string,
+    year?: number,
+    period?: string,
+    productTimeframe?: string,
+    categoryTimeframe?: string,
+    ordersTimeframe?: string,
+    paymentsTimeframe?: string,
   ) {
     const effectiveBranchId =
       typeof branchId === 'string'
         ? branchId
         : (branchId as any)?.branchId || undefined;
 
-    const cacheKey = `dash:${businessId}:${isAllBranchAdmin ? 'all' : effectiveBranchId}:${canViewProfit}`;
+    const cacheKey = `dash:${businessId}:${isAllBranchAdmin ? 'all' : effectiveBranchId}:${canViewProfit}:${year || ''}:${startDate || ''}:${endDate || ''}:${productTimeframe || ''}:${categoryTimeframe || ''}:${ordersTimeframe || ''}:${paymentsTimeframe || ''}`;
     const cached = this.getCached(cacheKey);
     if (cached) return cached;
 
@@ -52,7 +60,16 @@ export class DashboardService {
     startOfWeek.setHours(0, 0, 0, 0);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    const targetYear = year ? Number(year) : now.getFullYear();
+    const startOfYear = new Date(targetYear, 0, 1);
+    const endOfYear = new Date(targetYear, 11, 31, 23, 59, 59, 999);
+
+    const customStart = startDate ? new Date(startDate) : null;
+    const customEnd = endDate ? new Date(endDate) : null;
+    if (customEnd) {
+      customEnd.setHours(23, 59, 59, 999);
+    }
 
     const baseWhereSale: any = {
       business_id: businessId,
@@ -62,8 +79,27 @@ export class DashboardService {
       baseWhereSale.branch_id = effectiveBranchId;
     }
 
-    // 1. Sales aggregates (Today, Week, Month, All-Time)
-    const [salesToday, salesWeek, salesMonth, salesTotal] = await Promise.all([
+    const baseWhereExpense: any = { business_id: businessId };
+    if (!isAllBranchAdmin && effectiveBranchId) {
+      baseWhereExpense.branch_id = effectiveBranchId;
+    }
+
+    // 1. Sales & Expenses aggregates (Today, Week, Month, 30 Days, Year, All-Time, Custom)
+    const [
+      salesToday,
+      salesWeek,
+      salesMonth,
+      sales30Days,
+      salesYear,
+      salesTotal,
+      salesCustom,
+      expToday,
+      expWeek,
+      expMonth,
+      exp30Days,
+      expYear,
+      expCustom,
+    ] = await Promise.all([
       this.prisma.sale.aggregate({
         where: { ...baseWhereSale, sale_date: { gte: startOfToday } },
         _sum: { total_amount: true, total_cost: true },
@@ -80,19 +116,28 @@ export class DashboardService {
         _count: { id: true },
       }),
       this.prisma.sale.aggregate({
+        where: { ...baseWhereSale, sale_date: { gte: thirtyDaysAgo } },
+        _sum: { total_amount: true, total_cost: true },
+        _count: { id: true },
+      }),
+      this.prisma.sale.aggregate({
+        where: { ...baseWhereSale, sale_date: { gte: startOfYear, lte: endOfYear } },
+        _sum: { total_amount: true, total_cost: true },
+        _count: { id: true },
+      }),
+      this.prisma.sale.aggregate({
         where: baseWhereSale,
         _sum: { total_amount: true, total_cost: true },
         _count: { id: true },
       }),
-    ]);
+      customStart && customEnd
+        ? this.prisma.sale.aggregate({
+            where: { ...baseWhereSale, sale_date: { gte: customStart, lte: customEnd } },
+            _sum: { total_amount: true, total_cost: true },
+            _count: { id: true },
+          })
+        : Promise.resolve({ _sum: { total_amount: 0, total_cost: 0 }, _count: { id: 0 } }),
 
-    // 2. Expenses today, this week, this month
-    const baseWhereExpense: any = { business_id: businessId };
-    if (!isAllBranchAdmin && effectiveBranchId) {
-      baseWhereExpense.branch_id = effectiveBranchId;
-    }
-
-    const [expToday, expWeek, expMonth] = await Promise.all([
       this.prisma.expense.aggregate({
         where: { ...baseWhereExpense, expense_date: { gte: startOfToday } },
         _sum: { total_amount: true },
@@ -105,9 +150,23 @@ export class DashboardService {
         where: { ...baseWhereExpense, expense_date: { gte: startOfMonth } },
         _sum: { total_amount: true },
       }),
+      this.prisma.expense.aggregate({
+        where: { ...baseWhereExpense, expense_date: { gte: thirtyDaysAgo } },
+        _sum: { total_amount: true },
+      }),
+      this.prisma.expense.aggregate({
+        where: { ...baseWhereExpense, expense_date: { gte: startOfYear, lte: endOfYear } },
+        _sum: { total_amount: true },
+      }),
+      customStart && customEnd
+        ? this.prisma.expense.aggregate({
+            where: { ...baseWhereExpense, expense_date: { gte: customStart, lte: customEnd } },
+            _sum: { total_amount: true },
+          })
+        : Promise.resolve({ _sum: { total_amount: 0 } }),
     ]);
 
-    // 3. Receivables & Payables & Customer Counts
+    // 2. Receivables & Payables & Customer Counts
     const [receivables, payables, totalCustomers] = await Promise.all([
       this.prisma.customer.aggregate({
         where: { business_id: businessId, deleted_at: null },
@@ -122,7 +181,7 @@ export class DashboardService {
       }),
     ]);
 
-    // 4. Stock value & low stock count (fixed relation name: variant)
+    // 3. Stock value & low stock count
     const stockWhere: any = { business_id: businessId };
     if (!isAllBranchAdmin && effectiveBranchId) {
       stockWhere.branch_id = effectiveBranchId;
@@ -163,7 +222,7 @@ export class DashboardService {
         }),
       ]);
 
-    // 5. 30-Day daily sales trend from live Sale records
+    // 4. 30-Day daily sales trend from live Sale records
     const recentSales = await this.prisma.sale.findMany({
       where: { ...baseWhereSale, sale_date: { gte: thirtyDaysAgo } },
       select: { sale_date: true, total_amount: true },
@@ -181,13 +240,29 @@ export class DashboardService {
     }
     const salesTrend = Array.from(trendMap.entries()).map(([date, total]) => ({ date, total }));
 
-    // 6. Top selling products with real names, SKUs, category and stock
+    // 5. Top selling products with real names, SKUs, category and stock based on productTimeframe
+    let productDateGte: Date | undefined;
+    if (productTimeframe === '7d') {
+      productDateGte = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (productTimeframe === '30d') {
+      productDateGte = thirtyDaysAgo;
+    } else if (productTimeframe === '90d') {
+      productDateGte = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    } else if (productTimeframe === 'year') {
+      productDateGte = startOfYear;
+    }
+
     const topSaleItems = await this.prisma.saleItem.groupBy({
       by: ['product_variant_id'],
-      where: { sale: baseWhereSale },
+      where: {
+        sale: {
+          ...baseWhereSale,
+          ...(productDateGte ? { sale_date: { gte: productDateGte } } : {}),
+        },
+      },
       _sum: { quantity: true, total_amount: true },
       orderBy: { _sum: { quantity: 'desc' } },
-      take: 6,
+      take: 8,
     });
 
     const topVariantIds = topSaleItems.map((ti) => ti.product_variant_id);
@@ -224,9 +299,12 @@ export class DashboardService {
       };
     });
 
-    // 7. Monthly Performance 12-Month Curve (Current Year Jan..Dec from real sales)
+    // 6. Monthly Performance 12-Month Curve for targetYear from real sales
     const yearlySales = await this.prisma.sale.findMany({
-      where: { ...baseWhereSale, sale_date: { gte: startOfYear } },
+      where: {
+        ...baseWhereSale,
+        sale_date: { gte: startOfYear, lte: endOfYear },
+      },
       select: { sale_date: true, total_amount: true, total_cost: true },
     });
 
@@ -259,7 +337,20 @@ export class DashboardService {
       };
     });
 
-    // 8. Sales Distribution by Category from live sales
+    // 7. Sales Distribution by Category from live sales for categoryTimeframe
+    let categoryDateGte: Date | undefined;
+    if (categoryTimeframe === 'today') {
+      categoryDateGte = startOfToday;
+    } else if (categoryTimeframe === '7d') {
+      categoryDateGte = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (categoryTimeframe === '30d') {
+      categoryDateGte = thirtyDaysAgo;
+    } else if (categoryTimeframe === '90d') {
+      categoryDateGte = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    } else if (categoryTimeframe === 'year') {
+      categoryDateGte = startOfYear;
+    }
+
     const categories = await this.prisma.category.findMany({
       where: { business_id: businessId, deleted_at: null },
       select: { id: true, name: true },
@@ -270,7 +361,10 @@ export class DashboardService {
       categories.map(async (cat) => {
         const catSales = await this.prisma.saleItem.aggregate({
           where: {
-            sale: baseWhereSale,
+            sale: {
+              ...baseWhereSale,
+              ...(categoryDateGte ? { sale_date: { gte: categoryDateGte } } : {}),
+            },
             variant: {
               product: { category_id: cat.id },
             },
@@ -285,12 +379,26 @@ export class DashboardService {
       }),
     );
 
-    // 9. Payment Channels breakdown from live sale_payments
+    // 8. Payment Channels breakdown from live sale_payments for paymentsTimeframe
+    let paymentsDateGte: Date | undefined;
+    if (paymentsTimeframe === 'today') {
+      paymentsDateGte = startOfToday;
+    } else if (paymentsTimeframe === '7d') {
+      paymentsDateGte = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (paymentsTimeframe === 'month') {
+      paymentsDateGte = startOfMonth;
+    } else if (paymentsTimeframe === '30d') {
+      paymentsDateGte = thirtyDaysAgo;
+    } else if (paymentsTimeframe === 'year') {
+      paymentsDateGte = startOfYear;
+    }
+
     const paymentRows = await this.prisma.salePayment.groupBy({
       by: ['payment_method'],
       where: {
         business_id: businessId,
         ...(effectiveBranchId ? { branch_id: effectiveBranchId } : {}),
+        ...(paymentsDateGte ? { created_at: { gte: paymentsDateGte } } : {}),
       },
       _sum: { amount: true },
     });
@@ -300,20 +408,44 @@ export class DashboardService {
       amount: Number(p._sum.amount || 0),
     }));
 
-    // 10. Orders overview breakdown
-    const [completedCount, refundedCount] = await Promise.all([
+    // 9. Orders overview breakdown for ordersTimeframe
+    let ordersDateGte: Date | undefined;
+    if (ordersTimeframe === 'today') {
+      ordersDateGte = startOfToday;
+    } else if (ordersTimeframe === '7d') {
+      ordersDateGte = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (ordersTimeframe === 'month') {
+      ordersDateGte = startOfMonth;
+    } else if (ordersTimeframe === '30d') {
+      ordersDateGte = thirtyDaysAgo;
+    } else if (ordersTimeframe === 'year') {
+      ordersDateGte = startOfYear;
+    }
+
+    const [completedCount, refundedCount, periodTotalOrders] = await Promise.all([
       this.prisma.sale.count({
-        where: { ...baseWhereSale, status: 'COMPLETED' },
+        where: {
+          ...baseWhereSale,
+          status: 'COMPLETED',
+          ...(ordersDateGte ? { sale_date: { gte: ordersDateGte } } : {}),
+        },
       }),
       this.prisma.salesReturn.count({
         where: {
           business_id: businessId,
           ...(effectiveBranchId ? { branch_id: effectiveBranchId } : {}),
+          ...(ordersDateGte ? { created_at: { gte: ordersDateGte } } : {}),
+        },
+      }),
+      this.prisma.sale.count({
+        where: {
+          ...baseWhereSale,
+          ...(ordersDateGte ? { sale_date: { gte: ordersDateGte } } : {}),
         },
       }),
     ]);
 
-    // 11. Per branch comparison (for all-branch admin)
+    // 10. Per branch comparison (for all-branch admin)
     let branchComparison: any[] = [];
     if (isAllBranchAdmin) {
       const branches = await this.prisma.branch.findMany({
@@ -340,28 +472,43 @@ export class DashboardService {
     const todayRev = Number(salesToday._sum.total_amount || 0);
     const weekRev = Number(salesWeek._sum.total_amount || 0);
     const monthRev = Number(salesMonth._sum.total_amount || 0);
+    const rev30Days = Number(sales30Days._sum.total_amount || 0);
+    const yearRev = Number(salesYear._sum.total_amount || 0);
     const allTimeRev = Number(salesTotal._sum.total_amount || 0);
+    const customRev = Number(salesCustom._sum.total_amount || 0);
 
     const todayCost = Number(salesToday._sum.total_cost || 0);
     const weekCost = Number(salesWeek._sum.total_cost || 0);
     const monthCost = Number(salesMonth._sum.total_cost || 0);
+    const cost30Days = Number(sales30Days._sum.total_cost || 0);
+    const yearCost = Number(salesYear._sum.total_cost || 0);
     const allTimeCost = Number(salesTotal._sum.total_cost || 0);
+    const customCost = Number(salesCustom._sum.total_cost || 0);
 
     const todayExp = Number(expToday._sum.total_amount || 0);
     const weekExp = Number(expWeek._sum.total_amount || 0);
     const monthExp = Number(expMonth._sum.total_amount || 0);
+    const exp30DaysTotal = Number(exp30Days._sum.total_amount || 0);
+    const yearExp = Number(expYear._sum.total_amount || 0);
+    const customExp = Number(expCustom._sum.total_amount || 0);
 
     const result: any = {
       sales: {
         today: { revenue: todayRev, count: salesToday._count.id },
         thisWeek: { revenue: weekRev, count: salesWeek._count.id },
         thisMonth: { revenue: monthRev, count: salesMonth._count.id },
+        last30Days: { revenue: rev30Days, count: sales30Days._count.id },
+        thisYear: { revenue: yearRev, count: salesYear._count.id },
         allTime: { revenue: allTimeRev, count: salesTotal._count.id },
+        custom: { revenue: customRev, count: salesCustom._count.id },
       },
       expenses: {
         today: todayExp,
         thisWeek: weekExp,
         thisMonth: monthExp,
+        last30Days: exp30DaysTotal,
+        thisYear: yearExp,
+        custom: customExp,
       },
       receivables: Number(receivables._sum.current_due || 0),
       payables: Number(payables._sum.current_balance || 0),
@@ -369,7 +516,7 @@ export class DashboardService {
       lowStockCount: lowStockItems,
       totalProducts,
       totalCustomers,
-      totalOrders: salesTotal._count.id,
+      totalOrders: periodTotalOrders || salesTotal._count.id,
       stockOverview: {
         total: totalStockRows,
         inStock: inStockItems,
@@ -377,7 +524,7 @@ export class DashboardService {
         outOfStock: outOfStockItems,
       },
       ordersOverview: {
-        total: salesTotal._count.id,
+        total: periodTotalOrders,
         completed: completedCount,
         refunded: refundedCount,
       },
@@ -395,13 +542,19 @@ export class DashboardService {
         today: { gross: todayRev - todayCost, net: todayRev - todayCost - todayExp },
         thisWeek: { gross: weekRev - weekCost, net: weekRev - weekCost - weekExp },
         thisMonth: { gross: monthRev - monthCost, net: monthRev - monthCost - monthExp },
+        last30Days: { gross: rev30Days - cost30Days, net: rev30Days - cost30Days - exp30DaysTotal },
+        thisYear: { gross: yearRev - yearCost, net: yearRev - yearCost - yearExp },
         allTime: { gross: allTimeRev - allTimeCost, net: allTimeRev - allTimeCost },
+        custom: { gross: customRev - customCost, net: customRev - customCost - customExp },
       };
       result.cogs = {
         today: todayCost,
         thisWeek: weekCost,
         thisMonth: monthCost,
+        last30Days: cost30Days,
+        thisYear: yearCost,
         allTime: allTimeCost,
+        custom: customCost,
       };
     }
 

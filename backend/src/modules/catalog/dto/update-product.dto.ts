@@ -54,6 +54,11 @@ export class UpdateProductDto {
   @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({ example: '/uploads/products/image.webp' })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+
   @ApiPropertyOptional({ example: true })
   @IsBoolean()
   @IsOptional()

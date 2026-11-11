@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 /**
  * Security headers and strict Content Security Policy (CSP)
  */
@@ -9,7 +11,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com data:;
   img-src 'self' data: blob: https:;
-  connect-src 'self' http://localhost:4000 http://localhost:3000;
+  connect-src 'self' http://localhost:4000 http://localhost:3000 ws://localhost:3000 ws://localhost:3001 ws: wss:;
   frame-ancestors 'none';
   object-src 'none';
   base-uri 'self';
@@ -17,9 +19,20 @@ const cspHeader = `
 `.replace(/\s{2,}/g, ' ').trim();
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   poweredByHeader: false,
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: 'http://localhost:4000/uploads/:path*',
+      },
+    ];
+  },
   async headers() {
+    if (isDev) {
+      return [];
+    }
     return [
       {
         source: '/(.*)',

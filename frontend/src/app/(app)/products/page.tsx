@@ -425,10 +425,21 @@ export default function ProductsPage() {
       header: 'Product & Code',
       accessor: (r: any) => (
         <div className="flex items-center gap-3">
-          {/* Avatar / Placeholder */}
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-100 to-blue-50 dark:from-sky-950 dark:to-blue-900 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs uppercase shadow-xs">
-            {r.name.slice(0, 2)}
-          </div>
+          {/* Avatar / Product Image */}
+          {r.imageUrl || r.image_url ? (
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 shadow-xs">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={r.imageUrl || r.image_url}
+                alt={r.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-100 to-blue-50 dark:from-sky-950 dark:to-blue-900 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs uppercase shadow-xs shrink-0">
+              {r.name.slice(0, 2)}
+            </div>
+          )}
           <div>
             <Link
               href={`/products/${r.id}`}

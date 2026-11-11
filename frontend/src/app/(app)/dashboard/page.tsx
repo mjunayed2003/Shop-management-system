@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/endpoints';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { useBranchStore } from '@/lib/store/branch-store';
@@ -10,6 +10,7 @@ import { usePermission } from '@/components/shared/PermissionGate';
 import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { CustomSelect } from '@/components/ui/custom-select';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -36,35 +37,89 @@ import {
   SlidersHorizontal,
   ChevronRight,
   ShoppingBag,
+  Calendar,
+  CalendarRange,
+  Filter,
+  X,
 } from 'lucide-react';
 
 export default function DashboardPage() {
   const { t, locale } = useTranslation();
   const currSym = locale === 'bn' ? '৳' : 'BDT';
+  const queryClient = useQueryClient();
   const { user, business } = useAuthStore();
   const isOwner = Boolean(user?.isOwner);
-  const { currentBranch, currentBranchId } = useBranchStore();
+  const { branches, currentBranch, currentBranchId, switchBranch } = useBranchStore();
   const { pendingCount } = useOfflineStore();
   const { hasPermission: canViewProfit } = usePermission(['report.view_profit', 'report.view']);
 
-  const [period, setPeriod] = useState<'today' | 'thisWeek' | 'thisMonth'>('thisMonth');
-  const [activeTab, setActiveTab] = useState<'business' | 'cashier'>('business');
-  const [activeChartPoint, setActiveChartPoint] = useState<number>(3); // Default April / Index 3
-  const [searchQuery, setSearchQuery] = useState('');
+  // =========================================================================
+  // REAL API FILTER STATES
+  // =========================================================================
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const sevenDaysAgoStr = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  // 1. Business / Management Dashboard query
+  const [period, setPeriod] = useState<string>('thisMonth');
+  const [customStartDate, setCustomStartDate] = useState<string>(sevenDaysAgoStr);
+  const [customEndDate, setCustomEndDate] = useState<string>(todayStr);
+
+  const [activeTab, setActiveTab] = useState<'business' | 'cashier'>('business');
+  const [activeChartPoint, setActiveChartPoint] = useState<number>(3); // Default index 3 (Apr)
+  const [chartYear, setChartYear] = useState<string>('2026');
+  const [chartMetric, setChartMetric] = useState<'all' | 'sales' | 'revenue' | 'profit'>('all');
+
+  // Widget specific filters connected to real API queries
+  const [productTimeframe, setProductTimeframe] = useState<string>('30d');
+  const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
+  const [productStatusFilter, setProductStatusFilter] = useState<string>('all');
+  const [productSearch, setProductSearch] = useState<string>('');
+
+  const [categoryTimeframe, setCategoryTimeframe] = useState<string>('30d');
+  const [stockFilter, setStockFilter] = useState<string>('all');
+  const [ordersTimeframe, setOrdersTimeframe] = useState<string>('30d');
+  const [paymentsTimeframe, setPaymentsTimeframe] = useState<string>('30d');
+
+  // =========================================================================
+  // 1. Business / Management Dashboard - 100% REAL LIVE API
+  // =========================================================================
   const {
     data: businessData,
     isLoading: isBusinessLoading,
     refetch: refetchBusiness,
     dataUpdatedAt: businessUpdatedAt,
   } = useQuery({
-    queryKey: ['dashboards', 'business', currentBranchId, canViewProfit],
-    queryFn: () => api.dashboards.business(),
+    queryKey: [
+      'dashboards',
+      'business',
+      currentBranchId,
+      canViewProfit,
+      period,
+      period === 'custom' ? customStartDate : '',
+      period === 'custom' ? customEndDate : '',
+      chartYear,
+      productTimeframe,
+      categoryTimeframe,
+      ordersTimeframe,
+      paymentsTimeframe,
+    ],
+    queryFn: () =>
+      api.dashboards.business({
+        branchId: currentBranchId || undefined,
+        startDate: period === 'custom' ? customStartDate : undefined,
+        endDate: period === 'custom' ? customEndDate : undefined,
+        year: chartYear,
+        period,
+        productTimeframe,
+        categoryTimeframe,
+        ordersTimeframe,
+        paymentsTimeframe,
+      }),
     staleTime: 30000,
   });
 
-  // 2. Cashier Dashboard query
+  // =========================================================================
+  // 2. Cashier Dashboard - 100% REAL LIVE API
+  // =========================================================================
   const {
     data: cashierData,
     isLoading: isCashierLoading,
@@ -75,20 +130,39 @@ export default function DashboardPage() {
     staleTime: 30000,
   });
 
-  const salesMetric = businessData?.sales?.[period] || { revenue: 0, count: 0 };
-  const expenseMetric = businessData?.expenses?.[period] || 0;
-  const profitMetric = businessData?.profit?.[period];
-  const cogsMetric = businessData?.cogs?.[period];
+  // =========================================================================
+  // REAL API METRICS DATA
+  // =========================================================================
+  const metricData = useMemo(() => {
+    const salesObj = (businessData?.sales as any)?.[period] || { revenue: 0, count: 0 };
+    const expVal = (businessData?.expenses as any)?.[period] || 0;
+    const profitObj = (businessData?.profit as any)?.[period] || { gross: 0, net: 0 };
 
-  const salesTrend = businessData?.salesTrend || [];
-  const maxTrendTotal = Math.max(...salesTrend.map((t) => Number(t?.total) || 0), 1);
+    let label = 'this month';
+    if (period === 'today') label = locale === 'bn' ? 'আজকের' : 'today';
+    else if (period === 'thisWeek') label = locale === 'bn' ? 'এই সপ্তাহের' : 'this week';
+    else if (period === 'thisMonth') label = locale === 'bn' ? 'এই মাসের' : 'this month';
+    else if (period === 'last30Days') label = locale === 'bn' ? 'গত ৩০ দিনের' : 'last 30 days';
+    else if (period === 'thisYear') label = locale === 'bn' ? 'এই বছরের' : 'this year';
+    else if (period === 'custom') label = `${customStartDate} → ${customEndDate}`;
+
+    return {
+      sales: salesObj,
+      expense: expVal,
+      profit: profitObj,
+      label,
+    };
+  }, [period, customStartDate, customEndDate, businessData, locale]);
+
+  const salesMetric = metricData.sales;
+  const profitMetric = metricData.profit;
 
   // Currency Formatter (BDT)
   const fmtCurrency = (num: number = 0) =>
     `${currSym} ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   // =========================================================================
-  // MULTI-LINE SPLINE SVG MATH (Performance Overview Chart) - 100% LIVE DATA
+  // MULTI-LINE SPLINE SVG MATH - 100% REAL DATABASE SALES RECORDS
   // =========================================================================
   const svgW = 860;
   const svgH = 260;
@@ -99,15 +173,24 @@ export default function DashboardPage() {
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 
-  // 12-month data points dynamically sourced from live backend sales records
-  const monthlyData: Array<{ month: string; sales: number; revenue: number; profit: number; orders: number }> =
-    businessData?.monthlyPerformance && businessData.monthlyPerformance.length === 12
-      ? businessData.monthlyPerformance
-      : months.map((m) => ({ month: m, sales: 0, revenue: 0, profit: 0, orders: 0 }));
+  const monthlyData = useMemo(() => {
+    const raw =
+      businessData?.monthlyPerformance && businessData.monthlyPerformance.length === 12
+        ? businessData.monthlyPerformance
+        : months.map((m) => ({ month: m, sales: 0, revenue: 0, profit: 0, orders: 0 }));
+
+    return raw.map((item: any) => ({
+      month: item.month,
+      sales: Number(item.sales) || 0,
+      revenue: Number(item.revenue) || 0,
+      profit: Number(item.profit) || 0,
+      orders: Number(item.orders) || 0,
+    }));
+  }, [businessData?.monthlyPerformance]);
 
   const chartMax = Math.max(
     ...monthlyData.map((m) => Math.max(Number(m.sales) || 0, Number(m.revenue) || 0, Number(m.profit) || 0)),
-    Math.max(Number(salesMetric.revenue) || 0, 10000),
+    Math.max(Number(salesMetric.revenue) || 0, 10000)
   );
 
   const getPoints = (key: 'sales' | 'profit' | 'revenue') => {
@@ -124,7 +207,6 @@ export default function DashboardPage() {
   const profitPoints = getPoints('profit');
   const revenuePoints = getPoints('revenue');
 
-  // Smooth spline generator function
   const createSplineD = (points: { x: number; y: number }[]) => {
     if (points.length === 0) return '';
     return points.reduce((acc, pt, idx, arr) => {
@@ -144,29 +226,74 @@ export default function DashboardPage() {
   const trafficPathD = profitPathD;
 
   const activeSalesPt = salesPoints[activeChartPoint] || salesPoints[3] || { x: 0, y: 0, val: 0 };
-  const activeProfitPt = profitPoints[activeChartPoint] || profitPoints[3] || { x: 0, y: 0, val: 0 };
-  const activeRevenuePt = revenuePoints[activeChartPoint] || revenuePoints[3] || { x: 0, y: 0, val: 0 };
 
   // =========================================================================
-  // CATEGORY SALES DISTRIBUTION DATA - 100% LIVE FROM DB
+  // TOP PRODUCTS - 100% REAL LIVE SALES QUERY
   // =========================================================================
-  const rawCategories = businessData?.categoryDistribution || [];
-  const maxCatVal = Math.max(...rawCategories.map((c: any) => Math.max(Number(c.sales) || 0, Number(c.revenue) || 0)), 1);
-  const categoryData = rawCategories.map((c: any) => ({
-    name: c.name || 'Category',
-    sales: Math.min(Math.round(((Number(c.sales) || 0) / maxCatVal) * 100), 100),
-    revenue: Math.min(Math.round(((Number(c.revenue) || 0) / maxCatVal) * 100), 100),
-    salesVal: Number(c.sales) || 0,
-    revenueVal: Number(c.revenue) || 0,
-  }));
+  const rawTopProducts = useMemo(() => {
+    return (businessData?.topProducts || []).map((p: any) => ({
+      name: p.productName || 'Product',
+      category: p.category || 'Clothing Retail',
+      sold: Number(p.quantitySold) || 0,
+      status: p.status || (p.currentStock > 5 ? 'In Stock' : p.currentStock > 0 ? 'Low Stock' : 'Out of Stock'),
+    }));
+  }, [businessData?.topProducts]);
+
+  // Distinct categories for product filter dropdown
+  const distinctCategories = useMemo(() => {
+    const cats = new Set<string>();
+    rawTopProducts.forEach((p) => {
+      if (p.category) cats.add(p.category);
+    });
+    return Array.from(cats);
+  }, [rawTopProducts]);
+
+  // Client-side instant refinement (search, category, status)
+  const filteredProductsList = useMemo(() => {
+    return rawTopProducts.filter((p) => {
+      if (productCategoryFilter !== 'all' && p.category !== productCategoryFilter) return false;
+      if (productStatusFilter !== 'all' && p.status !== productStatusFilter) return false;
+      if (
+        productSearch.trim() &&
+        !p.name.toLowerCase().includes(productSearch.toLowerCase().trim()) &&
+        !p.category.toLowerCase().includes(productSearch.toLowerCase().trim())
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [rawTopProducts, productCategoryFilter, productStatusFilter, productSearch]);
 
   // =========================================================================
-  // DONUT CHART 1: PRODUCTS OVERVIEW CALCULATIONS - 100% LIVE FROM DB
+  // CATEGORY SALES DISTRIBUTION - 100% REAL LIVE DATA
+  // =========================================================================
+  const categoryData = useMemo(() => {
+    const raw = businessData?.categoryDistribution || [];
+    const maxVal = Math.max(...raw.map((c: any) => Math.max(Number(c.sales) || 0, Number(c.revenue) || 0)), 1);
+
+    return raw.map((c: any) => ({
+      name: c.name || 'Category',
+      salesVal: Number(c.sales) || 0,
+      revenueVal: Number(c.revenue) || 0,
+      sales: maxVal > 0 ? Math.min(Math.round(((Number(c.sales) || 0) / maxVal) * 100), 100) : 0,
+      revenue: maxVal > 0 ? Math.min(Math.round(((Number(c.revenue) || 0) / maxVal) * 100), 100) : 0,
+    }));
+  }, [businessData?.categoryDistribution]);
+
+  // =========================================================================
+  // DONUT 1: PRODUCTS OVERVIEW - 100% REAL STOCK BALANCES
   // =========================================================================
   const totalStockCount = Number(businessData?.totalProducts ?? businessData?.stockOverview?.total ?? 0);
   const inStockCount = Number(businessData?.stockOverview?.inStock ?? 0);
   const lowStockCount = Number(businessData?.stockOverview?.lowStock ?? businessData?.lowStockCount ?? 0);
   const outOfStockCount = Number(businessData?.stockOverview?.outOfStock ?? 0);
+
+  const displayedStockCount = useMemo(() => {
+    if (stockFilter === 'in_stock') return inStockCount;
+    if (stockFilter === 'low_stock') return lowStockCount;
+    if (stockFilter === 'out_of_stock') return outOfStockCount;
+    return totalStockCount;
+  }, [stockFilter, inStockCount, lowStockCount, outOfStockCount, totalStockCount]);
 
   const inStockPct = totalStockCount > 0 ? Math.round((inStockCount / totalStockCount) * 100) : 0;
   const lowStockPct = totalStockCount > 0 ? Math.round((lowStockCount / totalStockCount) * 100) : 0;
@@ -179,10 +306,10 @@ export default function DashboardPage() {
   const outOfStockStroke = (outOfStockPct / 100) * donutCirc;
 
   // =========================================================================
-  // DONUT CHART 2: ORDERS OVERVIEW CALCULATIONS - 100% LIVE FROM DB
+  // DONUT 2: ORDERS OVERVIEW - 100% REAL LIVE ORDERS FROM PRISMA
   // =========================================================================
-  const totalOrdersCount = Number(businessData?.totalOrders ?? salesMetric.count ?? 0);
-  const ordCompletedCount = Number(businessData?.ordersOverview?.completed ?? totalOrdersCount);
+  const totalOrdersCount = Number(businessData?.ordersOverview?.total ?? businessData?.totalOrders ?? 0);
+  const ordCompletedCount = Number(businessData?.ordersOverview?.completed ?? 0);
   const ordRefundedCount = Number(businessData?.ordersOverview?.refunded ?? 0);
 
   const ordCompletedPct = totalOrdersCount > 0 ? Math.round((ordCompletedCount / totalOrdersCount) * 100) : 0;
@@ -192,49 +319,42 @@ export default function DashboardPage() {
   const ordCompletedStroke = (ordCompletedPct / 100) * donutCirc;
   const ordRefundedStroke = (ordRefundedPct / 100) * donutCirc;
   const ordInProgressStroke = (ordInProgressPct / 100) * donutCirc;
-  const ordShippedStroke = 0;
   const ordCancelledStroke = ordRefundedStroke;
 
   // =========================================================================
-  // TRAFFIC / PAYMENT SOURCES DATA - 100% LIVE FROM DB
+  // PAYMENT CHANNELS - 100% REAL SALE PAYMENTS FROM PRISMA
   // =========================================================================
-  const rawPayments = businessData?.paymentChannels || [];
-  const maxPaymentVal = Math.max(...rawPayments.map((p: any) => Number(p.amount) || 0), 1);
-  const paymentSources =
-    rawPayments.length > 0
-      ? rawPayments.map((p: any) => ({
-          label: p.label || 'Tender',
-          height: Math.max(Math.round(((Number(p.amount) || 0) / maxPaymentVal) * 100), 12),
-          val: fmtCurrency(Number(p.amount) || 0),
-        }))
-      : [
-          { label: 'CASH', height: 12, val: `${currSym} 0` },
-          { label: 'BKASH', height: 12, val: `${currSym} 0` },
-          { label: 'NAGAD', height: 12, val: `${currSym} 0` },
-          { label: 'BANK', height: 12, val: `${currSym} 0` },
-        ];
-
-  // Top products list directly from live sale records
-  const topProductsList = (businessData?.topProducts || []).map((p: any) => ({
-    name: p.productName || 'Product',
-    category: p.category || 'Clothing Retail',
-    sold: Number(p.quantitySold) || 0,
-    status: p.status || (p.currentStock > 5 ? 'In Stock' : p.currentStock > 0 ? 'Low Stock' : 'Out of Stock'),
-  }));
+  const paymentSources = useMemo(() => {
+    const raw = businessData?.paymentChannels || [];
+    if (raw.length === 0) {
+      return [
+        { label: 'CASH', height: 0, val: `${currSym} 0` },
+        { label: 'BKASH', height: 0, val: `${currSym} 0` },
+        { label: 'NAGAD', height: 0, val: `${currSym} 0` },
+        { label: 'CARD', height: 0, val: `${currSym} 0` },
+      ];
+    }
+    const maxVal = Math.max(...raw.map((p: any) => Number(p.amount) || 0), 1);
+    return raw.map((p: any) => ({
+      label: p.label,
+      height: maxVal > 0 ? Math.max(Math.round(((Number(p.amount) || 0) / maxVal) * 100), 10) : 0,
+      val: fmtCurrency(Number(p.amount) || 0),
+    }));
+  }, [businessData?.paymentChannels, currSym]);
 
   return (
     <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-100 font-sans pb-12">
       {/* ==================================================================== */}
-      {/* TOP HEADER: Store Name / Executive Overview + Mode Switcher & Filter */}
+      {/* TOP HEADER: Store Name & Mode Switcher + Live Refresh                */}
       {/* ==================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {currentBranch?.name || business?.name || 'Store Dashboard'}
             </h1>
             {isOwner && (
-              <Badge className="bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <Badge className="bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] border border-[#3b7987]/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Multi-Branch Admin
               </Badge>
             )}
@@ -245,7 +365,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Topbar Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Dashboard Mode Switcher */}
           <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
             <button
@@ -272,6 +392,7 @@ export default function DashboardPage() {
             </button>
           </div>
 
+          {/* Refresh Button */}
           <Button
             type="button"
             variant="outline"
@@ -280,7 +401,7 @@ export default function DashboardPage() {
               refetchBusiness();
               refetchCashier();
             }}
-            className="text-xs h-9 px-3 rounded-xl border-slate-200 dark:border-slate-800 hover:border-sky-500 hover:text-sky-600 bg-white dark:bg-slate-900 shadow-2xs font-semibold cursor-pointer"
+            className="text-xs h-9 px-3 rounded-xl border-slate-200 dark:border-slate-800 hover:border-[#3b7987] hover:text-[#3b7987] bg-white dark:bg-slate-900 shadow-2xs font-semibold cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isBusinessLoading ? 'animate-spin' : ''}`} />
             Refresh
@@ -290,51 +411,149 @@ export default function DashboardPage() {
 
       {activeTab === 'business' ? (
         /* ================================================================== */
-        /* ==================== MANAGEMENT / COTOVE VIEW ==================== */
+        /* ==================== MANAGEMENT / EXECUTIVE VIEW ================= */
         /* ================================================================== */
         <div className="space-y-6">
-          {/* Period Selector Tabs (Today / This Week / This Month) */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/70 text-xs font-semibold w-fit">
-              <button
-                type="button"
-                onClick={() => setPeriod('today')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  period === 'today'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                onClick={() => setPeriod('thisWeek')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  period === 'thisWeek'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                This Week
-              </button>
-              <button
-                type="button"
-                onClick={() => setPeriod('thisMonth')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  period === 'thisMonth'
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                This Month
-              </button>
+          {/* ================================================================ */}
+          {/* PERIOD FILTER CONTROLS: CustomSelect + Quick Pills + Date Range   */}
+          {/* ================================================================ */}
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-3">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              {/* Left: Custom Select for Timeframe Filter */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+                  <Filter className="w-3.5 h-3.5 text-[#3b7987] dark:text-[#52a7b7]" />
+                  <span>{locale === 'bn' ? 'সময়কাল ফিল্টার:' : 'Period Filter:'}</span>
+                </div>
+
+                {/* Main Custom Select Component */}
+                <CustomSelect
+                  value={period}
+                  onChange={(val) => setPeriod(val)}
+                  size="sm"
+                  options={[
+                    { value: 'today', label: locale === 'bn' ? 'আজকের (Today)' : 'Today', icon: Calendar },
+                    { value: 'thisWeek', label: locale === 'bn' ? 'এই সপ্তাহের (This Week)' : 'This Week', icon: Calendar },
+                    { value: 'thisMonth', label: locale === 'bn' ? 'এই মাসের (This Month)' : 'This Month', icon: Calendar },
+                    { value: 'last30Days', label: locale === 'bn' ? 'গত ৩০ দিন (Last 30 Days)' : 'Last 30 Days', icon: Calendar },
+                    { value: 'thisYear', label: locale === 'bn' ? 'এই বছরের (This Year)' : 'This Year', icon: Calendar },
+                    { value: 'custom', label: locale === 'bn' ? 'কাস্টম সময়সীমা (Custom Range)' : 'Custom Range', icon: CalendarRange },
+                  ]}
+                />
+
+                {/* Quick Selection Pills */}
+                <div className="hidden sm:flex items-center gap-1 p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setPeriod('today')}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      period === 'today'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 font-bold shadow-2xs'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPeriod('thisWeek')}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      period === 'thisWeek'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 font-bold shadow-2xs'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    This Week
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPeriod('thisMonth')}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      period === 'thisMonth'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 font-bold shadow-2xs'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    This Month
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPeriod('last30Days')}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      period === 'last30Days'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 font-bold shadow-2xs'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    30 Days
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPeriod('custom')}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      period === 'custom'
+                        ? 'bg-[#c2d4d4] dark:bg-[#2c4246] text-slate-900 dark:text-slate-50 font-bold shadow-2xs'
+                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Custom
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: Live Sync Status */}
+              <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#3b7987] animate-pulse"></span>
+                <span>
+                  Active Period: <strong className="text-slate-700 dark:text-slate-200">{metricData.label}</strong>
+                </span>
+                <span className="hidden xl:inline text-slate-300 dark:text-slate-700">|</span>
+                <span className="hidden xl:inline">
+                  Updated: {businessUpdatedAt ? new Date(businessUpdatedAt).toLocaleTimeString() : 'Just now'}
+                </span>
+              </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 font-mono hidden sm:flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Updated: {businessUpdatedAt ? new Date(businessUpdatedAt).toLocaleTimeString() : 'Just now'}</span>
-            </div>
+            {/* Custom Date Range Picker Inputs (Revealed when period === 'custom') */}
+            {period === 'custom' && (
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-3 animate-in fade-in duration-200">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-bold text-slate-500">{locale === 'bn' ? 'শুরুর তারিখ:' : 'From:'}</span>
+                  <input
+                    type="date"
+                    value={customStartDate}
+                    max={customEndDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#3b7987]/30 focus:border-[#3b7987]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-bold text-slate-500">{locale === 'bn' ? 'শেষ তারিখ:' : 'To:'}</span>
+                  <input
+                    type="date"
+                    value={customEndDate}
+                    min={customStartDate}
+                    max={todayStr}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                    className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#3b7987]/30 focus:border-[#3b7987]"
+                  />
+                </div>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setCustomStartDate(sevenDaysAgoStr);
+                    setCustomEndDate(todayStr);
+                  }}
+                  className="h-8 px-2 text-xs text-slate-500 hover:text-[#3b7987]"
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Reset
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* ================================================================ */}
@@ -342,7 +561,7 @@ export default function DashboardPage() {
           {/* ================================================================ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {/* Card 1: Total Sales */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Sales</span>
@@ -350,17 +569,17 @@ export default function DashboardPage() {
                     {fmtCurrency(salesMetric.revenue)}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <DollarSign className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold text-sm shrink-0">
+                  <DollarSign className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Total sales turnover on store this {period === 'today' ? 'day' : period === 'thisWeek' ? 'week' : 'month'}
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Sales revenue for <span className="text-slate-600 dark:text-slate-300 font-semibold">{metricData.label}</span>
               </p>
             </div>
 
             {/* Card 2: Total Revenue / Gross */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Revenue</span>
@@ -368,17 +587,17 @@ export default function DashboardPage() {
                     {profitMetric ? fmtCurrency(profitMetric.gross) : fmtCurrency(salesMetric.revenue)}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <TrendingUp className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold text-sm shrink-0">
+                  <TrendingUp className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Total revenue on store this {period === 'today' ? 'day' : period === 'thisWeek' ? 'week' : 'month'}
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Gross inflow recorded for <span className="text-slate-600 dark:text-slate-300 font-semibold">{metricData.label}</span>
               </p>
             </div>
 
             {/* Card 3: Total Orders */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Orders</span>
@@ -386,17 +605,17 @@ export default function DashboardPage() {
                     {salesMetric.count.toLocaleString()}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <Package className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold text-sm shrink-0">
+                  <Package className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Total orders store received this {period === 'today' ? 'day' : period === 'thisWeek' ? 'week' : 'month'}
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Completed invoices in <span className="text-slate-600 dark:text-slate-300 font-semibold">{metricData.label}</span>
               </p>
             </div>
 
             {/* Card 4: Total Products */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Products</span>
@@ -404,17 +623,17 @@ export default function DashboardPage() {
                     {totalStockCount.toLocaleString()}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <Layers className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold text-sm shrink-0">
+                  <Layers className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Total active product SKU catalog in inventory
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Active catalog SKUs across inventory
               </p>
             </div>
 
             {/* Card 5: Customers & Receivables */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Customers</span>
@@ -422,29 +641,29 @@ export default function DashboardPage() {
                     {(businessData?.totalCustomers || 0).toLocaleString()}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <Users className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold text-sm shrink-0">
+                  <Users className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-                Registered clients ({fmtCurrency(businessData?.receivables || 0)} outstanding dues)
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Registered clients ({fmtCurrency(businessData?.receivables || 0)} dues)
               </p>
             </div>
 
             {/* Card 6: Store Health / Low Stock Alert */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Low Stock Alert</span>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight mt-1">
                     {(businessData?.lowStockCount || 0).toLocaleString()}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm shrink-0">
-                  <Activity className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold text-sm shrink-0">
+                  <Activity className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
                 Items currently at or below minimum reorder threshold
               </p>
             </div>
@@ -453,33 +672,72 @@ export default function DashboardPage() {
           {/* ================================================================ */}
           {/* 2. PERFORMANCE OVERVIEW: MULTI-SPLINE CURVE CHART                */}
           {/* ================================================================ */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4">
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Performance Overview
-              </h3>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  Performance Overview
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Annual 12-month metrics trend for year {chartYear} from database
+                </p>
+              </div>
 
-              {/* Legends & Year Dropdown */}
-              <div className="flex items-center gap-4 text-xs font-semibold">
+              {/* Legends & Interactive CustomSelect Filters */}
+              <div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#0284c7]"></span>
+                  <button
+                    type="button"
+                    onClick={() => setChartMetric(chartMetric === 'sales' ? 'all' : 'sales')}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all cursor-pointer ${
+                      chartMetric === 'sales' || chartMetric === 'all'
+                        ? 'text-slate-800 dark:text-slate-200 font-bold'
+                        : 'opacity-40'
+                    }`}
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#3b7987]"></span>
                     <span>Sales</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setChartMetric(chartMetric === 'revenue' ? 'all' : 'revenue')}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all cursor-pointer ${
+                      chartMetric === 'revenue' || chartMetric === 'all'
+                        ? 'text-slate-800 dark:text-slate-200 font-bold'
+                        : 'opacity-40'
+                    }`}
+                  >
                     <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></span>
                     <span>Revenue</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setChartMetric(chartMetric === 'profit' ? 'all' : 'profit')}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all cursor-pointer ${
+                      chartMetric === 'profit' || chartMetric === 'all'
+                        ? 'text-slate-800 dark:text-slate-200 font-bold'
+                        : 'opacity-40'
+                    }`}
+                  >
                     <span className="w-2.5 h-2.5 rounded-full bg-[#94a3b8]"></span>
-                    <span>Traffic</span>
-                  </span>
+                    <span>Profit</span>
+                  </button>
                 </div>
 
-                <div className="h-7 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 inline-flex items-center gap-1 bg-slate-50 dark:bg-slate-950 cursor-pointer">
-                  <span>2026</span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </div>
+                {/* Custom Select for Year Filter */}
+                <CustomSelect
+                  value={chartYear}
+                  onChange={(val) => setChartYear(val)}
+                  size="xs"
+                  options={[
+                    { value: '2026', label: 'Year 2026' },
+                    { value: '2025', label: 'Year 2025' },
+                    { value: '2024', label: 'Year 2024' },
+                    { value: '2023', label: 'Year 2023' },
+                  ]}
+                />
               </div>
             </div>
 
@@ -537,21 +795,27 @@ export default function DashboardPage() {
                     y1={padY}
                     x2={activeSalesPt.x}
                     y2={svgH - padY}
-                    stroke="#0284c7"
+                    stroke="#3b7987"
                     strokeWidth="1.5"
                     strokeDasharray="3 3"
                     className="opacity-40"
                   />
                 )}
 
-                {/* Curve 1: Slate Traffic / Profit Wave */}
-                <path d={trafficPathD} fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Curve 1: Slate Profit Wave */}
+                {(chartMetric === 'all' || chartMetric === 'profit') && (
+                  <path d={trafficPathD} fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+                )}
 
                 {/* Curve 2: Rose Revenue Wave */}
-                <path d={revenuePathD} fill="none" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" />
+                {(chartMetric === 'all' || chartMetric === 'revenue') && (
+                  <path d={revenuePathD} fill="none" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" />
+                )}
 
-                {/* Curve 3: Ocean Blue Sales Wave */}
-                <path d={salesPathD} fill="none" stroke="#0284c7" strokeWidth="3.5" strokeLinecap="round" />
+                {/* Curve 3: Teal Brand Sales Wave */}
+                {(chartMetric === 'all' || chartMetric === 'sales') && (
+                  <path d={salesPathD} fill="none" stroke="#3b7987" strokeWidth="3.5" strokeLinecap="round" />
+                )}
 
                 {/* Active Indicator Point Dots */}
                 {activeSalesPt && (
@@ -559,7 +823,7 @@ export default function DashboardPage() {
                     cx={activeSalesPt.x}
                     cy={activeSalesPt.y}
                     r="5"
-                    fill="#0284c7"
+                    fill="#3b7987"
                     stroke="#ffffff"
                     strokeWidth="2.5"
                     className="shadow-md"
@@ -576,7 +840,7 @@ export default function DashboardPage() {
                     onClick={() => setActiveChartPoint(i)}
                     className={`text-[11px] font-sans cursor-pointer transition-colors ${
                       i === activeChartPoint
-                        ? 'fill-[#0284c7] font-bold'
+                        ? 'fill-[#3b7987] font-bold'
                         : 'fill-slate-400 dark:fill-slate-500 font-semibold hover:fill-slate-700'
                     }`}
                   >
@@ -595,7 +859,7 @@ export default function DashboardPage() {
                   }}
                 >
                   <div className="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-lg">
-                    {months[activeChartPoint]}: {currSym} {(activeSalesPt.val).toLocaleString()}
+                    {months[activeChartPoint]} ({chartYear}): {currSym} {(activeSalesPt.val).toLocaleString()}
                   </div>
                   <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1"></div>
                 </div>
@@ -604,27 +868,80 @@ export default function DashboardPage() {
           </div>
 
           {/* ================================================================ */}
-          {/* 3. ROW 3: TOP SELLING PRODUCTS (8 COLS) + CATEGORY BREAKDOWN (4) */}
+          {/* 3. ROW 3: TOP SELLING PRODUCTS + CATEGORY BREAKDOWN              */}
           {/* ================================================================ */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Top Selling Products Table (Left 8 Cols) */}
-            <div className="lg:col-span-8 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
-                  Top Selling Products
-                </h3>
+            <div className="lg:col-span-8 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    Top Selling Products
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Showing {filteredProductsList.length} products from live sales
+                  </p>
+                </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 inline-flex items-center gap-1 bg-slate-50 dark:bg-slate-950 cursor-pointer">
-                    <span>30 Days</span>
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                {/* Filter Controls Row */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Search input */}
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                      className="h-8 pl-8 pr-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#3b7987]/30 focus:border-[#3b7987] w-28 sm:w-36 transition-all"
+                    />
                   </div>
+
+                  {/* Category Filter */}
+                  {distinctCategories.length > 0 && (
+                    <CustomSelect
+                      value={productCategoryFilter}
+                      onChange={(val) => setProductCategoryFilter(val)}
+                      size="xs"
+                      options={[
+                        { value: 'all', label: 'All Categories' },
+                        ...distinctCategories.map((c) => ({ value: c, label: c })),
+                      ]}
+                    />
+                  )}
+
+                  {/* Status Filter */}
+                  <CustomSelect
+                    value={productStatusFilter}
+                    onChange={(val) => setProductStatusFilter(val)}
+                    size="xs"
+                    options={[
+                      { value: 'all', label: 'All Status' },
+                      { value: 'In Stock', label: 'In Stock' },
+                      { value: 'Low Stock', label: 'Low Stock' },
+                      { value: 'Out of Stock', label: 'Out of Stock' },
+                    ]}
+                  />
+
+                  {/* Timeframe Filter */}
+                  <CustomSelect
+                    value={productTimeframe}
+                    onChange={(val) => setProductTimeframe(val)}
+                    size="xs"
+                    options={[
+                      { value: '7d', label: '7 Days' },
+                      { value: '30d', label: '30 Days' },
+                      { value: '90d', label: '90 Days' },
+                      { value: 'year', label: 'This Year' },
+                      { value: 'all', label: 'All Time' },
+                    ]}
+                  />
 
                   <Link
                     href="/products"
-                    className="h-8 px-3.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer"
+                    className="h-8 px-3 rounded-xl bg-[#3b7987] hover:bg-[#326975] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer shrink-0"
                   >
-                    <span>View All Products</span>
+                    <span>View All</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -636,56 +953,78 @@ export default function DashboardPage() {
                   <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                       <th className="pb-3 font-semibold">Product Name</th>
-                      <th className="pb-3 font-semibold">Product Category</th>
-                      <th className="pb-3 font-semibold">Products Sold</th>
+                      <th className="pb-3 font-semibold">Category</th>
+                      <th className="pb-3 font-semibold">Quantity Sold</th>
                       <th className="pb-3 font-semibold text-right">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                    {topProductsList.map((prod, i) => (
-                      <tr key={i} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
-                        <td className="py-3.5 font-bold text-slate-800 dark:text-slate-200">
-                          {prod.name}
-                        </td>
-                        <td className="py-3.5 text-slate-500 dark:text-slate-400 font-medium">
-                          {prod.category}
-                        </td>
-                        <td className="py-3.5 font-semibold text-slate-700 dark:text-slate-300">
-                          {prod.sold.toLocaleString()}
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <span
-                            className={`inline-block text-[11px] font-bold ${
-                              prod.status === 'In Stock'
-                                ? 'text-emerald-500'
-                                : prod.status === 'Low Stock'
-                                ? 'text-amber-500'
-                                : 'text-rose-500'
-                            }`}
-                          >
-                            {prod.status}
-                          </span>
+                    {filteredProductsList.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-6 text-center text-xs text-slate-400 font-medium">
+                          No products match the selected filter criteria.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredProductsList.map((prod, i) => (
+                        <tr key={i} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+                          <td className="py-3.5 font-bold text-slate-800 dark:text-slate-200">
+                            {prod.name}
+                          </td>
+                          <td className="py-3.5 text-slate-500 dark:text-slate-400 font-medium">
+                            {prod.category}
+                          </td>
+                          <td className="py-3.5 font-semibold text-slate-700 dark:text-slate-300">
+                            {prod.sold.toLocaleString()}
+                          </td>
+                          <td className="py-3.5 text-right">
+                            <span
+                              className={`inline-block text-[11px] font-bold ${
+                                prod.status === 'In Stock'
+                                  ? 'text-emerald-500'
+                                  : prod.status === 'Low Stock'
+                                  ? 'text-amber-500'
+                                  : 'text-rose-500'
+                              }`}
+                            >
+                              {prod.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
 
             {/* Sales Distribution by Category (Right 4 Cols) */}
-            <div className="lg:col-span-4 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4 flex flex-col justify-between">
+            <div className="lg:col-span-4 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
-                    Sales Distribution by Category
+                    Category Distribution
                   </h3>
+
+                  {/* CustomSelect Timeframe Filter */}
+                  <CustomSelect
+                    value={categoryTimeframe}
+                    onChange={(val) => setCategoryTimeframe(val)}
+                    size="xs"
+                    options={[
+                      { value: 'today', label: 'Today' },
+                      { value: '7d', label: '7 Days' },
+                      { value: '30d', label: '30 Days' },
+                      { value: '90d', label: '90 Days' },
+                      { value: 'year', label: 'This Year' },
+                    ]}
+                  />
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-semibold mt-2">
                   <div className="flex items-center gap-3">
                     <span className="inline-flex items-center gap-1 text-slate-500">
-                      <span className="w-2 h-2 rounded-full bg-[#0284c7]"></span>
+                      <span className="w-2 h-2 rounded-full bg-[#3b7987]"></span>
                       <span>Sales</span>
                     </span>
                     <span className="inline-flex items-center gap-1 text-slate-500">
@@ -693,36 +1032,42 @@ export default function DashboardPage() {
                       <span>Revenue</span>
                     </span>
                   </div>
-                  <span className="text-slate-400 font-medium">30 Days</span>
+                  <span className="text-slate-400 font-medium">Live Aggregation</span>
                 </div>
               </div>
 
               {/* Dual Bar Chart */}
               <div className="h-48 flex items-end justify-between gap-3 pt-4 pb-1 border-b border-slate-100 dark:border-slate-800">
-                {categoryData.map((cat, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
-                    <div className="flex items-end gap-1 h-full">
-                      {/* Blue Bar (Sales) */}
-                      <div
-                        style={{ height: `${cat.sales}%` }}
-                        className="w-2.5 rounded-t-sm bg-[#0284c7] group-hover:bg-[#0369a1] transition-all"
-                        title={`${cat.name} Sales: ${cat.sales}%`}
-                      />
-                      {/* Rose Bar (Revenue) */}
-                      <div
-                        style={{ height: `${cat.revenue}%` }}
-                        className="w-2.5 rounded-t-sm bg-[#f43f5e] group-hover:bg-[#e11d48] transition-all"
-                        title={`${cat.name} Revenue: ${cat.revenue}%`}
-                      />
-                    </div>
+                {categoryData.length === 0 ? (
+                  <div className="w-full text-center text-xs text-slate-400 py-12">
+                    No category data available
                   </div>
-                ))}
+                ) : (
+                  categoryData.map((cat, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
+                      <div className="flex items-end gap-1 h-full">
+                        {/* Teal Bar (Sales) */}
+                        <div
+                          style={{ height: `${cat.sales}%` }}
+                          className="w-2.5 rounded-t-sm bg-[#3b7987] group-hover:bg-[#326975] transition-all"
+                          title={`${cat.name} Sales: ${cat.salesVal}`}
+                        />
+                        {/* Rose Bar (Revenue) */}
+                        <div
+                          style={{ height: `${cat.revenue}%` }}
+                          className="w-2.5 rounded-t-sm bg-[#f43f5e] group-hover:bg-[#e11d48] transition-all"
+                          title={`${cat.name} Revenue: ${fmtCurrency(cat.revenueVal)}`}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* Category labels below bars */}
               <div className="flex justify-between text-[10px] text-slate-400 font-semibold px-0.5">
                 {categoryData.map((c, i) => (
-                  <span key={i} className="truncate max-w-[45px] text-center">
+                  <span key={i} className="truncate max-w-[45px] text-center" title={c.name}>
                     {c.name}
                   </span>
                 ))}
@@ -735,15 +1080,24 @@ export default function DashboardPage() {
           {/* ================================================================ */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Widget 1: Products Overview (Donut Chart) */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
                   Products Overview
                 </h3>
-                <div className="h-6 px-2 rounded-md border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-500 inline-flex items-center gap-1">
-                  <span>30 Days</span>
-                  <ChevronDown className="w-2.5 h-2.5" />
-                </div>
+
+                {/* CustomSelect Stock Filter */}
+                <CustomSelect
+                  value={stockFilter}
+                  onChange={(val) => setStockFilter(val)}
+                  size="xs"
+                  options={[
+                    { value: 'all', label: 'All Stock' },
+                    { value: 'in_stock', label: 'In Stock' },
+                    { value: 'low_stock', label: 'Low Stock' },
+                    { value: 'out_of_stock', label: 'Out of Stock' },
+                  ]}
+                />
               </div>
 
               {/* Circular Donut Gauge */}
@@ -771,13 +1125,13 @@ export default function DashboardPage() {
                     strokeDashoffset="0"
                     strokeLinecap="round"
                   />
-                  {/* Arc 2: Low Stock (Sky Blue) */}
+                  {/* Arc 2: Low Stock (Teal) */}
                   <circle
                     cx="75"
                     cy="75"
                     r={donutR}
                     fill="none"
-                    stroke="#0284c7"
+                    stroke="#3b7987"
                     strokeWidth="14"
                     strokeDasharray={`${lowStockStroke} ${donutCirc}`}
                     strokeDashoffset={`-${inStockStroke}`}
@@ -800,9 +1154,11 @@ export default function DashboardPage() {
                 {/* Center text */}
                 <div className="absolute flex flex-col items-center justify-center text-center">
                   <span className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                    {totalStockCount}
+                    {displayedStockCount.toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium">Total Products</span>
+                  <span className="text-[10px] text-slate-400 font-medium capitalize">
+                    {stockFilter === 'all' ? 'Total Products' : stockFilter.replace('_', ' ')}
+                  </span>
                 </div>
               </div>
 
@@ -810,29 +1166,39 @@ export default function DashboardPage() {
               <div className="flex items-center justify-center gap-3.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300 pt-1">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
-                  <span>In Stock - {inStockPct}</span>
+                  <span>In Stock - {inStockPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0284c7]"></span>
-                  <span>Low Stock - {lowStockPct}</span>
+                  <span className="w-2 h-2 rounded-full bg-[#3b7987]"></span>
+                  <span>Low - {lowStockPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#f43f5e]"></span>
-                  <span>Out - {outOfStockPct}</span>
+                  <span>Out - {outOfStockPct}%</span>
                 </span>
               </div>
             </div>
 
             {/* Widget 2: Orders Overview (Donut Chart) */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
                   Orders Overview
                 </h3>
-                <div className="h-6 px-2 rounded-md border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-500 inline-flex items-center gap-1">
-                  <span>30 Days</span>
-                  <ChevronDown className="w-2.5 h-2.5" />
-                </div>
+
+                {/* CustomSelect Orders Timeframe Filter */}
+                <CustomSelect
+                  value={ordersTimeframe}
+                  onChange={(val) => setOrdersTimeframe(val)}
+                  size="xs"
+                  options={[
+                    { value: 'today', label: 'Today' },
+                    { value: '7d', label: '7 Days' },
+                    { value: '30d', label: '30 Days' },
+                    { value: 'month', label: 'This Month' },
+                    { value: 'year', label: 'This Year' },
+                  ]}
+                />
               </div>
 
               {/* Circular Donut Gauge */}
@@ -860,31 +1226,19 @@ export default function DashboardPage() {
                     strokeDashoffset="0"
                     strokeLinecap="round"
                   />
-                  {/* Arc 2: Shipped/In-Store (Sky Blue) */}
+                  {/* Arc 2: Active / In-Store (Teal) */}
                   <circle
                     cx="75"
                     cy="75"
                     r={donutR}
                     fill="none"
-                    stroke="#0284c7"
+                    stroke="#3b7987"
                     strokeWidth="14"
-                    strokeDasharray={`${ordShippedStroke} ${donutCirc}`}
+                    strokeDasharray={`${ordInProgressStroke} ${donutCirc}`}
                     strokeDashoffset={`-${ordCompletedStroke}`}
                     strokeLinecap="round"
                   />
-                  {/* Arc 3: In Progress (Amber) */}
-                  <circle
-                    cx="75"
-                    cy="75"
-                    r={donutR}
-                    fill="none"
-                    stroke="#f59e0b"
-                    strokeWidth="14"
-                    strokeDasharray={`${ordInProgressStroke} ${donutCirc}`}
-                    strokeDashoffset={`-${ordCompletedStroke + ordShippedStroke}`}
-                    strokeLinecap="round"
-                  />
-                  {/* Arc 4: Cancelled (Rose) */}
+                  {/* Arc 3: Cancelled / Refunded (Rose) */}
                   <circle
                     cx="75"
                     cy="75"
@@ -893,7 +1247,7 @@ export default function DashboardPage() {
                     stroke="#f43f5e"
                     strokeWidth="14"
                     strokeDasharray={`${ordCancelledStroke} ${donutCirc}`}
-                    strokeDashoffset={`-${ordCompletedStroke + ordShippedStroke + ordInProgressStroke}`}
+                    strokeDashoffset={`-${ordCompletedStroke + ordInProgressStroke}`}
                     strokeLinecap="round"
                   />
                 </svg>
@@ -901,9 +1255,9 @@ export default function DashboardPage() {
                 {/* Center text */}
                 <div className="absolute flex flex-col items-center justify-center text-center">
                   <span className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                    {totalOrdersCount}
+                    {totalOrdersCount.toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium">Total Orders</span>
+                  <span className="text-[10px] text-slate-400 font-medium">Orders ({ordersTimeframe})</span>
                 </div>
               </div>
 
@@ -911,45 +1265,52 @@ export default function DashboardPage() {
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 pt-1">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#10b981]"></span>
-                  <span>Completed - {ordCompletedPct}%</span>
+                  <span>Done - {ordCompletedPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0284c7]"></span>
-                  <span>In-Store - {ordInProgressPct}%</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+                  <span className="w-2 h-2 rounded-full bg-[#3b7987]"></span>
                   <span>Active - {ordInProgressPct}%</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#f43f5e]"></span>
-                  <span>Refunded - {ordRefundedPct}%</span>
+                  <span>Refund - {ordRefundedPct}%</span>
                 </span>
               </div>
             </div>
 
             {/* Widget 3: Traffic Sources / Tender Payment Breakdown */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-4 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
                   Payment Channels
                 </h3>
-                <div className="h-6 px-2 rounded-md border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-500 inline-flex items-center gap-1">
-                  <span>30 Days</span>
-                  <ChevronDown className="w-2.5 h-2.5" />
-                </div>
+
+                {/* CustomSelect Payments Timeframe Filter */}
+                <CustomSelect
+                  value={paymentsTimeframe}
+                  onChange={(val) => setPaymentsTimeframe(val)}
+                  size="xs"
+                  options={[
+                    { value: 'today', label: 'Today' },
+                    { value: '7d', label: '7 Days' },
+                    { value: '30d', label: '30 Days' },
+                    { value: 'month', label: 'This Month' },
+                    { value: 'year', label: 'This Year' },
+                  ]}
+                />
               </div>
 
-              {/* Clean Vertical Blue Bar Chart */}
+              {/* Clean Vertical Bar Chart */}
               <div className="h-36 flex items-end justify-between gap-3 pt-3 border-b border-slate-100 dark:border-slate-800">
                 {paymentSources.map((source, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
-                    <div className="text-[10px] font-mono text-slate-400 group-hover:text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity mb-1">
+                    <div className="text-[10px] font-mono text-slate-400 group-hover:text-[#3b7987] opacity-0 group-hover:opacity-100 transition-opacity mb-1 whitespace-nowrap">
                       {source.val}
                     </div>
                     <div
                       style={{ height: `${source.height}%` }}
-                      className="w-full max-w-[24px] rounded-t-md bg-[#0284c7] group-hover:bg-[#0369a1] transition-all cursor-pointer"
+                      className="w-full max-w-[24px] rounded-t-md bg-[#3b7987] group-hover:bg-[#326975] transition-all cursor-pointer"
+                      title={`${source.label}: ${source.val}`}
                     />
                   </div>
                 ))}
@@ -958,7 +1319,7 @@ export default function DashboardPage() {
               {/* Source Labels */}
               <div className="flex justify-between text-[10px] text-slate-400 font-semibold px-1">
                 {paymentSources.map((s, i) => (
-                  <span key={i} className="truncate max-w-[50px] text-center">
+                  <span key={i} className="truncate max-w-[50px] text-center" title={s.label}>
                     {s.label}
                   </span>
                 ))}
@@ -973,7 +1334,7 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {/* Active Session Status */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-3">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-3">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Register Shift Status</span>
               {cashierData?.activeSession ? (
                 <div className="space-y-2">
@@ -992,7 +1353,7 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-3 pt-1">
                   <div className="text-sm font-bold text-amber-600">No Open Shift Active</div>
-                  <Button asChild size="sm" className="text-xs h-9 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl font-bold shadow-xs">
+                  <Button asChild size="sm" className="text-xs h-9 bg-[#3b7987] hover:bg-[#326975] text-white rounded-xl font-bold shadow-xs">
                     <Link href="/pos">Open Shift in POS Counter</Link>
                   </Button>
                 </div>
@@ -1000,38 +1361,38 @@ export default function DashboardPage() {
             </div>
 
             {/* Today Sales Count */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-1">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">My Sales Count Today</span>
               <div className="text-3xl font-black text-slate-900 dark:text-white mt-1">
                 {(cashierData?.today?.salesCount || 0).toLocaleString()}
               </div>
-              <p className="text-xs text-slate-400 pt-1">Total retail invoices generated during shift</p>
+              <p className="text-xs text-slate-400 pt-1 font-medium">Total retail invoices generated during shift</p>
             </div>
 
             {/* Today Sales Amount */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">My Sales Total (BDT)</span>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">My Sales Total ({currSym})</span>
               <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                 {fmtCurrency(cashierData?.today?.salesAmount || 0)}
               </div>
-              <p className="text-xs text-slate-400 pt-1">Net cash &amp; digital collections processed</p>
+              <p className="text-xs text-slate-400 pt-1 font-medium">Net cash &amp; digital collections processed</p>
             </div>
           </div>
 
           {/* Quick Action Links for Cashier */}
-          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-3">
-            <Button asChild size="sm" className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs h-10 px-4 rounded-xl font-bold shadow-sm cursor-pointer">
+          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center gap-3">
+            <Button asChild size="sm" className="bg-[#3b7987] hover:bg-[#326975] text-white text-xs h-10 px-4 rounded-xl font-bold shadow-2xs cursor-pointer">
               <Link href="/pos">
                 <ShoppingCart className="w-4 h-4 mr-1.5" />
                 <span>Go to POS Terminal</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
+            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-[#3b7987] hover:text-[#3b7987] cursor-pointer">
               <Link href="/pos/register/close">
                 <span>Close Register Shift (Z-Report)</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-sky-500 cursor-pointer">
+            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-[#3b7987] hover:text-[#3b7987] cursor-pointer">
               <Link href="/sync">
                 <span>View Offline Queue ({pendingCount})</span>
               </Link>

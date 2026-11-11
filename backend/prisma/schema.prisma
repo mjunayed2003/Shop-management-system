@@ -922,6 +922,7 @@ model Product {
   gender             Gender    @default(UNISEX)
   fabric             String?
   description        String?
+  image_url          String?
   has_variants       Boolean   @default(true)
   track_individually Boolean   @default(false)
   is_active          Boolean   @default(true)

@@ -52,8 +52,8 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
           {locale === 'en' ? 'বাংলা' : 'English'}
         </span>
 
-        {/* Active subtle emerald pulse dot */}
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+        {/* Active subtle brand pulse dot */}
+        <span className="w-1.5 h-1.5 rounded-full bg-[#3b7987] animate-pulse shrink-0" />
       </button>
 
       {/* Floating micro notification badge on click */}

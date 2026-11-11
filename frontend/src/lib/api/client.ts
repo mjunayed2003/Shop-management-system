@@ -86,7 +86,9 @@ class ApiClient {
 
     // Prepare body: clean body to ensure business_id and branch_id are never sent in request bodies
     let body = customConfig.body;
-    if (body && typeof body === 'object' && !(body instanceof FormData)) {
+    if (body instanceof FormData) {
+      delete headers['Content-Type'];
+    } else if (body && typeof body === 'object') {
       body = JSON.stringify(this.cleanRequestBody(body));
     }
 
@@ -146,6 +148,14 @@ class ApiClient {
 
   put<T = any>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'PUT', body: data });
+  }
+
+  upload<T = any>(endpoint: string, formData: FormData, options?: RequestOptions): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+    });
   }
 
   delete<T = any>(endpoint: string, options?: RequestOptions): Promise<T> {

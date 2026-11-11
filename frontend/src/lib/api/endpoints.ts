@@ -371,6 +371,12 @@ export const api = {
         apiClient.patch<any>(`/api/v1/catalog/products/${id}`, data),
 
       delete: (id: string) => apiClient.delete<any>(`/api/v1/catalog/products/${id}`),
+
+      uploadImage: (formData: FormData, folder: string = 'products') =>
+        apiClient.upload<{ success: boolean; data: { url: string; key: string; size: number; provider: string } }>(
+          `/api/v1/storage/upload?folder=${encodeURIComponent(folder)}`,
+          formData,
+        ),
     },
 
     // Variants
@@ -1340,14 +1346,35 @@ export const api = {
 
   // Phase F6: Dashboards
   dashboards: {
-    business: () =>
+    business: (params?: {
+      branchId?: string;
+      startDate?: string;
+      endDate?: string;
+      year?: string | number;
+      period?: string;
+      productTimeframe?: string;
+      categoryTimeframe?: string;
+      ordersTimeframe?: string;
+      paymentsTimeframe?: string;
+    }) =>
       apiClient.get<{
         sales: {
           today: { revenue: number; count: number };
           thisWeek: { revenue: number; count: number };
           thisMonth: { revenue: number; count: number };
+          last30Days?: { revenue: number; count: number };
+          thisYear?: { revenue: number; count: number };
+          allTime?: { revenue: number; count: number };
+          custom?: { revenue: number; count: number };
         };
-        expenses: { today: number; thisWeek: number; thisMonth: number };
+        expenses: {
+          today: number;
+          thisWeek: number;
+          thisMonth: number;
+          last30Days?: number;
+          thisYear?: number;
+          custom?: number;
+        };
         receivables: number;
         payables: number;
         stockValue: number;
@@ -1356,8 +1383,11 @@ export const api = {
           variantId: string;
           sku?: string;
           productName?: string;
+          category?: string;
           quantitySold: number;
           revenue: number;
+          currentStock?: number;
+          status?: string;
         }>;
         salesTrend: Array<{ date: string; total: number }>;
         branchComparison: Array<{ branchId: string; branchName: string; monthRevenue: number }>;
@@ -1376,9 +1406,8 @@ export const api = {
           refunded: number;
         };
         paymentChannels?: Array<{
-          name: string;
-          value: number;
-          pct: number;
+          label: string;
+          amount: number;
         }>;
         monthlyPerformance?: Array<{
           month: string;
@@ -1388,7 +1417,7 @@ export const api = {
           orders: number;
         }>;
         categoryDistribution?: Array<{
-          category: string;
+          name: string;
           sales: number;
           revenue: number;
         }>;
@@ -1396,9 +1425,20 @@ export const api = {
           today: { gross: number; net: number };
           thisWeek: { gross: number; net: number };
           thisMonth: { gross: number; net: number };
+          last30Days?: { gross: number; net: number };
+          thisYear?: { gross: number; net: number };
+          allTime?: { gross: number; net: number };
+          custom?: { gross: number; net: number };
         };
-        cogs?: { today: number; thisWeek: number; thisMonth: number };
-      }>('/api/v1/dashboards/business'),
+        cogs?: {
+          today: number;
+          thisWeek: number;
+          thisMonth: number;
+          last30Days?: number;
+          thisYear?: number;
+          custom?: number;
+        };
+      }>('/api/v1/dashboards/business', params ? { params } : undefined),
 
     cashier: () =>
       apiClient.get<{
@@ -1506,5 +1546,17 @@ export const api = {
 
     close: (id: string) =>
       apiClient.patch<any>(`/api/v1/support/tickets/${id}/close`),
+  },
+
+  storage: {
+    uploadImage: (formData: FormData, folder: string = 'products') =>
+      apiClient.upload<{ success: boolean; data: { url: string; key: string; size: number; provider: string; mimetype: string } }>(
+        `/api/v1/storage/upload?folder=${encodeURIComponent(folder)}`,
+        formData,
+      ),
+    getProvider: () =>
+      apiClient.get<{ success: boolean; provider: string }>('/api/v1/storage/provider'),
+    deleteFile: (key: string) =>
+      apiClient.delete<{ success: boolean; message: string }>('/api/v1/storage/file', { body: JSON.stringify({ key }) as any }),
   },
 };

@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
     <div className="space-y-6">
       {/* Top Navigation & Action Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
@@ -196,6 +196,16 @@ export default function ProductDetailPage() {
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
+          {(product.imageUrl || product.image_url) && (
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 shadow-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={product.imageUrl || product.image_url}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight text-foreground">{product.name}</h1>

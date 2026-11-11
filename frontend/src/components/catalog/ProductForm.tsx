@@ -16,6 +16,7 @@ import { FormFieldWrapper } from '@/components/shared/FormFieldWrapper';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PlanLimitDialog } from '@/components/feedback/PlanLimitDialog';
 import { QuickCreateModal, MasterDataType } from './QuickCreateModal';
+import { ProductImageUpload } from './ProductImageUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -67,6 +68,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
   const isOwnerOrAdmin = user?.isOwner;
 
   // Basic Information Form State
+  const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || initialData?.image_url || '');
   const [name, setName] = useState(initialData?.name || '');
   const [code, setCode] = useState(initialData?.code || '');
   const [categoryId, setCategoryId] = useState(initialData?.category?.id || initialData?.category_id || '');
@@ -326,6 +328,11 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
       setVariantRowErrors({});
 
       // Client validation
+      if (!imageUrl) {
+        setFieldErrors((p) => ({ ...p, imageUrl: 'পণ্যের অন্তত একটি ছবি আপলোড করা আবশ্যক।' }));
+        toast.error('পণ্যের অন্তত একটি ছবি আপলোড করা আবশ্যক');
+        throw new Error('পণ্যের অন্তত একটি ছবি আপলোড করা আবশ্যক (At least one product image is required)');
+      }
       if (!name.trim()) throw new Error('Product Name is required.');
       if (!code.trim()) throw new Error('Product Style Code is required.');
       if (!categoryId) throw new Error('Category is required.');
@@ -362,6 +369,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
             gender,
             fabric: fabric.trim() || undefined,
             description: description.trim() || undefined,
+            imageUrl: imageUrl.trim() || undefined,
             hasVariants,
             trackIndividually,
             branchIds: isOwnerOrAdmin && selectedBranchIds.length > 0 ? selectedBranchIds : undefined,
@@ -381,6 +389,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
           gender,
           fabric: fabric.trim() || null,
           description: description.trim() || null,
+          imageUrl: imageUrl.trim() || null,
           hasVariants,
           trackIndividually,
         });
@@ -502,6 +511,22 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
             <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             {t('catalog.basicInfo')}
           </h2>
+        </div>
+
+        {/* Product Image Upload (Mandatory) */}
+        <div>
+          <ProductImageUpload
+            value={imageUrl}
+            onChange={(url) => {
+              setImageUrl(url);
+              setIsDirty(true);
+              if (fieldErrors.imageUrl) {
+                setFieldErrors((p) => ({ ...p, imageUrl: '' }));
+              }
+            }}
+            error={fieldErrors.imageUrl}
+            required
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

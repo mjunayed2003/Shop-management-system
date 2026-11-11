@@ -128,7 +128,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 relative"
+        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b7987] relative"
         aria-label="Notifications"
       >
         <Bell className="w-4 h-4" />
@@ -145,7 +145,7 @@ export function NotificationBell() {
             <div className="flex items-center gap-1.5">
               <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">{t('shell.notifications')}</h4>
               {unreadCount > 0 && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-semibold">
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#3b7987]/10 text-[#3b7987] dark:bg-[#3b7987]/20 dark:text-[#52a7b7] font-semibold">
                   {unreadCount} new
                 </span>
               )}
@@ -155,7 +155,7 @@ export function NotificationBell() {
                 type="button"
                 onClick={() => markAllMutation.mutate()}
                 disabled={markAllMutation.isPending}
-                className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                className="text-[11px] text-[#3b7987] dark:text-[#52a7b7] hover:underline flex items-center gap-1"
               >
                 <CheckCheck className="w-3 h-3" />
                 <span>Mark all read</span>

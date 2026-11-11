@@ -18,7 +18,7 @@ export function AppTopBar({ onOpenMobileSidebar }: AppTopBarProps) {
   const business = useAuthStore((s) => s.business);
 
   return (
-    <header className="h-16 px-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4">
+    <header className="h-16 px-4 sm:px-6 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-4">
       {/* Left: Mobile trigger & Business Name */}
       <div className="flex items-center gap-3">
         <button
@@ -31,8 +31,8 @@ export function AppTopBar({ onOpenMobileSidebar }: AppTopBarProps) {
         </button>
 
         {business && (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#3b7987]/10 dark:bg-[#3b7987]/20 text-[#3b7987] dark:text-[#52a7b7] flex items-center justify-center font-bold shadow-2xs">
               <Store className="w-4 h-4" />
             </div>
             <div>

@@ -87,11 +87,11 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b7987]"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
-        <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center shadow-sm">
+        <div className="w-8 h-8 rounded-full bg-[#3b7987] hover:bg-[#326975] text-white font-bold text-xs flex items-center justify-center shadow-xs transition-transform active:scale-95">
           {initials}
         </div>
         <div className="hidden md:block text-left">
@@ -111,7 +111,7 @@ export function UserMenu() {
             <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{user.fullName}</p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email || user.phone}</p>
             {business && (
-              <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
+              <p className="text-[10px] font-medium text-[#3b7987] dark:text-[#52a7b7] mt-1 flex items-center gap-1">
                 <Shield className="w-3 h-3" />
                 {business.name}
               </p>

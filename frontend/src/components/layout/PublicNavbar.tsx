@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n';
@@ -30,6 +30,84 @@ export function PublicNavbar() {
   // Scroll direction state for smart hide-on-scroll-down, show-on-scroll-up
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [activeHash, setActiveHash] = useState('');
+  const isAnchorNavigating = useRef(false);
+
+  // Sync hash state on mount and on hashchange
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncHash = () => {
+      const hash = window.location.hash;
+      setActiveHash(hash);
+      if (hash === '#features') {
+        setIsVisible(true);
+        isAnchorNavigating.current = true;
+        setTimeout(() => {
+          isAnchorNavigating.current = false;
+          setIsVisible(true);
+        }, 1200);
+      }
+    };
+
+    syncHash();
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, []);
+
+  // IntersectionObserver to set active hash to #features when in view, or reset when at top
+  useEffect(() => {
+    if (pathname !== '/') {
+      setActiveHash('');
+      return;
+    }
+
+    const el = document.getElementById('features');
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveHash('#features');
+          } else {
+            if (window.scrollY < el.offsetTop - 180) {
+              setActiveHash('');
+            }
+          }
+        });
+      },
+      { rootMargin: '-10% 0px -50% 0px', threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  // Smooth scroll to an anchor section with header offset without hiding navbar
+  const scrollToSection = (id: string) => {
+    isAnchorNavigating.current = true;
+    setIsVisible(true);
+    setActiveHash(`#${id}`);
+    window.history.pushState(null, '', `/#${id}`);
+
+    const el = document.getElementById(id);
+    if (el) {
+      const headerOffset = 80;
+      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+
+    setTimeout(() => {
+      isAnchorNavigating.current = false;
+      setIsVisible(true);
+    }, 1000);
+  };
 
   useEffect(() => {
     let ticking = false;
@@ -39,8 +117,16 @@ export function PublicNavbar() {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
 
+          // Never hide if anchor scrolling is in progress
+          if (isAnchorNavigating.current) {
+            setIsVisible(true);
+            setLastScrollY(currentScrollY);
+            ticking = false;
+            return;
+          }
+
           // Always visible at or near the top
-          if (currentScrollY <= 15) {
+          if (currentScrollY <= 25) {
             setIsVisible(true);
           } else if (currentScrollY > lastScrollY && currentScrollY > 70) {
             // Scrolling DOWN: hide navbar
@@ -73,12 +159,7 @@ export function PublicNavbar() {
       router.push('/contact');
     } else {
       if (pathname === '/') {
-        const el = document.getElementById('features');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          router.push('/#features');
-        }
+        scrollToSection('features');
       } else {
         router.push('/#features');
       }
@@ -90,13 +171,13 @@ export function PublicNavbar() {
       href: '/',
       label: t('nav.home') || 'HOME',
       icon: Home,
-      isActive: pathname === '/',
+      isActive: pathname === '/' && activeHash !== '#features',
     },
     {
       href: '/#features',
       label: t('nav.features') || 'FEATURES',
       icon: Layers,
-      isActive: false,
+      isActive: pathname === '/' && activeHash === '#features',
     },
     {
       href: '/pricing',
@@ -116,7 +197,7 @@ export function PublicNavbar() {
     <>
       {/* Smart Hide/Show Fixed Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-xs transition-transform duration-300 ease-in-out ${
           isVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
@@ -147,11 +228,22 @@ export function PublicNavbar() {
                     href={item.href}
                     prefetch={false}
                     onClick={(e) => {
-                      if (item.href === '/#features' && pathname === '/') {
-                        e.preventDefault();
-                        const el = document.getElementById('features');
-                        if (el) {
-                          el.scrollIntoView({ behavior: 'smooth' });
+                      if (item.href === '/#features') {
+                        if (pathname === '/') {
+                          e.preventDefault();
+                          scrollToSection('features');
+                        }
+                      } else if (item.href === '/') {
+                        if (pathname === '/') {
+                          e.preventDefault();
+                          isAnchorNavigating.current = true;
+                          setIsVisible(true);
+                          setActiveHash('');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          setTimeout(() => {
+                            isAnchorNavigating.current = false;
+                            setIsVisible(true);
+                          }, 800);
                         }
                       }
                     }}
@@ -265,11 +357,22 @@ export function PublicNavbar() {
                     prefetch={false}
                     onClick={(e) => {
                       setMobileMenuOpen(false);
-                      if (item.href === '/#features' && pathname === '/') {
-                        e.preventDefault();
-                        const el = document.getElementById('features');
-                        if (el) {
-                          el.scrollIntoView({ behavior: 'smooth' });
+                      if (item.href === '/#features') {
+                        if (pathname === '/') {
+                          e.preventDefault();
+                          scrollToSection('features');
+                        }
+                      } else if (item.href === '/') {
+                        if (pathname === '/') {
+                          e.preventDefault();
+                          isAnchorNavigating.current = true;
+                          setIsVisible(true);
+                          setActiveHash('');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          setTimeout(() => {
+                            isAnchorNavigating.current = false;
+                            setIsVisible(true);
+                          }, 800);
                         }
                       }
                     }}

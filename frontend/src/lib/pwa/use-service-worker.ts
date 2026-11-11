@@ -11,9 +11,24 @@ export function useServiceWorker() {
 
   const cartItemsCount = useCartStore((s) => s.items.length);
 
-  // Register SW and listen for waiting updates
+  // Register SW and listen for waiting updates (PRODUCTION ONLY)
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return;
+    }
+
+    // In development mode, NEVER register service worker; unregister any existing ones & clear cache
+    if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+      if ('caches' in window) {
+        caches.keys().then((keys) => {
+          keys.forEach((key) => caches.delete(key));
+        });
+      }
       return;
     }
 
