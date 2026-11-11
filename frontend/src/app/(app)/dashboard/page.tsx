@@ -41,6 +41,12 @@ import {
   CalendarRange,
   Filter,
   X,
+  RotateCcw,
+  Undo2,
+  ArrowDownLeft,
+  FileText,
+  Receipt,
+  CheckCircle,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -137,6 +143,7 @@ export default function DashboardPage() {
     const salesObj = (businessData?.sales as any)?.[period] || { revenue: 0, count: 0 };
     const expVal = (businessData?.expenses as any)?.[period] || 0;
     const profitObj = (businessData?.profit as any)?.[period] || { gross: 0, net: 0 };
+    const returnsObj = (businessData?.returns as any)?.[period] || { revenue: 0, count: 0 };
 
     let label = 'this month';
     if (period === 'today') label = locale === 'bn' ? 'আজকের' : 'today';
@@ -150,12 +157,15 @@ export default function DashboardPage() {
       sales: salesObj,
       expense: expVal,
       profit: profitObj,
+      returns: returnsObj,
       label,
     };
   }, [period, customStartDate, customEndDate, businessData, locale]);
 
   const salesMetric = metricData.sales;
   const profitMetric = metricData.profit;
+  const returnsMetric = metricData.returns;
+  const netSalesRevenue = Math.max(0, salesMetric.revenue - returnsMetric.revenue);
 
   // Currency Formatter (BDT)
   const fmtCurrency = (num: number = 0) =>
@@ -557,9 +567,9 @@ export default function DashboardPage() {
           </div>
 
           {/* ================================================================ */}
-          {/* 1. TOP METRICS: 6 CARDS (3 COLS x 2 ROWS GRID)                   */}
+          {/* 1. TOP METRICS: 8 CARDS (4 COLS x 2 ROWS GRID)                   */}
           {/* ================================================================ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {/* Card 1: Total Sales */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
@@ -596,7 +606,51 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Card 3: Total Orders */}
+            {/* Card 3: Total Returns & Refunds */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200/70 dark:border-amber-900/50 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px] group">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Total Returns</span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                      {returnsMetric.count} {locale === 'bn' ? 'টি' : 'returns'}
+                    </Badge>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight mt-1">
+                    {fmtCurrency(returnsMetric.revenue)}
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                <span>Refunded in <span className="text-slate-600 dark:text-slate-300 font-semibold">{metricData.label}</span></span>
+                <Link href="/sales/returns" className="text-amber-600 dark:text-amber-400 hover:underline font-bold text-[10px]">
+                  Details →
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 4: Net Revenue (Sales minus Returns) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-200/70 dark:border-emerald-900/50 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Net Revenue</span>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight mt-1">
+                    {fmtCurrency(netSalesRevenue)}
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 font-medium">
+                Net sales after refund deductions
+              </p>
+            </div>
+
+            {/* Card 5: Total Orders */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
@@ -614,7 +668,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Card 4: Total Products */}
+            {/* Card 6: Total Products */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
@@ -632,7 +686,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Card 5: Customers & Receivables */}
+            {/* Card 7: Customers & Receivables */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
@@ -650,7 +704,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Card 6: Store Health / Low Stock Alert */}
+            {/* Card 8: Store Health / Low Stock Alert */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between min-h-[120px]">
               <div className="flex items-start justify-between">
                 <div>
@@ -1326,13 +1380,200 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* ================================================================ */}
+          {/* 5. RETURNS & REFUNDS DETAILED AUDIT & RECENT ACTIVITY            */}
+          {/* ================================================================ */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <RotateCcw className="w-4 h-4" />
+                  </div>
+                  <span>Returns &amp; Refunds Overview ({locale === 'bn' ? 'পণ্য ফেরত ও রিফান্ড সংক্রান্ত তথ্য' : 'Customer & Supplier Returns'})</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Audit trail of restocked goods, damaged write-offs, customer refunds, and supplier returns
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button asChild size="sm" variant="outline" className="text-xs h-8 px-3 rounded-xl border-slate-200 dark:border-slate-800 font-bold hover:border-[#3b7987] hover:text-[#3b7987]">
+                  <Link href="/sales/returns">
+                    <RotateCcw className="w-3.5 h-3.5 mr-1 text-amber-500" />
+                    <span>Customer Returns</span>
+                  </Link>
+                </Button>
+                <Button asChild size="sm" variant="outline" className="text-xs h-8 px-3 rounded-xl border-slate-200 dark:border-slate-800 font-bold hover:border-[#3b7987] hover:text-[#3b7987]">
+                  <Link href="/purchases/returns">
+                    <Undo2 className="w-3.5 h-3.5 mr-1 text-indigo-500" />
+                    <span>Supplier Returns</span>
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Return Health Mini Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Stat 1: Resellable Goods */}
+              <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 flex items-start justify-between">
+                <div>
+                  <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                    {locale === 'bn' ? 'পুনরায় বিক্রয়যোগ্য স্টক' : 'Resellable Goods'}
+                  </span>
+                  <div className="text-2xl font-black text-emerald-800 dark:text-emerald-300 mt-0.5">
+                    {(businessData?.returnsOverview?.resellableItemsCount || 0).toLocaleString()} <span className="text-xs font-semibold">pcs</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-600/90 dark:text-emerald-400/80 mt-1">
+                    Returned in good shape &amp; restocked to branch ledger
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Stat 2: Damaged / Defect Items */}
+              <div className="p-4 rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 flex items-start justify-between">
+                <div>
+                  <span className="text-[11px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
+                    {locale === 'bn' ? 'ক্ষতিগ্রস্ত / ডিফেক্ট পণ্য' : 'Damaged / Defect Items'}
+                  </span>
+                  <div className="text-2xl font-black text-rose-800 dark:text-rose-300 mt-0.5">
+                    {(businessData?.returnsOverview?.damagedItemsCount || 0).toLocaleString()} <span className="text-xs font-semibold">pcs</span>
+                  </div>
+                  <p className="text-[11px] text-rose-600/90 dark:text-rose-400/80 mt-1">
+                    Written-off &amp; isolated from active inventory
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Stat 3: Supplier Purchase Returns */}
+              <div className="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-900/40 flex items-start justify-between">
+                <div>
+                  <span className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
+                    {locale === 'bn' ? 'সাপ্লায়ার ক্রয় ফেরত' : 'Supplier Purchase Returns'}
+                  </span>
+                  <div className="text-2xl font-black text-indigo-800 dark:text-indigo-300 mt-0.5">
+                    {(businessData?.returnsOverview?.purchaseReturnsCount || 0).toLocaleString()} <span className="text-xs font-semibold">({fmtCurrency(businessData?.returnsOverview?.purchaseReturnsAmount || 0)})</span>
+                  </div>
+                  <p className="text-[11px] text-indigo-600/90 dark:text-indigo-400/80 mt-1">
+                    Goods returned back to vendor with debit notes
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0">
+                  <Undo2 className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Returns Table */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  {locale === 'bn' ? 'সর্বশেষ ৫টি পণ্য ফেরতের বিবরণ (Recent Sales Returns)' : 'Recent Sales Returns Activity'}
+                </span>
+                <Link href="/sales/returns" className="text-xs font-bold text-[#3b7987] hover:underline flex items-center gap-1">
+                  <span>View Full Return Audit Trail</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="py-2.5 px-3">Return No</th>
+                      <th className="py-2.5 px-3">Orig. Invoice</th>
+                      <th className="py-2.5 px-3">Customer</th>
+                      <th className="py-2.5 px-3">Items Returned</th>
+                      <th className="py-2.5 px-3">Method</th>
+                      <th className="py-2.5 px-3 text-right">Refund Amount</th>
+                      <th className="py-2.5 px-3 text-center">Date</th>
+                      <th className="py-2.5 px-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                    {(!businessData?.returnsOverview?.recentReturns || businessData.returnsOverview.recentReturns.length === 0) ? (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center text-slate-400">
+                          <RotateCcw className="w-6 h-6 mx-auto mb-1.5 opacity-40" />
+                          <p className="font-semibold">No returns recorded in this branch yet</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">Customer sales returns will automatically appear here with full audit history.</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      businessData.returnsOverview.recentReturns.map((ret: any) => (
+                        <tr key={ret.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="py-2.5 px-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                            {ret.returnNo}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-slate-600 dark:text-slate-400">
+                            {ret.invoiceNo}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <div className="font-semibold text-slate-800 dark:text-slate-200">{ret.customerName}</div>
+                            {ret.customerPhone && (
+                              <div className="text-[10px] text-slate-400 font-mono">{ret.customerPhone}</div>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="font-bold text-slate-700 dark:text-slate-300">{ret.itemCount} pcs</span>
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              {ret.items?.slice(0, 2).map((it: any, idx: number) => (
+                                <span
+                                  key={idx}
+                                  className={`text-[9px] px-1 py-0.2 rounded font-bold ${
+                                    it.condition === 'DAMAGED'
+                                      ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                                      : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                                  }`}
+                                >
+                                  {it.productName} ({it.quantity})
+                                </span>
+                              ))}
+                              {ret.items?.length > 2 && (
+                                <span className="text-[9px] text-slate-400">+{ret.items.length - 2} more</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <Badge variant="outline" className="text-[10px] font-semibold uppercase">
+                              {ret.refundMethod}
+                            </Badge>
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-extrabold text-rose-600 dark:text-rose-400">
+                            {fmtCurrency(ret.refundAmount)}
+                          </td>
+                          <td className="py-2.5 px-3 text-center text-slate-400 text-[11px] whitespace-nowrap">
+                            {new Date(ret.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-2.5 px-3 text-right">
+                            <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-[11px] font-bold text-[#3b7987] hover:text-[#326975]">
+                              <Link href={`/sales/returns/${ret.id}`}>
+                                View Slip
+                              </Link>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         /* ================================================================== */
         /* ==================== CASHIER SHIFT VIEW ========================== */
         /* ================================================================== */
         <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Active Session Status */}
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-3">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Register Shift Status</span>
@@ -1377,6 +1618,15 @@ export default function DashboardPage() {
               </div>
               <p className="text-xs text-slate-400 pt-1 font-medium">Net cash &amp; digital collections processed</p>
             </div>
+
+            {/* Today Returns Processed */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200/70 dark:border-amber-900/50 shadow-2xs space-y-1">
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">My Returns Today</span>
+              <div className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">
+                {(cashierData?.today?.returnsCount || 0).toLocaleString()} <span className="text-xs font-bold text-slate-400">({fmtCurrency(cashierData?.today?.refundAmount || 0)})</span>
+              </div>
+              <p className="text-xs text-slate-400 pt-1 font-medium">Customer refunds processed during shift</p>
+            </div>
           </div>
 
           {/* Quick Action Links for Cashier */}
@@ -1385,6 +1635,12 @@ export default function DashboardPage() {
               <Link href="/pos">
                 <ShoppingCart className="w-4 h-4 mr-1.5" />
                 <span>Go to POS Terminal</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-[#3b7987] hover:text-[#3b7987] cursor-pointer">
+              <Link href="/sales/returns">
+                <RotateCcw className="w-4 h-4 mr-1.5 text-amber-600" />
+                <span>Process Return / Exchange</span>
               </Link>
             </Button>
             <Button asChild variant="outline" size="sm" className="text-xs h-10 px-4 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-bold hover:border-[#3b7987] hover:text-[#3b7987] cursor-pointer">

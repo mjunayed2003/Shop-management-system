@@ -84,7 +84,23 @@ export class DashboardService {
       baseWhereExpense.branch_id = effectiveBranchId;
     }
 
-    // 1. Sales & Expenses aggregates (Today, Week, Month, 30 Days, Year, All-Time, Custom)
+    const baseWhereReturn: any = {
+      business_id: businessId,
+      status: { not: 'REJECTED' },
+    };
+    if (!isAllBranchAdmin && effectiveBranchId) {
+      baseWhereReturn.branch_id = effectiveBranchId;
+    }
+
+    const baseWherePurchaseReturn: any = {
+      business_id: businessId,
+      status: { not: 'REJECTED' },
+    };
+    if (!isAllBranchAdmin && effectiveBranchId) {
+      baseWherePurchaseReturn.branch_id = effectiveBranchId;
+    }
+
+    // 1. Sales, Expenses & Returns aggregates (Today, Week, Month, 30 Days, Year, All-Time, Custom)
     const [
       salesToday,
       salesWeek,
@@ -99,6 +115,13 @@ export class DashboardService {
       exp30Days,
       expYear,
       expCustom,
+      returnsToday,
+      returnsWeek,
+      returnsMonth,
+      returns30Days,
+      returnsYear,
+      returnsTotal,
+      returnsCustom,
     ] = await Promise.all([
       this.prisma.sale.aggregate({
         where: { ...baseWhereSale, sale_date: { gte: startOfToday } },
@@ -136,7 +159,7 @@ export class DashboardService {
             _sum: { total_amount: true, total_cost: true },
             _count: { id: true },
           })
-        : Promise.resolve({ _sum: { total_amount: 0, total_cost: 0 }, _count: { id: 0 } }),
+        : Promise.resolve({ _sum: { total_amount: 0, total_cost: 0 }, _count: { id: 0 } } as any),
 
       this.prisma.expense.aggregate({
         where: { ...baseWhereExpense, expense_date: { gte: startOfToday } },
@@ -163,7 +186,46 @@ export class DashboardService {
             where: { ...baseWhereExpense, expense_date: { gte: customStart, lte: customEnd } },
             _sum: { total_amount: true },
           })
-        : Promise.resolve({ _sum: { total_amount: 0 } }),
+        : Promise.resolve({ _sum: { total_amount: 0 } } as any),
+
+      // Sales Returns Aggregates
+      this.prisma.salesReturn.aggregate({
+        where: { ...baseWhereReturn, created_at: { gte: startOfToday } },
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: { ...baseWhereReturn, created_at: { gte: startOfWeek } },
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: { ...baseWhereReturn, created_at: { gte: startOfMonth } },
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: { ...baseWhereReturn, created_at: { gte: thirtyDaysAgo } },
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: { ...baseWhereReturn, created_at: { gte: startOfYear, lte: endOfYear } },
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: baseWhereReturn,
+        _sum: { total_refund_amount: true },
+        _count: { id: true },
+      }),
+      customStart && customEnd
+        ? this.prisma.salesReturn.aggregate({
+            where: { ...baseWhereReturn, created_at: { gte: customStart, lte: customEnd } },
+            _sum: { total_refund_amount: true },
+            _count: { id: true },
+          })
+        : Promise.resolve({ _sum: { total_refund_amount: 0 }, _count: { id: 0 } } as any),
     ]);
 
     // 2. Receivables & Payables & Customer Counts
@@ -422,7 +484,14 @@ export class DashboardService {
       ordersDateGte = startOfYear;
     }
 
-    const [completedCount, refundedCount, periodTotalOrders] = await Promise.all([
+    const [
+      completedCount,
+      refundedCount,
+      periodTotalOrders,
+      returnConditions,
+      purchaseReturnsAgg,
+      recentReturns,
+    ] = await Promise.all([
       this.prisma.sale.count({
         where: {
           ...baseWhereSale,
@@ -432,8 +501,7 @@ export class DashboardService {
       }),
       this.prisma.salesReturn.count({
         where: {
-          business_id: businessId,
-          ...(effectiveBranchId ? { branch_id: effectiveBranchId } : {}),
+          ...baseWhereReturn,
           ...(ordersDateGte ? { created_at: { gte: ordersDateGte } } : {}),
         },
       }),
@@ -443,7 +511,58 @@ export class DashboardService {
           ...(ordersDateGte ? { sale_date: { gte: ordersDateGte } } : {}),
         },
       }),
+      this.prisma.salesReturnItem.groupBy({
+        by: ['condition'],
+        where: {
+          sales_return: {
+            ...baseWhereReturn,
+            ...(ordersDateGte ? { created_at: { gte: ordersDateGte } } : {}),
+          },
+        },
+        _sum: { quantity: true, total_refund: true },
+        _count: { id: true },
+      }),
+      this.prisma.purchaseReturn.aggregate({
+        where: {
+          ...baseWherePurchaseReturn,
+          ...(ordersDateGte ? { return_date: { gte: ordersDateGte } } : {}),
+        },
+        _sum: { total_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.findMany({
+        where: baseWhereReturn,
+        include: {
+          sale: { select: { invoice_no: true } },
+          customer: { select: { name: true, phone: true } },
+          items: {
+            select: {
+              quantity: true,
+              condition: true,
+              refund_price: true,
+              variant: {
+                select: {
+                  sku: true,
+                  product: { select: { name: true } },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { created_at: 'desc' },
+        take: 6,
+      }),
     ]);
+
+    let resellableQty = 0;
+    let damagedQty = 0;
+    for (const cond of returnConditions) {
+      if (cond.condition === 'RESELLABLE') {
+        resellableQty += Number(cond._sum.quantity || 0);
+      } else if (cond.condition === 'DAMAGED') {
+        damagedQty += Number(cond._sum.quantity || 0);
+      }
+    }
 
     // 10. Per branch comparison (for all-branch admin)
     let branchComparison: any[] = [];
@@ -509,6 +628,41 @@ export class DashboardService {
         last30Days: exp30DaysTotal,
         thisYear: yearExp,
         custom: customExp,
+      },
+      returns: {
+        today: { revenue: Number(returnsToday._sum.total_refund_amount || 0), count: returnsToday._count.id },
+        thisWeek: { revenue: Number(returnsWeek._sum.total_refund_amount || 0), count: returnsWeek._count.id },
+        thisMonth: { revenue: Number(returnsMonth._sum.total_refund_amount || 0), count: returnsMonth._count.id },
+        last30Days: { revenue: Number(returns30Days._sum.total_refund_amount || 0), count: returns30Days._count.id },
+        thisYear: { revenue: Number(returnsYear._sum.total_refund_amount || 0), count: returnsYear._count.id },
+        allTime: { revenue: Number(returnsTotal._sum.total_refund_amount || 0), count: returnsTotal._count.id },
+        custom: { revenue: Number(returnsCustom._sum.total_refund_amount || 0), count: returnsCustom._count.id },
+      },
+      returnsOverview: {
+        totalReturnsCount: refundedCount,
+        resellableItemsCount: resellableQty,
+        damagedItemsCount: damagedQty,
+        purchaseReturnsCount: purchaseReturnsAgg._count.id,
+        purchaseReturnsAmount: Number(purchaseReturnsAgg._sum.total_amount || 0),
+        recentReturns: recentReturns.map((r) => ({
+          id: r.id,
+          returnNo: r.return_no,
+          invoiceNo: r.sale?.invoice_no || 'N/A',
+          customerName: r.customer?.name || 'Walk-in Customer',
+          customerPhone: r.customer?.phone || null,
+          refundAmount: Number(r.total_refund_amount),
+          refundMethod: r.refund_method,
+          status: r.status,
+          reason: r.reason || 'General Return',
+          itemCount: r.items.reduce((acc, curr) => acc + Number(curr.quantity), 0),
+          items: r.items.map((i) => ({
+            productName: i.variant?.product?.name || 'Product',
+            sku: i.variant?.sku,
+            quantity: Number(i.quantity),
+            condition: i.condition,
+          })),
+          createdAt: r.created_at,
+        })),
       },
       receivables: Number(receivables._sum.current_due || 0),
       payables: Number(payables._sum.current_balance || 0),
@@ -590,7 +744,17 @@ export class DashboardService {
       salesWhere.branch_id = effectiveBranchId;
     }
 
-    const [activeSession, todaySales] = await Promise.all([
+    const cashierReturnsWhere: any = {
+      business_id: businessId,
+      created_by: userId,
+      created_at: { gte: startOfToday },
+      status: { not: 'REJECTED' },
+    };
+    if (effectiveBranchId) {
+      cashierReturnsWhere.branch_id = effectiveBranchId;
+    }
+
+    const [activeSession, todaySales, todayReturns] = await Promise.all([
       this.prisma.registerSession.findFirst({
         where: sessionWhere,
         include: { cash_register: true },
@@ -598,6 +762,11 @@ export class DashboardService {
       this.prisma.sale.aggregate({
         where: salesWhere,
         _sum: { total_amount: true },
+        _count: { id: true },
+      }),
+      this.prisma.salesReturn.aggregate({
+        where: cashierReturnsWhere,
+        _sum: { total_refund_amount: true },
         _count: { id: true },
       }),
     ]);
@@ -614,6 +783,8 @@ export class DashboardService {
       today: {
         salesCount: todaySales._count.id,
         salesAmount: todaySales._sum.total_amount ? Number(todaySales._sum.total_amount) : 0,
+        returnsCount: todayReturns._count.id,
+        refundAmount: todayReturns._sum.total_refund_amount ? Number(todayReturns._sum.total_refund_amount) : 0,
       },
     };
   }

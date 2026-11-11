@@ -402,27 +402,70 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
         // Update/create variants
         for (const v of variants) {
           if (v.id) {
-            await api.catalog.variants.update(v.id, {
-              sku: v.sku.trim() || undefined,
-              barcode: v.barcode.trim() || undefined,
-              retailPrice: Number(v.retailPrice) || 0,
-              wholesalePrice: Number(v.wholesalePrice) || 0,
-              costPrice: Number(v.costPrice) || 0,
-              stock: Number(v.initialStock) || 0,
-              reorderLevel: Number(v.reorderLevel) || 5,
-            });
+            try {
+              await api.catalog.variants.update(v.id, {
+                sizeId: v.sizeId || undefined,
+                colorId: v.colorId || undefined,
+                sku: v.sku.trim() || undefined,
+                barcode: v.barcode.trim() || undefined,
+                retailPrice: Number(v.retailPrice) || 0,
+                wholesalePrice: Number(v.wholesalePrice) || 0,
+                costPrice: Number(v.costPrice) || 0,
+                stock: Number(v.initialStock) || 0,
+                reorderLevel: Number(v.reorderLevel) || 5,
+              });
+            } catch (variantErr: any) {
+              // Graceful fallback if backend server hasn't been restarted with new stock DTO yet
+              const errorMsgs = Array.isArray(variantErr?.response?.data?.message)
+                ? variantErr.response.data.message
+                : [variantErr?.response?.data?.message || ''];
+              if (errorMsgs.some((m: string) => typeof m === 'string' && m.includes('stock'))) {
+                await api.catalog.variants.update(v.id, {
+                  sizeId: v.sizeId || undefined,
+                  colorId: v.colorId || undefined,
+                  sku: v.sku.trim() || undefined,
+                  barcode: v.barcode.trim() || undefined,
+                  retailPrice: Number(v.retailPrice) || 0,
+                  wholesalePrice: Number(v.wholesalePrice) || 0,
+                  costPrice: Number(v.costPrice) || 0,
+                  reorderLevel: Number(v.reorderLevel) || 5,
+                });
+              } else {
+                throw variantErr;
+              }
+            }
           } else {
-            await api.catalog.variants.create(initialData.id, {
-              sizeId: v.sizeId || undefined,
-              colorId: v.colorId || undefined,
-              sku: v.sku.trim() || undefined,
-              barcode: v.barcode.trim() || undefined,
-              retailPrice: Number(v.retailPrice) || 0,
-              wholesalePrice: Number(v.wholesalePrice) || 0,
-              costPrice: Number(v.costPrice) || 0,
-              stock: Number(v.initialStock) || 0,
-              reorderLevel: Number(v.reorderLevel) || 5,
-            });
+            try {
+              await api.catalog.variants.create(initialData.id, {
+                sizeId: v.sizeId || undefined,
+                colorId: v.colorId || undefined,
+                sku: v.sku.trim() || undefined,
+                barcode: v.barcode.trim() || undefined,
+                retailPrice: Number(v.retailPrice) || 0,
+                wholesalePrice: Number(v.wholesalePrice) || 0,
+                costPrice: Number(v.costPrice) || 0,
+                stock: Number(v.initialStock) || 0,
+                reorderLevel: Number(v.reorderLevel) || 5,
+              });
+            } catch (createErr: any) {
+              const errorMsgs = Array.isArray(createErr?.response?.data?.message)
+                ? createErr.response.data.message
+                : [createErr?.response?.data?.message || ''];
+              if (errorMsgs.some((m: string) => typeof m === 'string' && m.includes('stock'))) {
+                await api.catalog.variants.create(initialData.id, {
+                  sizeId: v.sizeId || undefined,
+                  colorId: v.colorId || undefined,
+                  sku: v.sku.trim() || undefined,
+                  barcode: v.barcode.trim() || undefined,
+                  retailPrice: Number(v.retailPrice) || 0,
+                  wholesalePrice: Number(v.wholesalePrice) || 0,
+                  costPrice: Number(v.costPrice) || 0,
+                  reorderLevel: Number(v.reorderLevel) || 5,
+                });
+              } else {
+                throw createErr;
+              }
+            }
           }
         }
 
