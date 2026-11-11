@@ -17,7 +17,7 @@ export default function PublicPricingPage() {
       {/* Hero Strip */}
       <div className="max-w-4xl mx-auto text-center space-y-4">
         <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold px-3 py-1 text-xs rounded-full">
-          {locale === 'bn' ? '🇧🇩 স্বচ্ছ ও সাশ্রয়ী প্যাকেজ' : 'Transparent & Affordable Plans'}
+          {locale === 'bn' ? 'স্বচ্ছ ও সাশ্রয়ী প্যাকেজ' : 'Transparent & Affordable Plans'}
         </Badge>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
           {locale === 'bn' ? 'আপনার ব্যবসার জন্য সঠিক পিওএস প্ল্যান বেছে নিন' : 'Choose the Right POS Plan for Your Business'}

@@ -517,7 +517,7 @@ export function generateReturnSlipHtml(
   </style>
 </head>
 <body>
-  ${isReprint ? `<div class="copy-banner">*** COPY / DUPLICATE RETURN SLIP ***</div>` : ''}
+  ${isReprint ? `<div class="copy-banner">*** COPY / DUPLICATE RETURN SLIP (অনুলিপি) ***</div>` : ''}
 
   <div class="center">
     <div class="bold" style="font-size: 14px;">${data.businessName || 'SHOP POS BD'}</div>

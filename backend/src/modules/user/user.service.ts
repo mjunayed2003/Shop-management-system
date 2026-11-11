@@ -202,22 +202,22 @@ export class UserService {
       );
     }
 
-    // 2. Uniqueness check for email and phone within business
+    // 2. Uniqueness check for email and phone across the entire system
     const cleanEmail = dto.email.trim().toLowerCase();
     const cleanPhone = dto.phone.trim();
 
     const existingEmail = await this.prisma.user.findFirst({
-      where: { business_id: businessId, email: cleanEmail, deleted_at: null },
+      where: { email: { equals: cleanEmail, mode: 'insensitive' }, deleted_at: null },
     });
     if (existingEmail) {
-      throw new ConflictException(`A user with email "${cleanEmail}" already exists in your business.`);
+      throw new ConflictException(`A user with email "${cleanEmail}" already exists.`);
     }
 
     const existingPhone = await this.prisma.user.findFirst({
-      where: { business_id: businessId, phone: cleanPhone, deleted_at: null },
+      where: { phone: cleanPhone, deleted_at: null },
     });
     if (existingPhone) {
-      throw new ConflictException(`A user with phone "${cleanPhone}" already exists in your business.`);
+      throw new ConflictException(`A user with phone "${cleanPhone}" already exists.`);
     }
 
     // 3. Verify Role
@@ -323,7 +323,7 @@ export class UserService {
     if (dto.email && dto.email.trim().toLowerCase() !== user.email.toLowerCase()) {
       const cleanEmail = dto.email.trim().toLowerCase();
       const existing = await this.prisma.user.findFirst({
-        where: { business_id: businessId, email: cleanEmail, id: { not: targetUserId }, deleted_at: null },
+        where: { email: { equals: cleanEmail, mode: 'insensitive' }, id: { not: targetUserId }, deleted_at: null },
       });
       if (existing) {
         throw new ConflictException(`Email "${cleanEmail}" is already used by another user.`);
@@ -333,7 +333,7 @@ export class UserService {
     if (dto.phone && dto.phone.trim() !== user.phone) {
       const cleanPhone = dto.phone.trim();
       const existing = await this.prisma.user.findFirst({
-        where: { business_id: businessId, phone: cleanPhone, id: { not: targetUserId }, deleted_at: null },
+        where: { phone: cleanPhone, id: { not: targetUserId }, deleted_at: null },
       });
       if (existing) {
         throw new ConflictException(`Phone "${cleanPhone}" is already used by another user.`);

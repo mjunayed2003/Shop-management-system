@@ -440,10 +440,6 @@ export default function ProfilePage() {
         variant="danger"
         isLoading={logoutAllMutation.isPending}
       />
-        confirmText={t('profile.logoutAllDevices')}
-        variant="danger"
-        isLoading={logoutAllMutation.isPending}
-      />
     </div>
   );
 }

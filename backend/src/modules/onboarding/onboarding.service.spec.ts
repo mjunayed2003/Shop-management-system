@@ -20,6 +20,9 @@ describe('OnboardingService', () => {
       permission: {
         findMany: vi.fn(),
       },
+      user: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
       userSession: {
         create: vi.fn(),
       },
@@ -43,6 +46,25 @@ describe('OnboardingService', () => {
       service.onboard({
         businessName: 'Aarong Boutique',
         businessSlug: 'aarong-boutique',
+        phone: '01711000111',
+        email: 'info@aarong.com',
+        ownerFirstName: 'Kamal',
+        ownerLastName: 'Hossain',
+        password: 'Password123!',
+        branchName: 'Main Showroom',
+        branchAddress: 'Gulshan, Dhaka',
+      }),
+    ).rejects.toThrow(ConflictException);
+  });
+
+  it('should reject onboarding if owner email or phone is already registered globally', async () => {
+    mockPrisma.business.findUnique.mockResolvedValue(null);
+    mockPrisma.user.findFirst.mockResolvedValue({ id: 'existing-user-id', email: 'info@aarong.com', phone: '01711000111' });
+
+    await expect(
+      service.onboard({
+        businessName: 'Aarong Boutique 2',
+        businessSlug: 'aarong-boutique-2',
         phone: '01711000111',
         email: 'info@aarong.com',
         ownerFirstName: 'Kamal',

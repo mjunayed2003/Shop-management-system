@@ -32,6 +32,23 @@ export class OnboardingService {
     const ownerEmail = (dto.ownerEmail || dto.email).trim().toLowerCase();
     const ownerPhone = (dto.ownerPhone || dto.phone).trim();
 
+    // 1b. Verify owner email and phone global uniqueness
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: { equals: ownerEmail, mode: 'insensitive' } },
+          { phone: ownerPhone },
+        ],
+        deleted_at: null,
+      },
+    });
+    if (existingUser) {
+      if (existingUser.email.toLowerCase() === ownerEmail) {
+        throw new ConflictException(`An account with email "${ownerEmail}" already exists. Please login.`);
+      }
+      throw new ConflictException(`An account with phone number "${ownerPhone}" already exists. Please login.`);
+    }
+
     // 2. Fetch Selected Plan
     const planCode = (dto.planCode || 'STARTER').toUpperCase();
     const plan = await this.prisma.plan.findUnique({

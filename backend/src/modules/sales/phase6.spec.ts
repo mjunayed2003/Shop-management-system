@@ -81,6 +81,9 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
       product: {
         count: vi.fn().mockResolvedValue(10),
       },
+      category: {
+        findMany: vi.fn().mockResolvedValue([]),
+      },
       productVariant: {
         count: vi.fn().mockResolvedValue(20),
         findMany: vi.fn().mockResolvedValue([]),
@@ -94,12 +97,21 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
         groupBy: vi.fn().mockResolvedValue([]),
         findMany: vi.fn().mockResolvedValue([]),
       },
+      salePayment: {
+        groupBy: vi.fn().mockResolvedValue([]),
+        findMany: vi.fn().mockResolvedValue([]),
+      },
+      salesReturn: {
+        count: vi.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([]),
+      },
       expense: {
         aggregate: vi.fn(),
         findMany: vi.fn().mockResolvedValue([]),
       },
       customer: {
         aggregate: vi.fn(),
+        count: vi.fn().mockResolvedValue(10),
         findFirst: vi.fn(),
         findMany: vi.fn().mockResolvedValue([]),
         create: vi.fn(),
@@ -1065,6 +1077,10 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
         .mockResolvedValueOnce({
           _sum: { total_amount: new Prisma.Decimal(100000), total_cost: new Prisma.Decimal(60000) },
           _count: { id: 200 },
+        })
+        .mockResolvedValueOnce({
+          _sum: { total_amount: new Prisma.Decimal(200000), total_cost: new Prisma.Decimal(120000) },
+          _count: { id: 400 },
         });
 
       mockPrisma.expense.aggregate.mockResolvedValue({
@@ -1102,6 +1118,10 @@ describe('Phase 6: Offline Sync, SMS, Notifications, Subscription & Billing, Sup
         .mockResolvedValueOnce({
           _sum: { total_amount: new Prisma.Decimal(100000), total_cost: new Prisma.Decimal(60000) },
           _count: { id: 200 },
+        })
+        .mockResolvedValueOnce({
+          _sum: { total_amount: new Prisma.Decimal(200000), total_cost: new Prisma.Decimal(120000) },
+          _count: { id: 400 },
         });
 
       mockPrisma.saleItem.groupBy.mockResolvedValue([
