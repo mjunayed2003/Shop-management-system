@@ -103,6 +103,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
         retailPrice: v.retailPrice ?? v.retail_price ?? 0,
         wholesalePrice: v.wholesalePrice ?? v.wholesale_price ?? 0,
         costPrice: v.costPrice ?? v.cost_price ?? 0,
+        initialStock: v.currentBranchStock ?? v.stock ?? 0,
         reorderLevel: v.reorderLevel ?? v.reorder_level ?? 5,
         isActive: v.isActive ?? true,
       }));
@@ -407,6 +408,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
               retailPrice: Number(v.retailPrice) || 0,
               wholesalePrice: Number(v.wholesalePrice) || 0,
               costPrice: Number(v.costPrice) || 0,
+              stock: Number(v.initialStock) || 0,
               reorderLevel: Number(v.reorderLevel) || 5,
             });
           } else {
@@ -418,6 +420,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
               retailPrice: Number(v.retailPrice) || 0,
               wholesalePrice: Number(v.wholesalePrice) || 0,
               costPrice: Number(v.costPrice) || 0,
+              stock: Number(v.initialStock) || 0,
               reorderLevel: Number(v.reorderLevel) || 5,
             });
           }
@@ -867,7 +870,9 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                 <th className="p-2.5 w-28">Retail ({currSym})*</th>
                 <th className="p-2.5 w-28">Wholesale ({currSym})</th>
                 <th className="p-2.5 w-28">Cost ({currSym})</th>
-                {mode === 'create' && <th className="p-2.5 w-28 text-emerald-600 dark:text-emerald-400">Opening Stock</th>}
+                <th className="p-2.5 w-28 text-emerald-600 dark:text-emerald-400">
+                  {mode === 'create' ? 'Opening Stock' : 'Stock (স্টক)'}
+                </th>
                 <th className="p-2.5 w-20">Reorder</th>
                 {hasVariants && <th className="p-2.5 w-20 text-right">Actions</th>}
               </tr>
@@ -984,20 +989,18 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                       />
                     </td>
 
-                    {/* Opening Stock (Create mode only) */}
-                    {mode === 'create' && (
-                      <td className="p-2">
-                        <Input
-                          type="number"
-                          value={row.initialStock ?? ''}
-                          onChange={(e) => updateVariantRow(idx, 'initialStock', e.target.value)}
-                          placeholder="0"
-                          min={0}
-                          className="h-8 text-center font-bold text-emerald-600 dark:text-emerald-400"
-                          title="নতুন পণ্যের প্রাথমিক ইনভেন্টরি স্টক সংখ্যা"
-                        />
-                      </td>
-                    )}
+                    {/* Stock Column (Visible in both create & edit modes) */}
+                    <td className="p-2">
+                      <Input
+                        type="number"
+                        value={row.initialStock ?? ''}
+                        onChange={(e) => updateVariantRow(idx, 'initialStock', e.target.value)}
+                        placeholder="0"
+                        min={0}
+                        className="h-8 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800"
+                        title={mode === 'create' ? 'নতুন পণ্যের প্রাথমিক ইনভেন্টরি স্টক সংখ্যা' : 'বর্তমান ইনভেন্টরি স্টক সংখ্যা'}
+                      />
+                    </td>
 
                     {/* Reorder Level */}
                     <td className="p-2">

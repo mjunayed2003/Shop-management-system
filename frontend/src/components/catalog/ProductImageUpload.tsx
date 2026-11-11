@@ -8,13 +8,10 @@ import {
   CheckCircle2,
   Trash2,
   RefreshCw,
-  Sparkles,
   AlertCircle,
-  HardDrive,
-  Cloud,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { compressAndResizeImage, formatFileSize, CompressionResult } from '@/lib/utils/image-compression';
+import { compressAndResizeImage } from '@/lib/utils/image-compression';
 import { api } from '@/lib/api/endpoints';
 
 interface ProductImageUploadProps {
@@ -33,9 +30,7 @@ export function ProductImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [compressionStats, setCompressionStats] = useState<CompressionResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [providerName, setProviderName] = useState<string>('local');
 
   const handleFile = async (file: File) => {
     if (!file) return;
@@ -56,8 +51,6 @@ export function ProductImageUpload({
         quality: 0.82,
       });
 
-      setCompressionStats(compressed);
-
       // 2. Prepare FormData with compressed file
       const formData = new FormData();
       formData.append('image', compressed.file);
@@ -67,9 +60,6 @@ export function ProductImageUpload({
 
       if (response && response.data) {
         onChange(response.data.url);
-        if (response.data.provider) {
-          setProviderName(response.data.provider);
-        }
       }
     } catch (err: any) {
       console.error('Image upload failed:', err);
@@ -99,7 +89,6 @@ export function ProductImageUpload({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange('');
-    setCompressionStats(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -155,43 +144,8 @@ export function ProductImageUpload({
               />
             </div>
 
-            {/* Image Meta & Controls */}
-            <div className="flex-1 w-full space-y-2 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                  <Sparkles className="w-3 h-3 text-blue-500" />
-                  রেজোলিউশন অপ্টিমাইজড (WebP)
-                </span>
-
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  {providerName === 'local' ? (
-                    <>
-                      <HardDrive className="w-3 h-3 text-slate-500" />
-                      লোকাল স্টোরেজ
-                    </>
-                  ) : (
-                    <>
-                      <Cloud className="w-3 h-3 text-indigo-500" />
-                      ক্লাউড স্টোরেজ ({providerName})
-                    </>
-                  )}
-                </span>
-              </div>
-
-              {compressionStats && (
-                <div className="text-xs text-slate-600 dark:text-slate-400 bg-white/70 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-200/70 dark:border-slate-800">
-                  <div className="flex items-center justify-between text-[11px] font-medium">
-                    <span>আসল সাইজ: {formatFileSize(compressionStats.originalSize)}</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                      কম্প্রেসড: {formatFileSize(compressionStats.compressedSize)} (-{compressionStats.compressionRatio}%)
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5">
-                    রেজোলিউশন: {compressionStats.width} × {compressionStats.height} px (স্বয়ংক্রিয়ভাবে অপ্টিমাইজড)
-                  </div>
-                </div>
-              )}
-
+            {/* Image Controls */}
+            <div className="flex-1 w-full space-y-3 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
                 <Button
                   type="button"

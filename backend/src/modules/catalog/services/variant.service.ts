@@ -138,12 +138,14 @@ export class VariantService {
             business_id: businessId,
             branch_id: branch.branch_id,
             product_variant_id: variant.id,
-            quantity: 0,
+            quantity: Number(dto.stock) || 0,
             allocated_quantity: 0,
             avg_cost_price: dto.costPrice ?? 0,
-            total_cost_value: 0,
+            total_cost_value: (Number(dto.stock) || 0) * (dto.costPrice ?? 0),
           },
-          update: {},
+          update: {
+            ...(dto.stock !== undefined ? { quantity: Number(dto.stock) || 0 } : {}),
+          },
         });
       }
 
@@ -222,6 +224,18 @@ export class VariantService {
         color: true,
       },
     });
+
+    if (dto.stock !== undefined) {
+      const stockQty = Math.max(0, Number(dto.stock) || 0);
+      const cost = Number(dto.costPrice ?? updated.cost_price) || 0;
+      await this.prisma.stockBalance.updateMany({
+        where: { business_id: businessId, product_variant_id: variantId },
+        data: {
+          quantity: stockQty,
+          total_cost_value: stockQty * cost,
+        },
+      });
+    }
 
     return {
       message: 'Variant updated successfully',

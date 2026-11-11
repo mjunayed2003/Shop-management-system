@@ -48,6 +48,12 @@ export class CreateVariantDto {
   @IsOptional()
   costPrice?: number;
 
+  @ApiPropertyOptional({ example: 10, default: 0, description: 'Initial stock quantity' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  stock?: number;
+
   @ApiPropertyOptional({ example: 5, default: 5, description: 'Reorder stock alert level' })
   @IsNumber()
   @Min(0)
@@ -93,6 +99,12 @@ export class UpdateVariantDto {
   @Min(0)
   @IsOptional()
   costPrice?: number;
+
+  @ApiPropertyOptional({ example: 50, description: 'Direct stock quantity update' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  stock?: number;
 
   @ApiPropertyOptional({ example: 10 })
   @IsNumber()
