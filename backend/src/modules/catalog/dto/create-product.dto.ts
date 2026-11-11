@@ -52,6 +52,13 @@ export class CreateProductVariantInputDto {
   @IsOptional()
   costPrice?: number;
 
+  @ApiPropertyOptional({ example: 10, default: 0, description: 'Initial / Opening stock quantity in branch' })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  initialStock?: number;
+
   @ApiPropertyOptional({ example: 5, default: 5, description: 'Minimum stock alert level' })
   @IsNumber()
   @Min(0)

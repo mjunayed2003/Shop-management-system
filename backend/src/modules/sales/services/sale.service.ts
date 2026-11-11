@@ -545,7 +545,7 @@ export class SaleService {
           referenceId: sale.id,
           createdBy: userId,
           remarks: `POS Sale ${invoiceNo}`,
-          allowNegativeStock: options?.allowNegativeStock || false,
+          allowNegativeStock: options?.allowNegativeStock ?? true,
         });
 
         if (movementResult.balance && new Prisma.Decimal(movementResult.balance.quantity).lessThan(0)) {

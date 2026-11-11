@@ -195,18 +195,45 @@ export class ProductService {
           },
         });
 
-        // Initialize StockBalance for each branch
+        const initialStockQty = Math.max(0, Number(vInput.initialStock) || 0);
+
+        // Initialize StockBalance for each branch (assign initialStock to currentBranchId)
         await tx.stockBalance.createMany({
-          data: branchIdsList.map((branchId) => ({
-            business_id: businessId,
-            branch_id: branchId,
-            product_variant_id: variant.id,
-            quantity: 0,
-            allocated_quantity: 0,
-            avg_cost_price: vInput.costPrice ?? 0,
-            total_cost_value: 0,
-          })),
+          data: branchIdsList.map((branchId) => {
+            const isCurrent = branchId === currentBranchId;
+            const qty = isCurrent ? initialStockQty : 0;
+            const cost = Number(vInput.costPrice) || 0;
+            return {
+              business_id: businessId,
+              branch_id: branchId,
+              product_variant_id: variant.id,
+              quantity: qty,
+              allocated_quantity: 0,
+              avg_cost_price: cost,
+              total_cost_value: qty * cost,
+            };
+          }),
         });
+
+        // Record OPENING stock movement for ledger audit if initial stock > 0
+        if (initialStockQty > 0) {
+          const cost = Number(vInput.costPrice) || 0;
+          await tx.stockMovement.create({
+            data: {
+              business_id: businessId,
+              branch_id: currentBranchId,
+              product_variant_id: variant.id,
+              movement_type: 'OPENING',
+              quantity: initialStockQty,
+              unit_cost: cost,
+              new_wac: cost,
+              reference_type: 'OPENING_BALANCE',
+              reference_id: variant.id,
+              remarks: 'Initial stock entered during product creation',
+              created_by: userId,
+            },
+          });
+        }
 
         createdVariants.push(variant);
       }

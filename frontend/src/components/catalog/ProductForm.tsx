@@ -46,6 +46,7 @@ export interface VariantRow {
   retailPrice: number | string;
   wholesalePrice: number | string;
   costPrice: number | string;
+  initialStock?: number | string;
   reorderLevel: number | string;
   isActive?: boolean;
 }
@@ -113,6 +114,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
         retailPrice: '',
         wholesalePrice: '',
         costPrice: '',
+        initialStock: 10,
         reorderLevel: 5,
       },
     ];
@@ -221,6 +223,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
         retailPrice: prev[0]?.retailPrice || '',
         wholesalePrice: prev[0]?.wholesalePrice || '',
         costPrice: prev[0]?.costPrice || '',
+        initialStock: prev[0]?.initialStock || 10,
         reorderLevel: 5,
       },
     ]);
@@ -347,6 +350,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
         retailPrice: Number(v.retailPrice) || 0,
         wholesalePrice: Number(v.wholesalePrice) || 0,
         costPrice: Number(v.costPrice) || 0,
+        initialStock: Number(v.initialStock) || 0,
         reorderLevel: Number(v.reorderLevel) || 5,
       }));
 
@@ -863,6 +867,7 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                 <th className="p-2.5 w-28">Retail ({currSym})*</th>
                 <th className="p-2.5 w-28">Wholesale ({currSym})</th>
                 <th className="p-2.5 w-28">Cost ({currSym})</th>
+                {mode === 'create' && <th className="p-2.5 w-28 text-emerald-600 dark:text-emerald-400">Opening Stock</th>}
                 <th className="p-2.5 w-20">Reorder</th>
                 {hasVariants && <th className="p-2.5 w-20 text-right">Actions</th>}
               </tr>
@@ -978,6 +983,21 @@ export function ProductForm({ mode, initialData }: ProductFormProps) {
                         className="h-8 text-slate-600 dark:text-slate-400"
                       />
                     </td>
+
+                    {/* Opening Stock (Create mode only) */}
+                    {mode === 'create' && (
+                      <td className="p-2">
+                        <Input
+                          type="number"
+                          value={row.initialStock ?? ''}
+                          onChange={(e) => updateVariantRow(idx, 'initialStock', e.target.value)}
+                          placeholder="0"
+                          min={0}
+                          className="h-8 text-center font-bold text-emerald-600 dark:text-emerald-400"
+                          title="নতুন পণ্যের প্রাথমিক ইনভেন্টরি স্টক সংখ্যা"
+                        />
+                      </td>
+                    )}
 
                     {/* Reorder Level */}
                     <td className="p-2">
